@@ -1,0 +1,30 @@
+# تكوين مراكز التطعيم
+- id: "HOSPITAL_01"
+  name: "مستشفى المركز الرئيسي"
+  device_ids: ["130600112764", "130600112765", "130600112766"]
+  temperature_ranges:
+    min: 2
+    max: 8
+  decision_thresholds:
+    freeze_tolerance: 0
+    ccm_limit: 600
+  
+- id: "CLINIC_02"
+  name: "عيادة الحي الشمالي"
+  device_ids: ["130600112767", "130600112768"]
+  temperature_ranges:
+    min: 2
+    max: 8
+  decision_thresholds:
+    freeze_tolerance: 0
+    ccm_limit: 300
+  
+- id: "MOBILE_03"
+  name: "وحدة التطعيم المتنقلة"
+  device_ids: ["130600112769"]
+  temperature_ranges:
+    min: 2
+    max: 8
+  decision_thresholds:
+    freeze_tolerance: 0
+    ccm_limit: 180
