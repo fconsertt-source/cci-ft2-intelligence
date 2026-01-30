@@ -1,0 +1,30 @@
+# config/center_profiles_enhanced.yaml
+- id: "HOSPITAL_01"
+  name: "مستشفى المركز الرئيسي"
+  device_ids: ["130600112764", "130600112765"]
+  
+  # نطاقات حرارة مختلفة للقاحات المختلفة
+  temperature_profiles:
+    polio:
+      min: -20  # يحتمل التجميد
+      max: 8
+    measles:
+      min: 2    # لا يحتمل التجميد
+      max: 25   # يتحمل حرارة أعلى
+  
+  # سياسات مرنة
+  policies:
+    freeze_tolerance: "SINGLE_SHOCK"  # ZERO_TOLERANCE, SINGLE_SHOCK, MULTIPLE_SHOCKS
+    max_freeze_duration: 30  # دقائق
+    max_freeze_events: 1
+    
+    # CCM تراكمي مع عوامل تصحيح
+    ccm_correction_factors:
+      summer: 1.2    # زيادة 20% صيفاً
+      mobile_unit: 1.5  # زيادة 50% للوحدات المتنقلة
+  
+  # إعدادات التقارير
+  reporting:
+    generate_pdf: true
+    include_charts: true
+    language: "ar"  # ar, en, fr
