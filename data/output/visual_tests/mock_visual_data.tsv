@@ -1,0 +1,6 @@
+center_id	center_name	decision	alert_level	vvm_stage	stability_budget_consumed_pct	thaw_remaining_hours	category_display	avg_temperature	min_temperature	max_temperature	num_ft2_entries	decision_reasons
+C001	Health Center A (Safe)	ACCEPTED	GREEN	NONE	5.2	N/A	Fridge Vaccine	4.5	2.1	6.8	100	Safe
+C002	Warehouse Stage 3	ACCEPTED	YELLOW	STAGE_B	100.0	N/A	Heat Sensitive	7.2	4.0	9.5	150	Warning: HER=82%
+C003	Mobile Unit Stage 4	REJECTED	RED	STAGE_D	150.0	N/A	Highly Sensitive	12.5	5.5	15.0	200	Critical: HER=150%
+C004	Ultra Cold Hub	ACCEPTED	YELLOW	NONE	65.0	72.5	mRNA Vaccine	3.8	2.0	5.2	80	Warning: Stage 2
+C005	Critical Alert	REJECTED	RED	STAGE_D	200.0	N/A	Heat Sensitive	15.0	10.0	20.0	50	Absolute Discard

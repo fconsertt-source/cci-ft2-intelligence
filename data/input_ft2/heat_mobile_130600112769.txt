@@ -1,0 +1,970 @@
+Device: Q-tag Fridge-tag 2 E
+Vers: 0.5
+Serial: 130600112769
+Temp unit: C
+Alarm:
+  0:
+   T AL: -0.5, t AL: 60
+  1:
+   T AL: +8.0, t AL: 600
+Hist:
+ 1:
+  Date: 2026-01-13
+  Min T: 13.1
+  Max T: 13.1
+  Avrg T: 13.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 2:
+  Date: 2026-01-13
+  Min T: 12.8
+  Max T: 12.8
+  Avrg T: 12.8
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 3:
+  Date: 2026-01-13
+  Min T: 11.0
+  Max T: 11.0
+  Avrg T: 11.0
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 4:
+  Date: 2026-01-13
+  Min T: 10.2
+  Max T: 10.2
+  Avrg T: 10.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 5:
+  Date: 2026-01-13
+  Min T: 12.7
+  Max T: 12.7
+  Avrg T: 12.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 6:
+  Date: 2026-01-13
+  Min T: 10.5
+  Max T: 10.5
+  Avrg T: 10.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 7:
+  Date: 2026-01-13
+  Min T: 11.1
+  Max T: 11.1
+  Avrg T: 11.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 8:
+  Date: 2026-01-13
+  Min T: 11.5
+  Max T: 11.5
+  Avrg T: 11.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 9:
+  Date: 2026-01-14
+  Min T: 10.5
+  Max T: 10.5
+  Avrg T: 10.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 10:
+  Date: 2026-01-14
+  Min T: 13.4
+  Max T: 13.4
+  Avrg T: 13.4
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 11:
+  Date: 2026-01-14
+  Min T: 13.6
+  Max T: 13.6
+  Avrg T: 13.6
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 12:
+  Date: 2026-01-14
+  Min T: 11.1
+  Max T: 11.1
+  Avrg T: 11.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 13:
+  Date: 2026-01-14
+  Min T: 12.1
+  Max T: 12.1
+  Avrg T: 12.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 14:
+  Date: 2026-01-14
+  Min T: 12.4
+  Max T: 12.4
+  Avrg T: 12.4
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 15:
+  Date: 2026-01-14
+  Min T: 10.5
+  Max T: 10.5
+  Avrg T: 10.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 16:
+  Date: 2026-01-14
+  Min T: 10.7
+  Max T: 10.7
+  Avrg T: 10.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 17:
+  Date: 2026-01-14
+  Min T: 12.5
+  Max T: 12.5
+  Avrg T: 12.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 18:
+  Date: 2026-01-14
+  Min T: 11.7
+  Max T: 11.7
+  Avrg T: 11.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 19:
+  Date: 2026-01-14
+  Min T: 11.8
+  Max T: 11.8
+  Avrg T: 11.8
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 20:
+  Date: 2026-01-14
+  Min T: 12.5
+  Max T: 12.5
+  Avrg T: 12.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 21:
+  Date: 2026-01-14
+  Min T: 12.5
+  Max T: 12.5
+  Avrg T: 12.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 22:
+  Date: 2026-01-14
+  Min T: 12.4
+  Max T: 12.4
+  Avrg T: 12.4
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 23:
+  Date: 2026-01-14
+  Min T: 12.9
+  Max T: 12.9
+  Avrg T: 12.9
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 24:
+  Date: 2026-01-14
+  Min T: 12.3
+  Max T: 12.3
+  Avrg T: 12.3
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 25:
+  Date: 2026-01-14
+  Min T: 12.7
+  Max T: 12.7
+  Avrg T: 12.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 26:
+  Date: 2026-01-14
+  Min T: 10.2
+  Max T: 10.2
+  Avrg T: 10.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 27:
+  Date: 2026-01-14
+  Min T: 11.2
+  Max T: 11.2
+  Avrg T: 11.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 28:
+  Date: 2026-01-14
+  Min T: 11.6
+  Max T: 11.6
+  Avrg T: 11.6
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 29:
+  Date: 2026-01-14
+  Min T: 11.3
+  Max T: 11.3
+  Avrg T: 11.3
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 30:
+  Date: 2026-01-14
+  Min T: 13.1
+  Max T: 13.1
+  Avrg T: 13.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 31:
+  Date: 2026-01-14
+  Min T: 10.6
+  Max T: 10.6
+  Avrg T: 10.6
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 32:
+  Date: 2026-01-14
+  Min T: 12.4
+  Max T: 12.4
+  Avrg T: 12.4
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 33:
+  Date: 2026-01-14
+  Min T: 12.7
+  Max T: 12.7
+  Avrg T: 12.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 34:
+  Date: 2026-01-14
+  Min T: 11.5
+  Max T: 11.5
+  Avrg T: 11.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 35:
+  Date: 2026-01-14
+  Min T: 10.8
+  Max T: 10.8
+  Avrg T: 10.8
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 36:
+  Date: 2026-01-14
+  Min T: 11.9
+  Max T: 11.9
+  Avrg T: 11.9
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 37:
+  Date: 2026-01-14
+  Min T: 12.2
+  Max T: 12.2
+  Avrg T: 12.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 38:
+  Date: 2026-01-14
+  Min T: 14.0
+  Max T: 14.0
+  Avrg T: 14.0
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 39:
+  Date: 2026-01-14
+  Min T: 12.0
+  Max T: 12.0
+  Avrg T: 12.0
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 40:
+  Date: 2026-01-14
+  Min T: 10.5
+  Max T: 10.5
+  Avrg T: 10.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 41:
+  Date: 2026-01-14
+  Min T: 13.7
+  Max T: 13.7
+  Avrg T: 13.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 42:
+  Date: 2026-01-14
+  Min T: 12.2
+  Max T: 12.2
+  Avrg T: 12.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 43:
+  Date: 2026-01-14
+  Min T: 13.1
+  Max T: 13.1
+  Avrg T: 13.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 44:
+  Date: 2026-01-14
+  Min T: 13.2
+  Max T: 13.2
+  Avrg T: 13.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 45:
+  Date: 2026-01-14
+  Min T: 12.2
+  Max T: 12.2
+  Avrg T: 12.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 46:
+  Date: 2026-01-14
+  Min T: 10.4
+  Max T: 10.4
+  Avrg T: 10.4
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 47:
+  Date: 2026-01-14
+  Min T: 13.9
+  Max T: 13.9
+  Avrg T: 13.9
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 48:
+  Date: 2026-01-14
+  Min T: 12.9
+  Max T: 12.9
+  Avrg T: 12.9
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 49:
+  Date: 2026-01-14
+  Min T: 10.8
+  Max T: 10.8
+  Avrg T: 10.8
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 50:
+  Date: 2026-01-14
+  Min T: 11.3
+  Max T: 11.3
+  Avrg T: 11.3
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 51:
+  Date: 2026-01-14
+  Min T: 13.3
+  Max T: 13.3
+  Avrg T: 13.3
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 52:
+  Date: 2026-01-14
+  Min T: 13.3
+  Max T: 13.3
+  Avrg T: 13.3
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 53:
+  Date: 2026-01-14
+  Min T: 11.9
+  Max T: 11.9
+  Avrg T: 11.9
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 54:
+  Date: 2026-01-14
+  Min T: 11.4
+  Max T: 11.4
+  Avrg T: 11.4
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 55:
+  Date: 2026-01-14
+  Min T: 10.0
+  Max T: 10.0
+  Avrg T: 10.0
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 56:
+  Date: 2026-01-14
+  Min T: 12.0
+  Max T: 12.0
+  Avrg T: 12.0
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 57:
+  Date: 2026-01-14
+  Min T: 10.1
+  Max T: 10.1
+  Avrg T: 10.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 58:
+  Date: 2026-01-14
+  Min T: 13.9
+  Max T: 13.9
+  Avrg T: 13.9
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 59:
+  Date: 2026-01-14
+  Min T: 11.4
+  Max T: 11.4
+  Avrg T: 11.4
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 60:
+  Date: 2026-01-14
+  Min T: 12.9
+  Max T: 12.9
+  Avrg T: 12.9
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 61:
+  Date: 2026-01-14
+  Min T: 12.9
+  Max T: 12.9
+  Avrg T: 12.9
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 62:
+  Date: 2026-01-14
+  Min T: 13.5
+  Max T: 13.5
+  Avrg T: 13.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 63:
+  Date: 2026-01-14
+  Min T: 11.0
+  Max T: 11.0
+  Avrg T: 11.0
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 64:
+  Date: 2026-01-14
+  Min T: 10.2
+  Max T: 10.2
+  Avrg T: 10.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 65:
+  Date: 2026-01-14
+  Min T: 12.1
+  Max T: 12.1
+  Avrg T: 12.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 66:
+  Date: 2026-01-14
+  Min T: 11.7
+  Max T: 11.7
+  Avrg T: 11.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 67:
+  Date: 2026-01-14
+  Min T: 10.6
+  Max T: 10.6
+  Avrg T: 10.6
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 68:
+  Date: 2026-01-14
+  Min T: 12.0
+  Max T: 12.0
+  Avrg T: 12.0
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 69:
+  Date: 2026-01-14
+  Min T: 13.2
+  Max T: 13.2
+  Avrg T: 13.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 70:
+  Date: 2026-01-14
+  Min T: 13.7
+  Max T: 13.7
+  Avrg T: 13.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 71:
+  Date: 2026-01-14
+  Min T: 13.2
+  Max T: 13.2
+  Avrg T: 13.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 72:
+  Date: 2026-01-14
+  Min T: 13.3
+  Max T: 13.3
+  Avrg T: 13.3
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 73:
+  Date: 2026-01-14
+  Min T: 13.4
+  Max T: 13.4
+  Avrg T: 13.4
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 74:
+  Date: 2026-01-14
+  Min T: 10.2
+  Max T: 10.2
+  Avrg T: 10.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 75:
+  Date: 2026-01-14
+  Min T: 13.2
+  Max T: 13.2
+  Avrg T: 13.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 76:
+  Date: 2026-01-14
+  Min T: 11.1
+  Max T: 11.1
+  Avrg T: 11.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 77:
+  Date: 2026-01-14
+  Min T: 11.2
+  Max T: 11.2
+  Avrg T: 11.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 78:
+  Date: 2026-01-14
+  Min T: 13.1
+  Max T: 13.1
+  Avrg T: 13.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 79:
+  Date: 2026-01-14
+  Min T: 11.7
+  Max T: 11.7
+  Avrg T: 11.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 80:
+  Date: 2026-01-14
+  Min T: 13.2
+  Max T: 13.2
+  Avrg T: 13.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 81:
+  Date: 2026-01-14
+  Min T: 13.0
+  Max T: 13.0
+  Avrg T: 13.0
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 82:
+  Date: 2026-01-14
+  Min T: 10.2
+  Max T: 10.2
+  Avrg T: 10.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 83:
+  Date: 2026-01-14
+  Min T: 13.4
+  Max T: 13.4
+  Avrg T: 13.4
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 84:
+  Date: 2026-01-14
+  Min T: 12.8
+  Max T: 12.8
+  Avrg T: 12.8
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 85:
+  Date: 2026-01-14
+  Min T: 12.1
+  Max T: 12.1
+  Avrg T: 12.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 86:
+  Date: 2026-01-14
+  Min T: 13.7
+  Max T: 13.7
+  Avrg T: 13.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 87:
+  Date: 2026-01-14
+  Min T: 13.5
+  Max T: 13.5
+  Avrg T: 13.5
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 88:
+  Date: 2026-01-14
+  Min T: 11.1
+  Max T: 11.1
+  Avrg T: 11.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 89:
+  Date: 2026-01-14
+  Min T: 11.4
+  Max T: 11.4
+  Avrg T: 11.4
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 90:
+  Date: 2026-01-14
+  Min T: 13.2
+  Max T: 13.2
+  Avrg T: 13.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 91:
+  Date: 2026-01-14
+  Min T: 13.8
+  Max T: 13.8
+  Avrg T: 13.8
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 92:
+  Date: 2026-01-14
+  Min T: 14.0
+  Max T: 14.0
+  Avrg T: 14.0
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 93:
+  Date: 2026-01-14
+  Min T: 12.2
+  Max T: 12.2
+  Avrg T: 12.2
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 94:
+  Date: 2026-01-14
+  Min T: 11.1
+  Max T: 11.1
+  Avrg T: 11.1
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 95:
+  Date: 2026-01-14
+  Min T: 12.7
+  Max T: 12.7
+  Avrg T: 12.7
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60
+ 96:
+  Date: 2026-01-14
+  Min T: 13.3
+  Max T: 13.3
+  Avrg T: 13.3
+  Alarm:
+   0:
+    t Acc: 0
+   1:
+    t Acc: 60

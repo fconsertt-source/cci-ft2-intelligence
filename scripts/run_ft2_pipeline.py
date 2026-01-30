@@ -1,0 +1,311 @@
+# scripts/run_ft2_pipeline.py
+import os
+import sys
+import argparse
+import logging
+from typing import Dict, List, Optional
+from datetime import datetime
+from pathlib import Path
+
+# إضافة المسار إلى src
+sys.path.append(str(Path(__file__).parent.parent))
+
+from src.utils.yaml_loader import load_yaml
+from src.infrastructure.logging import get_logger
+from src.shared.di_container import create_evaluate_cold_chain_uc
+from src.infrastructure.adapters.ft2_reader_adapter import FT2ReaderAdapter
+from src.application.mappers.center_mapper import to_center_dto
+from scripts.create_test_data import create_test_data
+from src.core.services.rules_engine import calculate_center_stats, apply_rules
+from src.reporting.csv_reporter import generate_centers_report
+
+
+
+logger = get_logger(__name__)
+
+def setup_directories():
+    """إعداد المجلدات المطلوبة"""
+    directories = [
+        'data/input_raw',
+        'data/input_ft2',
+        'data/output',
+        'data/reports',
+        'config'
+    ]
+    
+    for directory in directories:
+        os.makedirs(directory, exist_ok=True)
+        logger.debug(f"تم إنشاء/التحقق من المجلد: {directory}")
+
+def load_centers(config_path: str = "config/center_profiles.yaml") -> List:
+    """تحميل مراكز التطعيم من ملف التكوين"""
+    try:
+        center_profiles = load_yaml(config_path)
+        centers = []
+        for profile in center_profiles:
+            # --- طبقة التوافق مع الملف المطور (Enhanced Profile Adapter) ---
+            # إذا كان الملف يحتوي على ملفات تعريف حرارة متعددة (النظام الجديد)
+            # نقوم بحساب النطاق العام (الأوسع) لضمان عمل الكلاس القديم
+            if 'temperature_profiles' in profile and 'temperature_ranges' not in profile:
+                temps = profile['temperature_profiles']
+                # استخراج أقل حد أدنى وأعلى حد أقصى من جميع اللقاحات
+                min_t = min((v['min'] for v in temps.values()), default=2)
+                max_t = max((v['max'] for v in temps.values()), default=8)
+                profile['temperature_ranges'] = {'min': min_t, 'max': max_t}
+                # تنظيف الحقول غير المدعومة في الكلاس القديم لتجنب أخطاء __init__
+                profile.pop('temperature_profiles', None)
+                profile.pop('policies', None)
+                profile.pop('reporting', None)
+            
+            # حاول إنشاء الـ Entity القديم ثم تحويله إلى DTO تدريجيًا
+            try:
+                from src.core.entities.vaccination_center import VaccinationCenter as VC
+                vc = VC(**profile)
+                centers.append(to_center_dto(vc))
+            except Exception:
+                centers.append(profile)
+
+        logger.info(f"تم تحميل {len(centers)} مركز تطعيم (DTOs/Profiles)")
+        return centers
+    except Exception as e:
+        logger.critical(f"❌ خطأ حرج في تحميل تكوين المراكز: {e}")
+        # تحسين الصمود: عدم استخدام قيم افتراضية في الأنظمة الطبية
+        raise RuntimeError("فشل تحميل تكوين المراكز. تم إيقاف التشغيل لسلامة البيانات.") from e
+
+
+
+def process_ft2_file_new(file_path: str, centers: list, device_map: Dict[str, object] = None) -> Optional[dict]:
+    """
+    معالجة ملف FT2 باستخدام النظام الجديد
+    
+    Returns:
+        dict: نتائج التحليل
+    """
+    try:
+        logger.info(f"🔍 معالجة الملف (نظام جديد): {os.path.basename(file_path)}")
+        
+        # استخدام النظام الجديد عبر الـ Adapter والـ Use Case
+        # هذا الدّور الآن يُعهد إلى Use Case التي تتلقى Reader Adapter
+        # (التحويل الكامل إلى DTOs يحدث تدريجيًا عبر المappers)
+        reader = FT2ReaderAdapter()
+        entries = reader.read_all()
+
+        # أثناء المرحلة المرحلية، سنبقي الربط القديم كقيمة احتياطية
+        try:
+            from src.ft2_reader.services.ft2_linker import FT2Linker
+            FT2Linker.link(entries, centers)
+        except Exception:
+            pass
+        
+        # تحليل النتائج لكل مركز
+        analysis = {
+            'file_path': file_path,
+            'parsed_at': datetime.now().isoformat(),
+            'entries_count': len(entries),
+            'centers_affected': [],
+            'analysis': {}
+        }
+        
+        # تحديد الأجهزة الموجودة في الملف الحالي لتصفية التقرير
+        current_file_device_ids = set(entry.device_id for entry in entries)
+        affected_centers = set()
+
+        # تحسين الأداء: البحث المباشر باستخدام الخريطة O(1) بدلاً من الحلقات المتداخلة
+        if device_map:
+            for device_id in current_file_device_ids:
+                if device_id in device_map:
+                    affected_centers.add(device_map[device_id])
+        else:
+            # الطريقة القديمة (للاحتياط)
+            for center in centers:
+                if any(d_id in current_file_device_ids for d_id in center.device_ids):
+                    affected_centers.add(center)
+        
+        # تجميع النتائج
+        for center in affected_centers:
+            if center.ft2_entries: # التأكد من وجود بيانات مرتبطة
+                
+                # 1. تطبيق القواعد لتحديث القرار
+                apply_rules(center)
+                
+                # 2. الحصول على الإحصائيات للتقرير
+                stats = calculate_center_stats(center)
+
+                center_analysis = {
+                    'center_id': center.id,
+                    'center_name': center.name,
+                    'entries_count': len(center.ft2_entries),
+                    'decision': center.decision,
+                    'has_freeze': stats['has_freeze'],
+                    'has_ccm_violation': stats['has_ccm_violation']
+                }
+                analysis['centers_affected'].append(center_analysis)
+        
+        logger.info(f"✅ تم معالجة {len(entries)} إدخال لـ {len(analysis['centers_affected'])} مركز")
+        
+        return analysis
+        
+    except Exception as e:
+        logger.error(f"❌ خطأ في معالجة الملف {file_path}: {e}")
+        return None
+
+def run_pipeline(config_path: str = "config/center_profiles.yaml", 
+                 input_dir: str = "data/input_raw",
+                 output_dir: str = "data/output"):
+    """تشغيل خط المعالجة الكامل"""
+    
+    logger.info("🚀 بدء تشغيل خط معالجة FT2")
+    
+    # 1. إعداد المجلدات
+    setup_directories()
+    
+    # 2. تحميل مراكز التطعيم
+    centers = load_centers(config_path)
+    
+    # تحسين الأداء: إنشاء خريطة البحث السريع (Hash Map) للأجهزة
+    # التعقيد: O(1) للبحث بدلاً من O(N)
+    device_map = {}
+    for center in centers:
+        device_ids = []
+        if hasattr(center, 'device_ids'):
+            device_ids = getattr(center, 'device_ids')
+        elif isinstance(center, dict):
+            device_ids = center.get('device_ids', [])
+        for device_id in device_ids:
+            device_map[device_id] = center
+    
+    # 3. تحويل الملفات الخام (إذا كانت موجودة)
+    ft2_files = []
+    ft2_dir = ""
+
+    # النظام الجديد يعالج ملفات CSV/TSV مباشرة
+    ft2_dir = input_dir
+    if os.path.exists(ft2_dir):
+        ft2_files = [f for f in os.listdir(ft2_dir) if f.endswith(('.csv', '.tsv'))]
+            
+    if not ft2_files:
+        logger.warning(f"⚠️ لم يتم العثور على ملفات للمعالجة في: {ft2_dir}")
+        
+        # اقتراح ذكي للمستخدم
+        if not os.listdir(input_dir):
+            logger.info("💡 تلميح: المجلد فارغ. يمكنك إنشاء بيانات اختبار باستخدام الخيار: --generate-data")
+        return
+
+    logger.info(f"📁 وجد {len(ft2_files)} ملف للمعالجة في {ft2_dir}")
+    
+    failed_files = []
+    all_results = []
+    
+    # إنشاء الـ Reader Adapter و Use Case عبر DI
+    reader_adapter = FT2ReaderAdapter(input_dir)
+    uc = create_evaluate_cold_chain_uc(reader=reader_adapter)
+
+    for ft2_file in ft2_files:
+        ft2_path = os.path.join(ft2_dir, ft2_file)
+        try:
+            results = uc.execute()
+            # حافظ على هيكل إخراج بسيط متوافقًا مع النسخة القديمة
+            all_results.append({
+                'file_path': ft2_path,
+                'parsed_at': datetime.now().isoformat(),
+                'entries_count': len(results) if isinstance(results, list) else 0,
+                'centers_affected': []
+            })
+            logger.info(f"✅ تمت معالجة: {ft2_file}")
+        except Exception as e:
+            logger.error(f"❌ فشل معالجة {ft2_file}: {e}")
+            failed_files.append((ft2_file, str(e)))
+    
+    # 5. إنشاء التقارير
+    logger.info("📊 إنشاء التقارير...")
+    
+    # تقرير المراكز
+    centers_report_path = os.path.join(output_dir, "centers_report.tsv")
+    generate_centers_report(centers, centers_report_path)
+    
+    # التقارير التفصيلية
+    reports_dir = os.path.join(output_dir, "detailed_reports")
+    os.makedirs(reports_dir, exist_ok=True)
+    
+    for i, result in enumerate(all_results):
+        report_path = os.path.join(reports_dir, f"report_{i+1:03d}.txt")
+        
+        with open(report_path, 'w', encoding='utf-8') as f:
+            f.write(f"تقرير تحليل FT2\n")
+            f.write(f"================\n\n")
+            f.write(f"الملف: {result.get('file_path', 'غير معروف')}\n")
+            f.write(f"وقت التحليل: {result.get('parsed_at', 'غير معروف')}\n\n")
+            
+            if 'device_info' in result:
+                f.write(f"معلومات الجهاز:\n")
+                for key, value in result['device_info'].items():
+                    f.write(f"  {key}: {value}\n")
+            
+            if 'centers_affected' in result:
+                f.write(f"\nالمراكز المتأثرة:\n")
+                for center in result['centers_affected']:
+                    f.write(f"  - {center['center_name']}: {center['entries_count']} إدخال\n")
+    
+    # 6. عرض الملخص
+    logger.info("%s", "\n" + ("="*70))
+    logger.info("ملخص تشغيل خط المعالجة")
+    logger.info("%s", "="*70)
+    logger.info("الملفات المعالجة: %d من أصل %d", len(all_results), len(ft2_files))
+    logger.info("الملفات الفاشلة: %d", len(failed_files))
+    logger.info("تقرير المراكز: %s", centers_report_path)
+    logger.info("التقارير التفصيلية: %s/", reports_dir)
+
+    if failed_files:
+        logger.warning("الملفات الفاشلة:")
+        for file, error in failed_files:
+            logger.warning("  - %s: %s", file, error)
+    
+    logger.info(f"🏁 اكتمل خط المعالجة. انظر {output_dir} للنتائج")
+
+def main():
+    """الدالة الرئيسية"""
+    parser = argparse.ArgumentParser(
+        description='نظام متكامل لمعالجة ملفات FT2 لمراقبة سلسلة التبريد',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+أمثلة:
+  %(prog)s                           # التشغيل الافتراضي
+  %(prog)s --config my_config.yaml   # استخدام تكوين مخصص
+  %(prog)s --input ./my_data         # مجلد بيانات مخصص
+  %(prog)s --verbose                 # عرض تفاصيل أكثر
+        """
+    )
+    
+    parser.add_argument('--config', '-c', default='config/center_profiles.yaml',
+                       help='مسار ملف تكوين المراكز')
+    parser.add_argument('--input', '-i', default='data/input_raw',
+                       help='مجلد الملفات الخام المدخلة')
+    parser.add_argument('--output', '-o', default='data/output',
+                       help='مجلد الملفات المخرجة')
+    parser.add_argument('--verbose', '-v', action='store_true',
+                       help='عرض معلومات تفصيلية')
+    parser.add_argument('--generate-data', action='store_true', dest='generate_data', help='إنشاء بيانات اختبار في data/input_raw')
+    
+    args = parser.parse_args()
+    
+    # ضبط مستوى التسجيل
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+        logger.debug("وضع التفصيل مفعّل")
+    
+    try:
+        if getattr(args, 'generate_data', False):
+            logger.info("🧪 جاري إنشاء بيانات اختبار...")
+            create_test_data()
+
+        run_pipeline(
+            config_path=args.config,
+            input_dir=args.input,
+            output_dir=args.output
+        )
+    except Exception as e:
+        logger.error(f"❌ خطأ غير متوقع: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
