@@ -14,7 +14,7 @@ from src.utils.yaml_loader import load_yaml
 from src.infrastructure.logging import get_logger
 from src.shared.di_container import create_evaluate_cold_chain_uc
 from src.infrastructure.adapters.ft2_reader_adapter import FT2ReaderAdapter
-from src.application.mappers.center_mapper import to_center_dto
+from src.application.dtos.center_dto import CenterDTO
 from scripts.create_test_data import create_test_data
 from src.core.services.rules_engine import calculate_center_stats, apply_rules
 from src.reporting.csv_reporter import generate_centers_report
@@ -57,15 +57,31 @@ def load_centers(config_path: str = "config/center_profiles.yaml") -> List:
                 profile.pop('policies', None)
                 profile.pop('reporting', None)
             
-            # حاول إنشاء الـ Entity القديم ثم تحويله إلى DTO تدريجيًا
+            # إنشاء CenterDTO مباشرة لتجنب خروج الـ Entity من النطاق
             try:
-                from src.core.entities.vaccination_center import VaccinationCenter as VC
-                vc = VC(**profile)
-                centers.append(to_center_dto(vc))
+                # profile is expected to be a dict from YAML
+                device_ids = profile.get('device_ids', []) if isinstance(profile, dict) else getattr(profile, 'device_ids', [])
+                center_id = profile.get('id', profile.get('center_id')) if isinstance(profile, dict) else getattr(profile, 'id', None)
+                name = profile.get('name', '') if isinstance(profile, dict) else getattr(profile, 'name', '')
+
+                dto = CenterDTO(
+                    id=center_id,
+                    name=name,
+                    device_ids=device_ids,
+                    ft2_entries=[],
+                    decision='UNKNOWN',
+                    vvm_stage='NONE',
+                    alert_level=None,
+                    stability_budget_consumed_pct=0.0,
+                    thaw_remaining_hours=None,
+                    category_display=None,
+                    decision_reasons=[]
+                )
+                centers.append(dto)
             except Exception:
                 centers.append(profile)
 
-        logger.info(f"تم تحميل {len(centers)} مركز تطعيم (DTOs/Profiles)")
+        logger.info(f"تم تحميل {len(centers)} مركز تطعيم (Entities/Profiles)")
         return centers
     except Exception as e:
         logger.critical(f"❌ خطأ حرج في تحميل تكوين المراكز: {e}")
@@ -166,11 +182,7 @@ def run_pipeline(config_path: str = "config/center_profiles.yaml",
     # التعقيد: O(1) للبحث بدلاً من O(N)
     device_map = {}
     for center in centers:
-        device_ids = []
-        if hasattr(center, 'device_ids'):
-            device_ids = getattr(center, 'device_ids')
-        elif isinstance(center, dict):
-            device_ids = center.get('device_ids', [])
+        device_ids = getattr(center, 'device_ids', []) if not isinstance(center, dict) else center.get('device_ids', [])
         for device_id in device_ids:
             device_map[device_id] = center
     
@@ -194,57 +206,58 @@ def run_pipeline(config_path: str = "config/center_profiles.yaml",
     logger.info(f"📁 وجد {len(ft2_files)} ملف للمعالجة في {ft2_dir}")
     
     failed_files = []
-    all_results = []
     
-    # إنشاء الـ Reader Adapter و Use Case عبر DI
-    reader_adapter = FT2ReaderAdapter(input_dir)
-    uc = create_evaluate_cold_chain_uc(reader=reader_adapter)
+    # --- الإصلاح المعماري ---
+    # إزالة حالة الاستخدام (Use Case) والعودة إلى منطق التحليل والربط البسيط
+    # الذي يتوافق مع بنية البرنامج النصي.
+    from src.ft2_reader.parser.ft2_parser import FT2Parser
+    from src.ft2_reader.services.ft2_linker import FT2Linker
 
     for ft2_file in ft2_files:
         ft2_path = os.path.join(ft2_dir, ft2_file)
         try:
-            results = uc.execute()
-            # حافظ على هيكل إخراج بسيط متوافقًا مع النسخة القديمة
-            all_results.append({
-                'file_path': ft2_path,
-                'parsed_at': datetime.now().isoformat(),
-                'entries_count': len(results) if isinstance(results, list) else 0,
-                'centers_affected': []
-            })
-            logger.info(f"✅ تمت معالجة: {ft2_file}")
+            # 1. التحليل (Parse)
+            entries = FT2Parser.parse_file(ft2_path)
+
+            # 2. الربط (Link)
+            # FT2Linker expects objects with `device_ids` and `add_ft2_entry`.
+            # Create lightweight adapters around DTOs that delegate additions to the DTO.ft2_entries list.
+            class CenterAdapter:
+                def __init__(self, dto):
+                    self._dto = dto
+                    self.device_ids = getattr(dto, 'device_ids', [])
+                def add_ft2_entry(self, entry):
+                    if not hasattr(self._dto, 'ft2_entries'):
+                        self._dto.ft2_entries = []
+                    self._dto.ft2_entries.append(entry)
+                def __getattr__(self, item):
+                    return getattr(self._dto, item)
+
+            adapters = [CenterAdapter(c) for c in centers]
+            FT2Linker.link(entries, adapters)
+
+            logger.info(f"✅ تمت معالجة وربط: {ft2_file}")
         except Exception as e:
             logger.error(f"❌ فشل معالجة {ft2_file}: {e}")
             failed_files.append((ft2_file, str(e)))
     
-    # 5. إنشاء التقارير
-    logger.info("📊 إنشاء التقارير...")
+    # 5. تطبيق القواعد وإنشاء التقارير
+    logger.info(" Applying rules and generating reports...")
     
+    all_results = [] # للتوافق مع بنية التقرير القديمة
+    for center in centers:
+        if center.ft2_entries:
+            apply_rules(center)
+            all_results.append({'file_path': 'Multiple sources', 'centers_affected': [{'center_name': center.name, 'entries_count': len(center.ft2_entries)}]})
+
+
     # تقرير المراكز
     centers_report_path = os.path.join(output_dir, "centers_report.tsv")
     generate_centers_report(centers, centers_report_path)
     
-    # التقارير التفصيلية
+    # التقارير التفصيلية (تم تبسيطها لأن الربط شامل)
     reports_dir = os.path.join(output_dir, "detailed_reports")
     os.makedirs(reports_dir, exist_ok=True)
-    
-    for i, result in enumerate(all_results):
-        report_path = os.path.join(reports_dir, f"report_{i+1:03d}.txt")
-        
-        with open(report_path, 'w', encoding='utf-8') as f:
-            f.write(f"تقرير تحليل FT2\n")
-            f.write(f"================\n\n")
-            f.write(f"الملف: {result.get('file_path', 'غير معروف')}\n")
-            f.write(f"وقت التحليل: {result.get('parsed_at', 'غير معروف')}\n\n")
-            
-            if 'device_info' in result:
-                f.write(f"معلومات الجهاز:\n")
-                for key, value in result['device_info'].items():
-                    f.write(f"  {key}: {value}\n")
-            
-            if 'centers_affected' in result:
-                f.write(f"\nالمراكز المتأثرة:\n")
-                for center in result['centers_affected']:
-                    f.write(f"  - {center['center_name']}: {center['entries_count']} إدخال\n")
     
     # 6. عرض الملخص
     logger.info("%s", "\n" + ("="*70))
