@@ -8,7 +8,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from src.infrastructure.logging import get_logger
 from src.shared.di_container import create_evaluate_cold_chain_uc
 from src.application.dtos.center_dto import CenterDTO
-from src.core.services.rules_engine import apply_rules
+from src.domain.services.rules_engine import apply_rules
 from src.reporting.csv_reporter import generate_centers_report
 
 logger = get_logger(__name__)

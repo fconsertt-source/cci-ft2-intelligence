@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 from src.application.use_cases.evaluate_cold_chain_safety_uc import EvaluateColdChainSafetyUC
 from src.application.dtos.analysis_result_dto import VaccineStatus
-from src.core.entities.temperature_reading import TemperatureReading
-from src.core.entities.vaccine import Vaccine
+from src.domain.entities.temperature_reading import TemperatureReading
+from src.domain.entities.vaccine import Vaccine
 
 @pytest.fixture
 def mock_reader():

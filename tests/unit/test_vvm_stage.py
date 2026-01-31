@@ -1,5 +1,5 @@
 import pytest
-from src.core.enums.vvm_stage import VVMStage
+from src.domain.enums.vvm_stage import VVMStage
 
 def test_vvm_stage_from_duration():
     # NONE: < 2 days (2880 mins)

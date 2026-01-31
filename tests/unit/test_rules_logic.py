@@ -15,8 +15,8 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 # استيراد المحرك الحقيقي للقواعد
-from src.core.services.rules_engine import apply_rules, calculate_center_stats
-from src.core.enums.vvm_stage import VVMStage
+from src.domain.services.rules_engine import apply_rules, calculate_center_stats
+from src.domain.enums.vvm_stage import VVMStage
 
 @dataclass
 class MockEntry:

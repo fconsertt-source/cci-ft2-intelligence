@@ -1,5 +1,5 @@
 from typing import List, Dict
-from src.core.entities.temperature_reading import TemperatureReading
+from src.domain.entities.temperature_reading import TemperatureReading
 
 # ccm_calculator.py (مُحسّن)
 class CCMCalculator:

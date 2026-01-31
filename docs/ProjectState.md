@@ -54,6 +54,10 @@
 3. وضع خطة لنقل أو توحيد `ft2_reader/` و `ingestion/` داخل بنية `src/` تحت طبقة Infrastructure إن أمكن.
 4. تنظيف المجلدات العائمة بعد الموافقة عبر ADR.
 
+
+## المنجز
+ADR0004: Phase 3 — DTO-first migration and legacy isolation: Implemented as of 2026-01-31
+
 ## مراجع
 
 - ميثاق الهندسة: `docs/architecture/ENGINEERING_CHARTER.md`

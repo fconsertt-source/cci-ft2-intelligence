@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime, timedelta
-from src.core.calculators.ccm_calculator import CCMCalculator
-from src.core.entities.temperature_reading import TemperatureReading
+from src.domain.calculators.ccm_calculator import CCMCalculator
+from src.domain.entities.temperature_reading import TemperatureReading
 
 class TestCCMCalculator:
     
