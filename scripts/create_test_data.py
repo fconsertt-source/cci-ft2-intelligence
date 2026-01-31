@@ -1,7 +1,14 @@
 import os
+import sys
 import csv
 import random
 from datetime import datetime, timedelta
+from pathlib import Path
+
+# allow importing src
+sys.path.append(str(Path(__file__).parent.parent))
+from src.infrastructure.logging import get_logger
+logger = get_logger(__name__)
 
 def create_test_data():
     """إنشاء بيانات اختبار لخط المعالجة"""
@@ -30,7 +37,7 @@ def create_test_data():
         }
     ]
     
-    print(f"🚀 جاري إنشاء ملفات اختبار في {output_dir}...")
+    logger.info("🚀 جاري إنشاء ملفات اختبار في %s...", output_dir)
     
     for scenario in scenarios:
         filename = f"{scenario['name']}_{scenario['device_id']}.csv"
@@ -59,7 +66,7 @@ def create_test_data():
                     "BATCH-2024-001"
                 ])
         
-        print(f"✅ تم إنشاء: {filename}")
+        logger.info("✅ تم إنشاء: %s", filename)
 
 if __name__ == "__main__":
     create_test_data()

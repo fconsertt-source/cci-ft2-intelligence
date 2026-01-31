@@ -2,12 +2,12 @@ import os
 import csv
 from datetime import datetime
 from typing import List, Dict, Any
-import logging
+from src.infrastructure.logging import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class FT2Entry:
-    def __init__(self, device_id: str, timestamp: str, temperature: float, 
+    def __init__(self, device_id: str, timestamp: datetime, temperature: float, 
                  vaccine_type: str, batch: str, duration_minutes: float = 15.0):
         self.device_id = device_id
         self.timestamp = timestamp
@@ -37,9 +37,20 @@ class FT2Parser:
                     reader = csv.DictReader(f, delimiter=delimiter)
                     for i, row in enumerate(reader):
                         try:
+                            # Parse timestamp properly
+                            ts_str = row.get('timestamp')
+                            if ts_str:
+                                try:
+                                    ts = datetime.fromisoformat(ts_str)
+                                except ValueError:
+                                    # Handle simple cases or assume ISO
+                                    ts = datetime.now() # Fallback or error logic
+                            else:
+                                ts = datetime.now()
+
                             entry = FT2Entry(
                                 device_id=str(row['device_id']),
-                                timestamp=row.get('timestamp', datetime.now().isoformat()),
+                                timestamp=ts,
                                 temperature=float(row['temperature']),
                                 vaccine_type=row.get('vaccine_type', 'UNKNOWN'),
                                 batch=row.get('batch', 'UNKNOWN'),

@@ -1,0 +1,61 @@
+# ===============================
+# Python virtual environments
+# ===============================
+.venv/
+venv/
+env/
+ENV/
+
+# ===============================
+# Python cache files
+# ===============================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ===============================
+# Backup files / temporary
+# ===============================
+backups/
+*.bak
+*.swp
+*.tmp
+
+# ===============================
+# IDE / Editor settings
+# ===============================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ===============================
+# OS generated files
+# ===============================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===============================
+# Logs
+# ===============================
+*.log
+
+# ===============================
+# Compiled / build artifacts
+# ===============================
+*.pyc
+*.pyo
+*.pyd
+build/
+dist/
+*.egg-info/
+
+# ===============================
+# Optional: test output
+# ===============================
+htmlcov/
+.coverage
+*.cover
+nosetests.xml
+coverage.xml

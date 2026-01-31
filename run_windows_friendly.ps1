@@ -65,7 +65,7 @@ function Run-MainPipeline {
     Show-Info "جاري تشغيل نظام Python..."
     
     # تشغيل نظام المعالجة
-    $pythonOutput = python -m scripts.run_ft2_pipeline --legacy 2>&1
+    $pythonOutput = python -m scripts.run_ft2_pipeline 2>&1
     
     if ($LASTEXITCODE -eq 0) {
         Show-Success "اكتملت معالجة البيانات"
@@ -153,7 +153,7 @@ function Check-Results {
         
         # اقتراح إنشاء بيانات اختبار
         Show-Info "جرب إنشاء بيانات اختبار أولاً:"
-        Write-Host "  python -m scripts.run_ft2_pipeline --generate-data --legacy" -ForegroundColor White
+        Write-Host "  python -m scripts.run_ft2_pipeline --generate-data" -ForegroundColor White
     }
 }
 
@@ -163,7 +163,7 @@ function Create-TestData {
     Show-Info "جاري إنشاء بيانات اختبار..."
     
     # تشغيل مع خيار generate-data
-    $pythonOutput = python -m scripts.run_ft2_pipeline --generate-data --legacy 2>&1
+    $pythonOutput = python -m scripts.run_ft2_pipeline --generate-data 2>&1
     
     if ($LASTEXITCODE -eq 0) {
         Show-Success "تم إنشاء بيانات الاختبار"
@@ -282,6 +282,9 @@ function Show-Menu {
     Write-Host "5. " -NoNewline -ForegroundColor $Cyan
     Write-Host "فتح مجلد النتائج" -ForegroundColor $White
     
+    Write-Host "6. " -NoNewline -ForegroundColor $Cyan
+    Write-Host "تشغيل جميع الاختبارات (Pytest)" -ForegroundColor $White
+    
     Write-Host "0. " -NoNewline -ForegroundColor $Red
     Write-Host "خروج" -ForegroundColor $White
     
@@ -320,6 +323,39 @@ function Main {
             "5" {
                 # فتح المجلد
                 Open-ResultsFolder
+            }
+            "6" {
+                # تشغيل الاختبارات
+                Show-Step "تشغيل جميع الاختبارات (Pytest)" 6
+                
+                # التأكد من أن Python و Pytest مثبتان
+                $pythonExists = (Get-Command python -ErrorAction SilentlyContinue)
+                if (-not $pythonExists) {
+                    Show-Error "لم يتم العثور على Python. يرجى تثبيته وإضافته إلى PATH."
+                    return
+                }
+                
+                $pytestExists = (python -m pip show pytest)
+                if ($LASTEXITCODE -ne 0) {
+                    Show-Warning "Pytest غير مثبت. جار محاولة التثبيت..."
+                    python -m pip install pytest
+                    if ($LASTEXITCODE -ne 0) {
+                        Show-Error "فشل تثبيت Pytest. يرجى تثبيته يدوياً: pip install pytest"
+                        return
+                    }
+                    Show-Success "تم تثبيت Pytest بنجاح."
+                }
+                
+                Show-Info "جاري تشغيل Pytest..."
+                
+                # تشغيل pytest
+                pytest
+                
+                if ($LASTEXITCODE -eq 0) { 
+                    Show-Success "نجحت جميع الاختبارات" 
+                } else { 
+                    Show-Error "فشلت بعض الاختبارات" 
+                }
             }
             "0" {
                 Write-Host "`nمع السلامة!" -ForegroundColor Green

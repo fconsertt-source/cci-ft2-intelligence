@@ -1,0 +1,28 @@
+# CCI-FT2 Intelligence System Configuration
+
+system:
+  version: "1.0.3"
+  environment: "production"
+  locale: "ar-SA"
+
+paths:
+  fonts_dir: "assets/fonts"
+  output_dir: "data/output"
+  reports_dir: "data/output/reports"
+  logs_dir: "data/logs"
+
+reporting:
+  default_theme_color: "#2C3E50"
+  accent_color: "#3498DB"
+  include_charts: true
+  organization_name: "مديرية الصحة العامة"
+
+biological_defaults:
+  default_q10: 2.0
+  default_ideal_temp: 5.0
+  critical_high_threshold: 10.0
+  freeze_threshold: 0.0
+
+scenarios:
+  vvm_max_her: 1.0
+  ccm_max_minutes: 600

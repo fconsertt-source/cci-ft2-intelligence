@@ -1,8 +1,8 @@
 import yaml
-import logging
+from src.infrastructure.logging import get_logger
 from typing import Any, Dict, List
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 def load_yaml(file_path: str) -> Any:
     """
