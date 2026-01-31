@@ -1,7 +1,7 @@
 from typing import Dict, Any, List, Optional
 from abc import ABC, abstractmethod
 from datetime import datetime
-from src.core.enums.vvm_stage import VVMStage
+from src.domain.enums.vvm_stage import VVMStage
 
 def calculate_center_stats(center) -> Dict[str, Any]:
     """

@@ -1,5 +1,5 @@
 import pytest
-from src.core.calculators.vvm_q10_model import VVMQ10Model
+from src.domain.calculators.vvm_q10_model import VVMQ10Model
 
 # --- Constants for testing ---
 Q10_VALUE = 2.0

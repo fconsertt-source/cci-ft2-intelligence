@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from enum import Enum
-from src.core.enums.vvm_stage import VVMStage
+from src.domain.enums.vvm_stage import VVMStage
 
 class VaccineStatus(Enum):
     SAFE = "SAFE"

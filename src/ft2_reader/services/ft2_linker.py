@@ -3,7 +3,7 @@ from typing import List, Dict, TYPE_CHECKING
 from src.infrastructure.logging import get_logger
 
 if TYPE_CHECKING:
-    from src.core.entities.vaccination_center import VaccinationCenter
+    from src.domain.entities.vaccination_center import VaccinationCenter
 
 logger = get_logger(__name__)
 

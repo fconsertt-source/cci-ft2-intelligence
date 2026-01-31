@@ -1,15 +1,17 @@
 from datetime import datetime
 from typing import List, Tuple
-from src.core.calculators.ccm_calculator import CCMCalculator
-from src.core.calculators.vvm_q10_model import VVMQ10Model
-from src.core.entities.temperature_reading import TemperatureReading
-from src.core.enums.vvm_stage import VVMStage
+from src.domain.calculators.ccm_calculator import CCMCalculator
+from src.domain.calculators.vvm_q10_model import VVMQ10Model
+from src.domain.entities.temperature_reading import TemperatureReading
+from src.domain.enums.vvm_stage import VVMStage
 from src.application.dtos.analysis_result_dto import (
     AnalysisResultDTO,
     VaccineStatus,
 )
-from src.core.services.rules_engine import apply_rules, RulesEngine
+from src.domain.services.rules_engine import apply_rules, RulesEngine
 from src.utils.vaccine_library_loader import VaccineLibraryLoader
+from src.application.ports.i_repository import IDataRepository
+from src.application.ports.i_reporter import IReporter
 
 
 class EvaluateColdChainSafetyUC:
@@ -27,16 +29,18 @@ class EvaluateColdChainSafetyUC:
         5. Map outcomes to DTOs and audit logs.
     """
 
-    def __init__(self, reader, repository=None):
+    def __init__(self, reader=None, repository=None, reporter: IReporter | None = None):
         """
         Initializes the Use Case with necessary drivers.
         
         Args:
-            reader: The FT2 data reader.
-            repository: The vaccine profile repository.
+            reader: The FT2 data reader (legacy) or a repository-like object.
+            repository: Optional sink that exposes save_all(results) for persistence.
+            reporter: Optional reporter port for emitting results.
         """
         self.reader = reader
         self.repository = repository
+        self._reporter = reporter
         self.ccm_calculator = CCMCalculator()
         self.rules_engine = RulesEngine()
 
@@ -48,8 +52,9 @@ class EvaluateColdChainSafetyUC:
             List[AnalysisResultDTO]: A list of detailed analysis results, 
             including decisions, VVM stages, and recommendations.
         """
-        vaccines = self.reader.get_vaccines()
-        readings = self.reader.read_all()
+        # Legacy reader path for compatibility with existing tests
+        vaccines = self.reader.get_vaccines() if self.reader else []
+        readings = self.reader.read_all() if self.reader else []
 
         results: List[AnalysisResultDTO] = []
 
@@ -203,8 +208,18 @@ class EvaluateColdChainSafetyUC:
             result_dto.generate_recommendations()
             results.append(result_dto)
 
+        # Backward-compatible persistence path
         if self.repository:
             self.repository.save_all(results)
+
+        if self._reporter:
+            # Emit each result via reporter; concrete adapter decides on artifact type
+            for r in results:
+                try:
+                    self._reporter.generate(r)
+                except Exception:
+                    # Reporter failure should not break analysis aggregation
+                    pass
 
         return results
 
