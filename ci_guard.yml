@@ -1,0 +1,36 @@
+name: CCI-FT2 Architecture Guard & CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  quality-gate:
+    name: 🛡️ Quality Gate
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+        
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # تثبيت المكتبات الأساسية والاختبار
+        pip install pytest pytest-snapshot pandas reportlab
+        # إذا كان لديك ملف requirements.txt، قم بإلغاء التعليق التالي:
+        # pip install -r requirements.txt
+        
+    - name: 🛡️ Run Architecture Guard
+      run: |
+        python scripts/check_no_core_entity_imports.py
+        
+    - name: 🧪 Run All Tests
+      run: pytest
