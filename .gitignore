@@ -16,7 +16,8 @@ __pycache__/
 # ===============================
 # Backup files / temporary
 # ===============================
-backups/
+backup/
+backup/*.tar.gz
 *.bak
 *.swp
 *.tmp
