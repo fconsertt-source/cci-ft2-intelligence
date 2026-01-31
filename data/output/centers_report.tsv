@@ -1,4 +1,0 @@
-center_id	center_name	decision	vvm_stage	recommended_action	num_ft2_entries	has_freeze	has_ccm_violation	freeze_duration_mins	heat_duration_mins	avg_temperature	min_temperature	max_temperature
-HOSPITAL_01	مستشفى المركز الرئيسي	ACCEPTED	NONE	اللقاحات سليمة (النوافذ بيضاء). تستخدم بشكل طبيعي	24	NO	NO	0	0	5.0	4.8	5.2
-CLINIC_02	عيادة الحي الشمالي	REJECTED_FREEZE_SENSITIVE	NONE	تحقق من خاصية اللقاح: إتلاف الحساسة للتجميد فقط. الباقي سليم	24	YES	NO	120	0	-1.8	-2.1	-1.5
-MOBILE_03	وحدة التطعيم المتنقلة	WARNING_HEAT_A	A	استخدم شلل الأطفال خلال 3 أشهر. باقي اللقاحات طبيعي (المرحلة A)	24	NO	YES	0	180	13.4	12.5	14.2
