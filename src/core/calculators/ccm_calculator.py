@@ -1,3 +1,6 @@
+from typing import List, Dict
+from src.core.entities.temperature_reading import TemperatureReading
+
 # ccm_calculator.py (مُحسّن)
 class CCMCalculator:
     """يحسب التراكم الحراري بطرق متعددة"""
