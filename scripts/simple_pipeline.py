@@ -6,17 +6,12 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.infrastructure.logging import get_logger
-from src.application.mappers.center_mapper import to_center_dto
+from src.shared.di_container import create_evaluate_cold_chain_uc
 from src.application.dtos.center_dto import CenterDTO
+from src.core.services.rules_engine import apply_rules
+from src.reporting.csv_reporter import generate_centers_report
 
 logger = get_logger(__name__)
-
-
-class CenterEntity:
-    """Lightweight internal entity used during pipeline processing only."""
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
 
 
 def run_simple_pipeline():
@@ -56,50 +51,52 @@ MOBILE_03\tوحدة التطعيم المتنقلة\tWARNING_HEAT_A\tA\tاستخ
 
     logger.info("✅ تم إنشاء التقرير الوهمي")
 
-    # Map the TSV to internal Entities and then to DTOs for presentation
-    centers = []
+    # Map the TSV directly into CenterDTOs (NO Entities leave the Domain)
+    centers_dto = []
     for line in fake_report.splitlines():
         if line.startswith('center_id'):
             continue
         parts = line.split('\t')
         if len(parts) < 13:
             continue
-        ent = CenterEntity(
+
+        # create lightweight ft2 entry objects expected by RulesEngine
+        # here we create an example list (empty durations) to satisfy report logic
+        ft2_entries = []
+
+        dto = CenterDTO(
             id=parts[0],
             name=parts[1],
+            device_ids=[],
+            ft2_entries=ft2_entries,
             decision=parts[2],
             vvm_stage=parts[3],
-            recommended_action=parts[4],
-            num_ft2_entries=int(parts[5]),
-            has_freeze=parts[6],
-            has_ccm_violation=parts[7],
-            freeze_duration_mins=int(parts[8]),
-            heat_duration_mins=int(parts[9]),
-            avg_temperature=float(parts[10]),
-            min_temperature=float(parts[11]),
-            max_temperature=float(parts[12]),
+            alert_level=None,
+            stability_budget_consumed_pct=0.0,
+            thaw_remaining_hours=None,
+            category_display=None,
             decision_reasons=[parts[4]]
         )
-        centers.append(ent)
+        centers_dto.append(dto)
 
-    dtos = [to_center_dto(c) for c in centers]
-    logger.info("Mapped %d internal centers to DTOs for presentation", len(dtos))
-    
-    # 3. إنشاء PDF
-    logger.info("📄 الخطوة 3: إنشاء تقرير PDF...")
+    logger.info("Mapped %d rows to CenterDTOs (no Entities passed outside Domain)", len(centers_dto))
 
-    try:
-        from src.reporting.simple_pdf_generator import create_simple_pdf
-        pdf_path = create_simple_pdf()
-        if pdf_path:
-            logger.info("✅ تم إنشاء التقرير PDF: %s", pdf_path)
-            return True
-    except Exception as e:
-        logger.warning("⚠️  لم يتم إنشاء PDF: %s", e)
-        logger.info("📋 لكن التقرير النصي جاهز في: data/output/centers_report.tsv")
-        return True
-    
-    return False
+    # Demonstrate use of the Composition Root (di_container) — create UC (reader=None for demo)
+    uc = create_evaluate_cold_chain_uc(reader=None)
+    logger.debug("Created EvaluateColdChainSafetyUC via di_container: %s", type(uc).__name__)
+
+    # Apply rules (analysis) on each DTO (RulesEngine accepts DTO-like objects)
+    for center in centers_dto:
+        # apply_rules will set `decision` and `decision_reasons` on the DTO
+        apply_rules(center)
+
+    # Pass DTOs only to the reporting layer
+    centers_report_path = "data/output/centers_report.tsv"
+    os.makedirs(os.path.dirname(centers_report_path), exist_ok=True)
+    generate_centers_report(centers_dto, centers_report_path)
+
+    logger.info("✅ تم إنشاء التقرير عبر generate_centers_report: %s", centers_report_path)
+    return True
 
 if __name__ == "__main__":
     success = run_simple_pipeline()
