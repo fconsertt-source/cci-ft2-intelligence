@@ -1,0 +1,9 @@
+# serializer version: 1
+# name: test_centers_report_snapshot
+  '''
+  center_id	center_name	decision	has_warning	alert_level	vvm_stage	stability_budget_consumed_pct	thaw_remaining_hours	category_display	recommended_action	num_ft2_entries	has_freeze	has_ccm_violation	avg_temperature	min_temperature	max_temperature	decision_reasons
+  C1	Center 1	ACCEPTED	NO	GREEN	STAGE_1	0.00	N/A	General	اللقاحات سليمة (النوافذ بيضاء). تستخدم بشكل طبيعي	1	NO	NO	5.00	2.00	8.00	All entries within custom range
+  C2	Center 2	REJECTED	NO	GREEN	STAGE_2	0.00	N/A	General	مراجعة يدوية (REJECTED)	1	NO	NO	10.00	4.00	12.00	Temp 12.0 > max 8.0
+  
+  '''
+# ---

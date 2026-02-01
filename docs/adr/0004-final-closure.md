@@ -36,3 +36,5 @@ Operational next steps
 4. Update `docs/ProjectState.md` with the final project snapshot and note ADR0004 as implemented.
 
 Signed-off-by: Architecture Team
+
+Reference: Superseded / Finalized by ADR 0005
