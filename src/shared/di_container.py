@@ -6,6 +6,7 @@ Centralizes construction so Presentation and Application do not `new` domain com
 from src.application.use_cases.evaluate_cold_chain_safety_use_case import EvaluateColdChainSafetyUseCase
 from src.application.use_cases.import_ft2_data_uc import ImportFt2DataUseCase
 from src.application.use_cases.generate_report_uc import GenerateReportUseCase
+from src.application.ports.report_generator_port import ReportGeneratorPort
 from src.infrastructure.adapters.default_ft2_reader import DefaultFt2Reader
 from src.infrastructure.adapters.json_ft2_data_writer import JsonFt2DataWriter
 
@@ -24,14 +25,24 @@ def build_evaluate_uc() -> EvaluateColdChainSafetyUseCase:
     return EvaluateColdChainSafetyUseCase()
 
 
+class MockReportGenerator:
+    """Mock adapter implementing ReportGeneratorPort for Phase 4 validation.
+    
+    This proves that:
+      - Ports enforce contractual boundaries
+      - DI container is the ONLY place for adapter instantiation
+      - Application layer never depends on concrete infrastructure
+    """
+    def generate(self, input_path: str, output_path: str) -> str:
+        print("Mock-generating report...")
+        return output_path
+
+
 def build_generate_report_uc() -> GenerateReportUseCase:
-    """Placeholder implementation for Phase 4 validation."""
-    class MockGenerator:
-        def generate(self, *args, **kwargs):
-            return "reports/mock_report.txt"
+    """Composition Root wiring for report generation.
     
-    class MockValidator:
-        def validate(self, *args, **kwargs):
-            pass
-    
-    return GenerateReportUseCase(generator=MockGenerator(), validator=MockValidator())
+    This is the ONLY place where infrastructure adapters (even mocks) are instantiated
+    and wired to application-layer Use Cases via Ports.
+    """
+    generator: ReportGeneratorPort = MockReportGenerator()
+    return GenerateReportUseCase(generator=generator)
