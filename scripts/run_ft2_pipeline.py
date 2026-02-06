@@ -15,9 +15,11 @@ from src.infrastructure.logging import get_logger
 from src.shared.di_container import create_evaluate_cold_chain_uc
 from src.infrastructure.adapters.ft2_reader_adapter import FT2ReaderAdapter
 from src.application.dtos.center_dto import CenterDTO
+from src.application.dtos.evaluate_cold_chain_safety_request import EvaluateColdChainSafetyRequest, TemperatureReading
+from src.application.use_cases.evaluate_cold_chain_safety_use_case import EvaluateColdChainSafetyUseCase
 from scripts.create_test_data import create_test_data
-from src.domain.services.rules_engine import calculate_center_stats, apply_rules
-from src.reporting.csv_reporter import generate_centers_report
+from src.domain.services.rules_engine import calculate_center_stats
+from src.presentation.reporting.csv_reporter import generatecgenerate_centers_report, MessageProvider
 
 
 
@@ -105,9 +107,9 @@ def load_centers(config_path: str = "config/center_profiles.yaml") -> List:
         logger.info(f"تم تحميل {len(centers)} مركز تطعيم (Entities/Profiles)")
         return centers
     except Exception as e:
-        logger.critical(f"❌ خطأ حرج في تحميل تكوين المراكز: {e}")
+        logger.critical(MessageProvider.get('CRITICAL_CONFIG_LOAD_FAILED', error=e))
         # تحسين الصمود: عدم استخدام قيم افتراضية في الأنظمة الطبية
-        raise RuntimeError("فشل تحميل تكوين المراكز. تم إيقاف التشغيل لسلامة البيانات.") from e
+        raise RuntimeError(MessageProvider.get('CONFIG_LOAD_FAILED_STOP')) from e
 
 
 
@@ -129,7 +131,7 @@ def process_ft2_file_new(file_path: str, centers: list, device_map: Dict[str, ob
 
         # أثناء المرحلة المرحلية، سنبقي الربط القديم كقيمة احتياطية
         try:
-            from src.ft2_reader.services.ft2_linker import FT2Linker
+            from src.infrastructure.ft2_reader.services.ft2_linker import FT2Linker
             FT2Linker.link(entries, centers)
         except Exception:
             pass
@@ -191,7 +193,7 @@ def run_pipeline(config_path: str = "config/center_profiles.yaml",
                  output_dir: str = "data/output"):
     """تشغيل خط المعالجة الكامل"""
     
-    logger.info("🚀 بدء تشغيل خط معالجة FT2")
+    logger.info(MessageProvider.get('PIPELINE_START'))
     
     # 1. إعداد المجلدات
     setup_directories()
@@ -217,22 +219,22 @@ def run_pipeline(config_path: str = "config/center_profiles.yaml",
         ft2_files = [f for f in os.listdir(ft2_dir) if f.endswith(('.csv', '.tsv'))]
             
     if not ft2_files:
-        logger.warning(f"⚠️ لم يتم العثور على ملفات للمعالجة في: {ft2_dir}")
+        logger.warning(MessageProvider.get('NO_FILES_TO_PROCESS', path=ft2_dir))
         
         # اقتراح ذكي للمستخدم
         if not os.listdir(input_dir):
-            logger.info("💡 تلميح: المجلد فارغ. يمكنك إنشاء بيانات اختبار باستخدام الخيار: --generate-data")
+            logger.info(MessageProvider.get('EMPTY_INPUT_DIR_HINT'))
         return
 
-    logger.info(f"📁 وجد {len(ft2_files)} ملف للمعالجة في {ft2_dir}")
+    logger.info(MessageProvider.get('FILES_FOUND_TO_PROCESS', count=len(ft2_files), path=ft2_dir))
     
     failed_files = []
     
     # --- الإصلاح المعماري ---
     # إزالة حالة الاستخدام (Use Case) والعودة إلى منطق التحليل والربط البسيط
     # الذي يتوافق مع بنية البرنامج النصي.
-    from src.ft2_reader.parser.ft2_parser import FT2Parser
-    from src.ft2_reader.services.ft2_linker import FT2Linker
+    from src.infrastructure.ft2_reader.parser.ft2_parser import FT2Parser
+    from src.infrastructure.ft2_reader.services.ft2_linker import FT2Linker
 
     for ft2_file in ft2_files:
         ft2_path = os.path.join(ft2_dir, ft2_file)
@@ -247,16 +249,47 @@ def run_pipeline(config_path: str = "config/center_profiles.yaml",
 
             logger.info(f"✅ تمت معالجة وربط: {ft2_file}")
         except Exception as e:
-            logger.error(f"❌ فشل معالجة {ft2_file}: {e}")
+            logger.error(MessageProvider.get('FILE_PROCESSING_FAILED', file=ft2_file, error=e))
             failed_files.append((ft2_file, str(e)))
     
-    # 5. تطبيق القواعد وإنشاء التقارير
-    logger.info(" Applying rules and generating reports...")
+    # 5. تطبيق القواعد وإنشاء التقارير (عبر UseCase)
+    logger.info(" Applying rules via EvaluateColdChainSafetyUseCase...")
+    
+    # Instantiate UseCase (Pure Logic, no readers)
+    use_case = EvaluateColdChainSafetyUseCase()
     
     all_results = [] # للتوافق مع بنية التقرير القديمة
     for center in centers:
         if center.ft2_entries:
-            apply_rules(center)
+            # 1. Prepare Request (Data Only)
+            readings = tuple(
+                TemperatureReading(
+                    value=entry.temp,
+                    timestamp=entry.timestamp,
+                    device_id=getattr(entry, 'device_id', 'unknown')
+                ) for entry in center.ft2_entries
+            )
+            
+            request = EvaluateColdChainSafetyRequest(
+                center_id=center.id,
+                center_name=center.name,
+                readings=readings,
+                temperature_ranges=center.temperature_ranges,
+                decision_thresholds=center.decision_thresholds
+            )
+            
+            # 2. Execute UseCase (Pure Processing)
+            response = use_case.execute(request)
+            
+            # 3. Update Runtime Object with Results (for reporting compatibility)
+            center.decision = response.decision
+            center.vvm_stage = response.vvm_stage
+            center.alert_level = response.alert_level
+            center.stability_budget_consumed_pct = response.stability_budget_consumed_pct
+            center.thaw_remaining_hours = response.thaw_remaining_hours
+            center.category_display = response.category_display
+            center.decision_reasons = list(response.decision_reasons)
+            
             all_results.append({'file_path': 'Multiple sources', 'centers_affected': [{'center_name': center.name, 'entries_count': len(center.ft2_entries)}]})
 
     # --- Phase 2: Mapping Boundary ---
@@ -289,24 +322,24 @@ def run_pipeline(config_path: str = "config/center_profiles.yaml",
     
     # 6. عرض الملخص
     logger.info("%s", "\n" + ("="*70))
-    logger.info("ملخص تشغيل خط المعالجة")
+    logger.info(MessageProvider.get('PIPELINE_SUMMARY_TITLE'))
     logger.info("%s", "="*70)
-    logger.info("الملفات المعالجة: %d من أصل %d", len(all_results), len(ft2_files))
-    logger.info("الملفات الفاشلة: %d", len(failed_files))
-    logger.info("تقرير المراكز: %s", centers_report_path)
-    logger.info("التقارير التفصيلية: %s/", reports_dir)
+    logger.info(MessageProvider.get('FILES_PROCESSED', processed_count=len(all_results), total_count=len(ft2_files)))
+    logger.info(MessageProvider.get('FILES_FAILED', failed_count=len(failed_files)))
+    logger.info(MessageProvider.get('CENTER_REPORT_GENERATED', path=centers_report_path))
+    logger.info(MessageProvider.get('DETAILED_REPORTS_GENERATED', path=f"{reports_dir}/"))
 
     if failed_files:
-        logger.warning("الملفات الفاشلة:")
+        logger.warning(MessageProvider.get('FAILED_FILES_LIST_TITLE'))
         for file, error in failed_files:
             logger.warning("  - %s: %s", file, error)
     
-    logger.info(f"🏁 اكتمل خط المعالجة. انظر {output_dir} للنتائج")
+    logger.info(MessageProvider.get('PIPELINE_COMPLETE', output_dir=output_dir))
 
 def main():
     """الدالة الرئيسية"""
     parser = argparse.ArgumentParser(
-        description='نظام متكامل لمعالجة ملفات FT2 لمراقبة سلسلة التبريد',
+        description=MessageProvider.get('CLI_DESCRIPTION'),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 أمثلة:
@@ -345,7 +378,7 @@ def main():
             output_dir=args.output
         )
     except Exception as e:
-        logger.error(f"❌ خطأ غير متوقع: {e}")
+        logger.error(MessageProvider.get('UNEXPECTED_ERROR', error=e))
         sys.exit(1)
 
 if __name__ == "__main__":

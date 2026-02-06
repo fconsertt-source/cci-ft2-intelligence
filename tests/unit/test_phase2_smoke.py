@@ -1,26 +1,55 @@
 import pytest
+from datetime import datetime, timedelta
 
-from src.infrastructure.parsers import FT2Parser
-from src.infrastructure.validators import FT2Validator
-from src.shared.di_container import create_evaluate_cold_chain_uc
-
-
-class DummyReader:
-    def get_vaccines(self):
-        return []
-
-    def read_all(self):
-        return []
+from src.application.use_cases.evaluate_cold_chain_safety_use_case import EvaluateColdChainSafetyUseCase
+from src.application.dtos.evaluate_cold_chain_safety_request import (
+    EvaluateColdChainSafetyRequest,
+    TemperatureReading,
+)
+from src.application.dtos.analysis_result_dto import VaccineStatus
 
 
-def test_reexports_importable():
-    # Ensure that re-exports are importable and callable
-    assert hasattr(FT2Parser, 'parse_file')
-    assert hasattr(FT2Validator, 'validate_temporal_consistency') or hasattr(FT2Validator, 'validate')
+def make_dummy_readings(device_id: str, count: int = 3):
+    """إنشاء قراءات حرارة وهمية بالترتيب الزمني"""
+    now = datetime.now()
+    return tuple(
+        TemperatureReading(
+            device_id=device_id,
+            value=5.0 + i,  # درجة حرارة بسيطة متزايدة
+            timestamp=now + timedelta(hours=i)
+        )
+        for i in range(count)
+    )
 
 
-def test_uc_creation_and_execute_returns_list():
-    reader = DummyReader()
-    uc = create_evaluate_cold_chain_uc(reader=reader)
-    results = uc.execute()
-    assert isinstance(results, list)
+def test_uc_creation_and_execute_returns_response():
+    """التحقق من أن UseCase يعمل مع طلب صالح ويعيد استجابة متوقعة"""
+    uc = EvaluateColdChainSafetyUseCase()
+
+    # تجهيز البيانات الوهمية
+    readings = make_dummy_readings("DEV001")
+
+    request = EvaluateColdChainSafetyRequest(
+        center_id="C01",
+        center_name="Test Center",
+        readings=readings,
+    )
+
+    # تنفيذ الـ UseCase
+    response = uc.execute(request)
+
+    # التحقق من أن الاستجابة تعكس الطلب والتحليل
+    assert response.center_id == "C01"
+    assert response.decision is not None
+    assert response.stability_budget_consumed_pct >= 0.0
+
+
+def test_uc_handles_empty_request():
+    """التحقق من التعامل مع طلب فارغ"""
+    uc = EvaluateColdChainSafetyUseCase()
+    request = EvaluateColdChainSafetyRequest(center_id="C02", center_name="Empty Center", readings=())
+    response = uc.execute(request)
+
+    # يجب أن تكون النتيجة حالة غير معروفة ولكن بدون خطأ
+    assert response.center_id == "C02"
+    assert response.decision == "UNKNOWN"

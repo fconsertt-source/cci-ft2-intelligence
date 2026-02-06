@@ -34,7 +34,7 @@ The `VVMStageRule` uses the **Heat Exposure Ratio (HER)** calculated by the `VVM
 
 ## 4. Status Mapping
 
-In the application layer (`EvaluateColdChainSafetyUC`), string decisions are mapped to `VaccineStatus` enums:
+In the application layer (`EvaluateColdChainSafetyUseCase`), string decisions are mapped to `VaccineStatus` enums:
 
 - `ACCEPTED` -> `SAFE` (or `PARTIAL` if warnings/VVM stages exist)
 - `REJECTED_*` -> `DISCARD`

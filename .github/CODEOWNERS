@@ -1,0 +1,21 @@
+# CODEOWNERS — Architecture Guardians
+# Any change to these paths requires review from @fconsertt-source
+# This enforces architectural boundaries at the PR review level
+
+# Core Domain Layer — Pure business rules (no external dependencies allowed)
+/src/domain/          @fconsertt-source
+
+# Application Layer — Pure Use Cases + DTOs (no infrastructure dependencies allowed)
+/src/application/     @fconsertt-source
+
+# Infrastructure Layer — Adapters only (must implement Application Ports)
+/src/infrastructure/  @fconsertt-source
+
+# Presentation Layer — Formatting/Wiring only (no business logic allowed)
+/src/presentation/    @fconsertt-source
+
+# Architectural Decision Records — Changes require architecture review
+/docs/adr/            @fconsertt-source
+
+# Guard Scripts — Critical for architectural enforcement
+/scripts/check_*.py   @fconsertt-source

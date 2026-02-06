@@ -2,7 +2,7 @@ import pytest
 import os
 import csv
 from datetime import datetime
-from src.ft2_reader.parser.ft2_parser import FT2Parser, FT2Entry
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser, FT2Entry
 
 class TestFT2Parser:
     

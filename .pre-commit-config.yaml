@@ -1,0 +1,30 @@
+# Pre-commit hooks — Lightweight local guards
+# Install once: pre-commit install
+# Runs automatically before every git commit
+
+repos:
+  - repo: local
+    hooks:
+      - id: architectural-guard-entity-leakage
+        name: "Guard: No Entity Leakage"
+        entry: python scripts/check_no_core_entity_imports.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [commit]
+      
+      - id: architectural-guard-di-container
+        name: "Guard: DI Container Enforcement"
+        entry: python scripts/check_di_container_usage.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [commit]
+      
+      - id: architectural-guard-src-root
+        name: "Guard: src/ Root Cleanliness"
+        entry: python scripts/check_src_root_clean.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [commit]
