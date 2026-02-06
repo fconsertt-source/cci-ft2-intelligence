@@ -10,7 +10,6 @@ import re
 ROOT = os.path.dirname(os.path.dirname(__file__))
 TARGET_DIRS = [
     os.path.join(ROOT, 'scripts'),
-    os.path.join(ROOT, 'src', 'reporting'),
     os.path.join(ROOT, 'src', 'presentation')
 ]
 

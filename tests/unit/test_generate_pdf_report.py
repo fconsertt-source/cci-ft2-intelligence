@@ -31,6 +31,6 @@ def test_generate_pdf_report_calls_generator(monkeypatch, tmp_path):
     FakeGen = MagicMock()
     FakeGen.generate_report.return_value = fake_path
 
-    with patch('src.reporting.pdf_generator.PDFReportGenerator', return_value=FakeGen):
+    with patch('src.presentation.reporting.pdf_generator.PDFReportGenerator', return_value=FakeGen):
         generate_pdf_report.main()
         FakeGen.generate_report.assert_called()

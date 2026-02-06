@@ -1,19 +1,16 @@
+# src/application/ports/ft2_reader_port.py
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Protocol
+from typing import Protocol, List
 
-from application.dtos.analysis_result_dto import AnalysisResultDTO
+from src.application.dtos.ft2_entry_dto import FT2EntryDTO
 
 
 class Ft2ReaderPort(Protocol):
     """
-    Port for reading FT2 raw data and returning a DTO suitable for application layer consumption.
-    Implementations live in infrastructure/adapters and must not be imported by application.
+    Port for reading FT2 raw data and returning pure DTOs (no analysis/decision logic).
+    Implementations must return raw entries only — analysis happens in Use Cases.
     """
-
-    def read(self, source: Path) -> AnalysisResultDTO:  # Narrow DTO for app use
-        """Read FT2 source (file or directory) and return structured DTO.
-        Implementations may perform parsing/validation but must not leak domain entities.
-        """
+    def read(self, source: Path) -> List[FT2EntryDTO]:
         ...

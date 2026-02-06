@@ -1,8 +1,8 @@
 # tests/unit/test_ft2_linker.py
 import pytest
 from datetime import datetime
-from src.ft2_reader.services.ft2_linker import FT2Linker
-from src.ft2_reader.parser.ft2_parser import FT2Entry
+from src.infrastructure.adapters.ft2_reader.services.ft2_linker import FT2Linker
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Entry
 from src.domain.entities.vaccination_center import VaccinationCenter, FreezeTolerance
 
 # Fixtures for test data

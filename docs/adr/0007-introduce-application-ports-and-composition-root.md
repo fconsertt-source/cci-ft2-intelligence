@@ -15,7 +15,7 @@ Additionally, there is an existing "reader" path used by tests and some scripts 
 - Introduce explicit Application Ports to invert dependencies:
   - IDataRepository: reads DTOs for centers and vaccines.
   - IReporter: emits artifacts for a given AnalysisResultDTO.
-- Keep the current `reader` constructor argument on `EvaluateColdChainSafetyUC` for backward compatibility in tests and scripts, but consider it a transitional mechanism.
+- Keep the current `reader` constructor argument on `EvaluateColdChainSafetyUseCase` for backward compatibility in tests and scripts, but consider it a transitional mechanism.
 - Establish an explicit Composition Root where Infrastructure adapters are wired to Use Cases. This is the only place that may import Infrastructure from Application.
 
 ## Added Ports
@@ -30,14 +30,14 @@ These Ports use DTOs only; no domain entities or IO details.
 
 ## Transitional Legacy Reader
 
-- EvaluateColdChainSafetyUC still supports `reader` and `repository` constructor params for existing tests and scripts.
+- EvaluateColdChainSafetyUseCase still supports `reader` and `repository` constructor params for existing tests and scripts.
 - The `reader` path is maintained to avoid breaking changes during the transition. Over time, data ingestion should move behind IDataRepository (and future ports for readings), then the legacy `reader` can be deprecated.
 
 ## Composition Root
 
 - A new explicit factory was added:
   - src/shared/di_container.py
-    - build_evaluate_uc(): wires Ft2RepositoryAdapter (IDataRepository) and NoOpReporter (IReporter) into EvaluateColdChainSafetyUC.
+    - build_evaluate_uc(): wires Ft2RepositoryAdapter (IDataRepository) and NoOpReporter (IReporter) into EvaluateColdChainSafetyUseCase.
 - No conditional logic is present in the Composition Root; it only performs wiring.
 - Application does not import Infrastructure anywhere else.
 

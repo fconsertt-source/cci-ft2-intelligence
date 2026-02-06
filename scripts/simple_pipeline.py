@@ -6,19 +6,18 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.infrastructure.logging import get_logger
-from src.shared.di_container import create_evaluate_cold_chain_uc
 from src.application.dtos.center_dto import CenterDTO
 from src.domain.services.rules_engine import apply_rules
-from src.reporting.csv_reporter import generate_centers_report
-
+from src.presentation.reporting.csv_reporter import generate_centers_report
+from src.presentation.messages.message_map import MessageProvider
 logger = get_logger(__name__)
 
 
 def run_simple_pipeline():
-    logger.info("🚀 بدء التشغيل المبسط...")
+    logger.info(MessageProvider.get('SIMPLE_PIPELINE_START'))
 
     # 1. إنشاء بيانات اختبار
-    logger.info("🧪 الخطوة 1: إنشاء بيانات اختبار...")
+    logger.info(MessageProvider.get('SIMPLE_PIPELINE_STEP_1'))
     
     test_data = '''device_id,timestamp,temperature,vaccine_type,batch
 130600112764,2024-01-15T08:00:00,5.2,COVID-19,BATCH-2024-001
@@ -33,10 +32,10 @@ def run_simple_pipeline():
     with open("data/input_raw/test_data.csv", "w", encoding="utf-8") as f:
         f.write(test_data)
 
-    logger.info("✅ تم إنشاء بيانات الاختبار")
+    logger.info(MessageProvider.get('SIMPLE_PIPELINE_TEST_DATA_CREATED'))
     
     # 2. محاكاة معالجة البيانات
-    logger.info("🔄 الخطوة 2: محاكاة معالجة البيانات...")
+    logger.info(MessageProvider.get('SIMPLE_PIPELINE_STEP_2'))
     
     # إنشاء تقرير وهمي
     os.makedirs("data/output", exist_ok=True)
@@ -49,7 +48,7 @@ MOBILE_03\tوحدة التطعيم المتنقلة\tWARNING_HEAT_A\tA\tاستخ
     with open("data/output/centers_report.tsv", "w", encoding="utf-8") as f:
         f.write(fake_report)
 
-    logger.info("✅ تم إنشاء التقرير الوهمي")
+    logger.info(MessageProvider.get('SIMPLE_PIPELINE_FAKE_REPORT_CREATED'))
 
     # Map the TSV directly into CenterDTOs (NO Entities leave the Domain)
     centers_dto = []
@@ -79,11 +78,7 @@ MOBILE_03\tوحدة التطعيم المتنقلة\tWARNING_HEAT_A\tA\tاستخ
         )
         centers_dto.append(dto)
 
-    logger.info("Mapped %d rows to CenterDTOs (no Entities passed outside Domain)", len(centers_dto))
-
-    # Demonstrate use of the Composition Root (di_container) — create UC (reader=None for demo)
-    uc = create_evaluate_cold_chain_uc(reader=None)
-    logger.debug("Created EvaluateColdChainSafetyUC via di_container: %s", type(uc).__name__)
+    logger.info(MessageProvider.get('SIMPLE_PIPELINE_MAPPED_TO_DTO', count=len(centers_dto)))
 
     # Apply rules (analysis) on each DTO (RulesEngine accepts DTO-like objects)
     for center in centers_dto:
@@ -95,12 +90,12 @@ MOBILE_03\tوحدة التطعيم المتنقلة\tWARNING_HEAT_A\tA\tاستخ
     os.makedirs(os.path.dirname(centers_report_path), exist_ok=True)
     generate_centers_report(centers_dto, centers_report_path)
 
-    logger.info("✅ تم إنشاء التقرير عبر generate_centers_report: %s", centers_report_path)
+    logger.info(MessageProvider.get('SIMPLE_PIPELINE_REPORT_GENERATED', path=centers_report_path))
     return True
 
 if __name__ == "__main__":
     success = run_simple_pipeline()
     if success:
-        logger.info("🎉 اكتمل التشغيل المبسط بنجاح!")
+        logger.info(MessageProvider.get('SIMPLE_PIPELINE_SUCCESS'))
     else:
-        logger.error("❌ فشل التشغيل المبسط")
+        logger.error(MessageProvider.get('SIMPLE_PIPELINE_FAILED'))

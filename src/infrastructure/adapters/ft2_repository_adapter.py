@@ -5,7 +5,7 @@ from typing import Iterable, List
 from src.application.ports.i_repository import IDataRepository
 from src.application.dtos.center_dto import CenterDTO
 from src.application.dtos.vaccine_dto import VaccineDTO
-from src.utils.vaccine_library_loader import VaccineLibraryLoader
+from src.infrastructure.utils.vaccine_library_loader import VaccineLibraryLoader
 
 
 class Ft2RepositoryAdapter(IDataRepository):
