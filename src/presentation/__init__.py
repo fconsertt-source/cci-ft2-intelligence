@@ -1,7 +1,14 @@
-"""Presentation package.
+"""
+Presentation Layer — User-facing interfaces only (no business logic).
 
-Contains API controllers, CLI commands, and visualization entry points.
-Ensure controllers accept/return DTOs only; domain entities must not be returned here.
+Exports:
+  - reporting: Data formatting (CSV/PDF/HTML)
+  - cli: Command-line interfaces (wiring only)
+  - messages: Centralized MessageMap for all user text
 """
 
-__all__ = []
+from . import reporting
+from . import cli
+from . import messages
+
+__all__ = ["reporting", "cli", "messages"]

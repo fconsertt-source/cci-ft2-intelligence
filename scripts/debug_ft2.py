@@ -14,7 +14,8 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.infrastructure.logging import get_logger
-from src.ft2_reader.parser.ft2_parser import FT2Parser
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
+from src.presentation.messages.message_map import MessageProvider
 
 logger = get_logger(__name__)
 
@@ -23,10 +24,10 @@ def clean_bad_files():
     """حذف الملفات الفارغة أو التالفة من data/input_ft2"""
     target_dir = "data/input_ft2"
     if not os.path.exists(target_dir):
-        logger.warning("المجلد %s غير موجود.", target_dir)
+        logger.warning(MessageProvider.get('DEBUG_DIR_NOT_FOUND', path=target_dir))
         return
 
-    logger.info("🧹 تنظيف الملفات التالفة في %s", target_dir)
+    logger.info(MessageProvider.get('DEBUG_CLEANING_FILES', path=target_dir))
 
     removed_count = 0
     for file in os.listdir(target_dir):
@@ -51,23 +52,23 @@ def clean_bad_files():
 
             if should_remove:
                 os.remove(filepath)
-                logger.info("🗑️ تم حذف: %s (%s)", file, reason)
+                logger.info(MessageProvider.get('DEBUG_FILE_DELETED', file=file, reason=reason))
                 removed_count += 1
 
         except Exception as e:
             logger.error("❌ خطأ في فحص %s: %s", file, e)
 
     if removed_count == 0:
-        logger.info("✨ لم يتم العثور على ملفات تالفة.")
+        logger.info(MessageProvider.get('DEBUG_NO_BAD_FILES'))
     else:
-        logger.info("✅ تم تنظيف %d ملف.", removed_count)
+        logger.info(MessageProvider.get('DEBUG_CLEANED_COUNT', count=removed_count))
 
 def debug_raw_files():
     """فحص الملفات الخام (TSV/CSV) في data/input_raw"""
     input_dir = "data/input_raw"
     
     if not os.path.exists(input_dir):
-        logger.warning("المجلد %s غير موجود.", input_dir)
+        logger.warning(MessageProvider.get('DEBUG_DIR_NOT_FOUND', path=input_dir))
         return
 
     logger.info("فحص الملفات الخام في: %s", input_dir)
@@ -103,7 +104,7 @@ def debug_ft2_files():
     input_dir = "data/input_ft2"
 
     if not os.path.exists(input_dir):
-        logger.warning("المجلد %s غير موجود.", input_dir)
+        logger.warning(MessageProvider.get('DEBUG_DIR_NOT_FOUND', path=input_dir))
         return
 
     for file in os.listdir(input_dir):
@@ -140,4 +141,4 @@ if __name__ == "__main__":
     else:
         debug_raw_files()
         debug_ft2_files()
-        logger.info("\n💡 تلميح: لتنظيف الملفات التالفة تلقائياً، شغّل: python scripts/debug_ft2.py --clean")
+        logger.info(MessageProvider.get('DEBUG_CLEAN_HINT'))

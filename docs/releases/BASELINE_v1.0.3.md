@@ -17,7 +17,7 @@
 ## 2. Architectural Compliance
 
 ### 2.1 Use Case & Orchestration
-- `EvaluateColdChainSafetyUC`: Successfully refactored as an Orchestrator. 
+- `EvaluateColdChainSafetyUseCase`: Successfully refactored as an Orchestrator. 
 - **Scientific Logic:** Outsourced to `VVMQ10Model`.
 - **Decision Making:** Outsourced to `RulesEngine`.
 
@@ -31,7 +31,7 @@
 - **Critical Logic Coverage:**
     - `vvm_q10_model.py`: **97%**
     - `rules_engine.py`: **99%**
-    - `evaluate_cold_chain_safety_uc.py`: **98%**
+    - `evaluate_cold_chain_safety_use_case.py`: **98%**
     - `vvm_stage.py`: **100%**
 - **Test Naming:** All files follow `test_*.py` pattern and are auto-discoverable by pytest.
 

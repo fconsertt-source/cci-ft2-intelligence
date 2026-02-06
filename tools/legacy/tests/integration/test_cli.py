@@ -3,7 +3,9 @@ import types
 
 import pytest
 
-from src import main
+from src.shared.di_container import build_evaluate_uc
+uc = build_evaluate_uc()
+result = uc.execute(request)
 
 
 def test_cli_evaluate_logs_results(monkeypatch, caplog):
@@ -33,7 +35,7 @@ def test_cli_evaluate_logs_results(monkeypatch, caplog):
     main.main(["evaluate"])
 
     assert executed["ok"] is True
-    assert "Running EvaluateColdChainSafetyUC" in caplog.text
+    assert "Running EvaluateColdChainSafetyUseCase" in caplog.text
     assert "Vaccine=VAX-123" in caplog.text
 
 

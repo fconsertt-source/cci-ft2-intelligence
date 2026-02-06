@@ -252,7 +252,7 @@
         "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-        "path": "src/application/use_cases/evaluate_cold_chain_safety_uc.py",
+        "path": "src/application/use_cases/evaluate_cold_chain_safety_use_case.py",
         "sha256": "8af385462469ef0e6d2861e4782076c058102dce9d821fcb204c7d000251a8e2"
     },
     {

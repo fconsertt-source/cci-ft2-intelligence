@@ -2,7 +2,7 @@
 import pytest
 from datetime import datetime
 from src.domain.entities.vaccination_center import VaccinationCenter, FreezeTolerance
-from src.ft2_reader.parser.ft2_parser import FT2Entry
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Entry
 
 @pytest.fixture
 def zero_tolerance_center():

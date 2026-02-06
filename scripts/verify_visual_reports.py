@@ -7,6 +7,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.infrastructure.logging import get_logger
+from src.presentation.messages.message_map import MessageProvider
 
 logger = get_logger(__name__)
 
@@ -48,22 +49,22 @@ def main():
     
     # Import heavy generator lazily
     try:
-        from src.reporting.unified_pdf_generator import UnifiedPDFGenerator, ReportType
+        from src.presentation.reporting.unified_pdf_generator import UnifiedPDFGenerator, ReportType
     except Exception as e:
         logger.error("Could not import UnifiedPDFGenerator: %s", e)
         return
 
     gen = UnifiedPDFGenerator(output_dir=output_dir)
 
-    logger.info("Generating Official Visual Report...")
+    logger.info(MessageProvider.get('VISUAL_REPORT_OFFICIAL'))
     official_path = gen.generate(ReportType.OFFICIAL, data_path, "visual_test_official.pdf")
     logger.info("Done: %s", official_path)
 
-    logger.info("Generating Technical Visual Report...")
+    logger.info(MessageProvider.get('VISUAL_REPORT_TECHNICAL'))
     tech_path = gen.generate(ReportType.TECHNICAL, data_path, "visual_test_tech.pdf")
     logger.info("Done: %s", tech_path)
 
-    logger.info("Generating Arabic Visual Report...")
+    logger.info(MessageProvider.get('VISUAL_REPORT_ARABIC'))
     arabic_path = gen.generate(ReportType.ARABIC, data_path, "visual_test_arabic.pdf")
     logger.info("Done: %s", arabic_path)
 
