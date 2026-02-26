@@ -1,0 +1,45 @@
+# ADR-0010: Safe Interface Construction on a Hardened Reference
+
+## Status
+**APPROVED — VALIDATION PHASE**  
+*Not expansion — proof that guards enable value without drift*
+
+## Goal
+Prove that the hardened reference (Phase 3) can safely support real user interfaces **without breaking architectural boundaries**.  
+This is validation of Phase 3 — not feature development.
+
+## Unbreakable Rules (Violations block merge)
+1. **Composition Root Enforcement**  
+   All Use Cases MUST be instantiated ONLY via `src/shared/di_container.py`  
+   → Direct instantiation outside di_container = merge blocked
+
+2. **DTO Boundary Integrity**  
+   Presentation layer MUST consume ONLY DTOs (never Domain Entities)  
+   → `from src.domain.entities import *` in `src/presentation/` = merge blocked
+
+3. **MessageMap Monopoly**  
+   All user-facing text MUST flow through `src/presentation/messages/message_map.py`  
+   → Hardcoded Arabic/English text outside MessageMap = merge blocked
+
+4. **Zero Business Logic in Presentation**  
+   `src/presentation/` MUST contain ONLY:  
+   - Data formatting (DTO → CSV/PDF/HTML)  
+   - Wiring (Composition Root invocation)  
+   → Decision logic in presentation = merge blocked
+
+## Why This Is Validation (Not Expansion)
+| Phase 3 | Phase 4 |
+|---------|---------|
+| Proved boundaries CAN be locked | Proves locked boundaries DON'T prevent value |
+| Guard scripts passing | Guard scripts passing WHILE delivering real CLI/reporting |
+| Theoretical purity | Practical purity under pressure |
+
+## Success Criteria
+✅ Real user can complete workflow via CLI without touching code  
+✅ All outputs stable under Snapshot Testing  
+✅ Zero guard violations during entire Phase 4 execution  
+✅ Legacy integration remains isolated in `tools/legacy/`  
+
+## Signatures
+Architecture Team — 2026-02-05  
+*"The reference is not proven until it survives real usage."*

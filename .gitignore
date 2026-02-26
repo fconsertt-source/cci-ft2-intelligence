@@ -60,3 +60,16 @@ htmlcov/
 *.cover
 nosetests.xml
 coverage.xml
+
+# في ملف .gitignore الرئيسي
+
+# استثناء بيئات التشغيل الكاملة (يتم تحميلها عند النشر)
+assets/runtime/jre*/
+assets/runtime/jdk*/
+
+# الاحتفاظ بملف التعريف فقط (للتدقيق والمسارات)
+!assets/runtime/runtime_manifest.json
+
+# استثناء ملفات JAR الكبيرة إذا كانت تتغير
+# (أو احتفظ بها إذا كانت إصدارًا ثابتًا معتمدًا)
+assets/verifiers/*.jar

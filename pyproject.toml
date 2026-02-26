@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "ft2-reporting"
-version = "0.1.0"
-description = "FT2 data processing and reporting pipeline"
-authors = ["Your Name <you@example.com>"]
+name = "digital-sentinel-cold-chain"
+version = "0.5.0"
+description = "الحارس الرقمي لسلسلة التبريد — حماية سلامة اللقاحات عبر معمارية محصنة"
+authors = ["Amer <amer11974>"]
 license = "MIT"
 readme = "README.md"
 packages = [{ include = "src" }]

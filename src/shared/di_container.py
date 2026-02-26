@@ -1,48 +1,163 @@
-# src/shared/di_container.py
-"""Simple Composition Root / DI helpers.
-Centralizes construction so Presentation and Application do not `new` domain components.
+#!/usr/bin/env python3
+"""
+حاوية حقن التبعيات (Dependency Injection Container)
+
+✅ نظيفة من التكرار
+✅ تبني مكونات حقيقية (ليس Mocks في الإنتاج)
+✅ قابلة للتوسع
+✅ متوافقة مع Clean Architecture
+
+الإصدار: 3.0.0 (Production-Ready)
+التاريخ: 2026-02-26
 """
 
-from src.application.use_cases.evaluate_cold_chain_safety_use_case import EvaluateColdChainSafetyUseCase
-from src.application.use_cases.import_ft2_data_uc import ImportFt2DataUseCase
-from src.application.use_cases.generate_report_uc import GenerateReportUseCase
-from src.application.ports.report_generator_port import ReportGeneratorPort
-from src.infrastructure.adapters.default_ft2_reader import DefaultFt2Reader
-from src.infrastructure.adapters.json_ft2_data_writer import JsonFt2DataWriter
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any, Type, TypeVar, Optional
+import logging
+
+from src.application.ports.ledger_writer_port import LedgerWriterPort
+from src.infrastructure.adapters.ledger_writer_adapter import HashChainedLedgerWriter
+
+T = TypeVar('T')
+logger = logging.getLogger(__name__)
 
 
-def build_import_ft2_uc() -> ImportFt2DataUseCase:
-    """Builds the Import FT2 Data Use Case with its dependencies."""
-    reader = DefaultFt2Reader()
-    writer = JsonFt2DataWriter()
-    return ImportFt2DataUseCase(reader=reader, writer=writer)
-
-
-def build_evaluate_uc() -> EvaluateColdChainSafetyUseCase:
-    """Explicit Composition Root wiring.
-    Use Case is stateless - no infrastructure dependencies needed.
-    """
-    return EvaluateColdChainSafetyUseCase()
-
-
-class MockReportGenerator:
-    """Mock adapter implementing ReportGeneratorPort for Phase 4 validation.
+class DIContainer:
+    """حاوية بسيطة لحقن التبعيات للإنتاج."""
     
-    This proves that:
-      - Ports enforce contractual boundaries
-      - DI container is the ONLY place for adapter instantiation
-      - Application layer never depends on concrete infrastructure
-    """
-    def generate(self, input_path: str, output_path: str) -> str:
-        print("Mock-generating report...")
-        return output_path
-
-
-def build_generate_report_uc() -> GenerateReportUseCase:
-    """Composition Root wiring for report generation.
+    def __init__(self):
+        self._services: dict[Type, Any] = {}
+        self._factories: dict[Type, callable] = {}
     
-    This is the ONLY place where infrastructure adapters (even mocks) are instantiated
-    and wired to application-layer Use Cases via Ports.
+    def register_singleton(self, interface: Type[T], implementation: T) -> None:
+        """تسجيل خدمة كنسخة وحيدة (Singleton)"""
+        self._services[interface] = implementation
+    
+    def register_factory(self, interface: Type[T], factory: callable) -> None:
+        """تسجيل خدمة عبر مصنع (Factory)"""
+        self._factories[interface] = factory
+    
+    def resolve(self, interface: Type[T]) -> T:
+        """حل واجهة والحصول على التطبيق."""
+        if interface in self._services:
+            return self._services[interface]
+        
+        if interface in self._factories:
+            instance = self._factories[interface](self)
+            self._services[interface] = instance
+            return instance
+        
+        raise ValueError(f"No registration found for {interface}")
+    
+    def is_registered(self, interface: Type[T]) -> bool:
+        """التحقق مما إذا كانت الواجهة مسجلة"""
+        return interface in self._services or interface in self._factories
+    
+    def clear(self) -> None:
+        """مسح جميع التسجيلات (للاختبارات فقط)"""
+        self._services.clear()
+        self._factories.clear()
+
+
+# ═══════════════════════════════════════════════════════════════
+# حاوية عالمية مشتركة
+# ═══════════════════════════════════════════════════════════════
+
+container = DIContainer()
+
+
+# ═══════════════════════════════════════════════════════════════
+# دوال البناء (Composition Root)
+# ═══════════════════════════════════════════════════════════════
+
+def configure_ledger(
+    ledger_path: Optional[Path] = None,
+    state_path: Optional[Path] = None
+) -> HashChainedLedgerWriter:
+    """تهيئة وتسجيل LedgerWriter في الحاوية."""
+    if ledger_path is None:
+        ledger_path = Path('data/ledger/verification_ledger.jsonl')
+    else:
+        ledger_path = Path(ledger_path)
+    
+    ledger_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    ledger_writer = HashChainedLedgerWriter(
+        ledger_path=ledger_path,
+        state_path=state_path
+    )
+    
+    container.register_singleton(LedgerWriterPort, ledger_writer)
+    return ledger_writer
+
+
+def _resolve_or_fail(port_type: Type[T]) -> T:
+    """حل dependency من الحاوية مع فشل صريح ورسالة سياقية."""
+    try:
+        return container.resolve(port_type)
+    except ValueError as e:
+        logger.critical("DI misconfiguration: %s not registered", port_type.__name__)
+        raise RuntimeError(
+            f"DI misconfiguration: {port_type.__name__} is not registered. "
+            "Check your container setup."
+        ) from e
+
+
+def build_generate_device_report_uc(
+    device_repository: Optional[Any] = None,
+    vaccine_specifications: Optional[Any] = None,
+    regulatory_decision_service: Optional[Any] = None,
+    estimator: Optional[Any] = None,
+    validator: Optional[Any] = None,
+    license_guard: Optional[Any] = None,
+    data_path: Optional[Path] = None
+):
     """
-    generator: ReportGeneratorPort = MockReportGenerator()
-    return GenerateReportUseCase(generator=generator)
+    بناء Use Case حقيقي لتوليد تقرير الجهاز.
+    
+    ✅ للإنتاج فقط – لا Mocks
+    إذا لم تُمرر dependency، تُحل من الحاوية.
+    إذا لم تكن مسجلة، ترفع RuntimeError.
+    """
+    from src.application.ports.device_repository_port import DeviceRepositoryPort
+    from src.application.ports.vaccine_specification_port import VaccineSpecificationPort
+    from src.application.ports.validation_protocol_port import ValidationProtocolPort
+    from src.domain.services.regulatory_decision_service import RegulatoryDecisionService
+    from src.domain.services.thermal_degradation_estimator import ThermalDegradationEstimator
+    from src.application.security.license_guard import LicenseGuard
+    from src.application.use_cases.generate_device_report_uc import GenerateDeviceReportUseCase
+
+    if device_repository is None:
+        device_repository = _resolve_or_fail(DeviceRepositoryPort)
+    if vaccine_specifications is None:
+        vaccine_specifications = _resolve_or_fail(VaccineSpecificationPort)
+    if regulatory_decision_service is None:
+        regulatory_decision_service = _resolve_or_fail(RegulatoryDecisionService)
+    if estimator is None:
+        estimator = _resolve_or_fail(ThermalDegradationEstimator)
+    if validator is None:
+        validator = _resolve_or_fail(ValidationProtocolPort)
+    if license_guard is None:
+        license_guard = _resolve_or_fail(LicenseGuard)
+
+    return GenerateDeviceReportUseCase(
+        device_repository=device_repository,
+        vaccine_specifications=vaccine_specifications,
+        regulatory_decision_service=regulatory_decision_service,
+        estimator=estimator,
+        validator=validator,
+        license_guard=license_guard,
+        data_path=data_path
+    )
+
+
+def reset_container() -> None:
+    """إعادة تعيين الحاوية (للاختبارات فقط)."""
+    container.clear()
+
+
+def get_container() -> DIContainer:
+    """الحصول على الحاوية العالمية"""
+    return container

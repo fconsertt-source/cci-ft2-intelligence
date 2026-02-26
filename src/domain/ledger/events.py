@@ -1,0 +1,40 @@
+from enum import Enum
+
+
+class LedgerEvent(Enum):
+    """
+    أحداث السجل الجنائي لنظام الحارس الرقمي.
+    
+    كل حدث يمثل حالة قابلة للتدقيق قانونياً.
+    """
+    
+    # === مرحلة الاستقبال والمعالجة ===
+    FILE_INGESTED = "FILE_INGESTED"              # ملف دخل النظام للمعالجة
+    FILE_VALIDATED = "FILE_VALIDATED"            # تم التحقق من صيغة الملف
+    FILE_CORRUPTED = "FILE_CORRUPTED"            # ملف تالف أو غير صالح
+    
+    # === مرحلة الأرشفة ودورة الحياة ===
+    FILE_ARCHIVED = "FILE_ARCHIVED"              # أرشفة الملف الأصلي بنجاح
+    FILE_RETENTION_EXPIRED = "FILE_RETENTION_EXPIRED"  # انتهت مدة الاحتفاظ
+    FILE_DELETED = "FILE_DELETED"                # حذف الملف بعد انتهاء الصلاحية
+    FILE_QUARANTINED = "FILE_QUARANTINED"        # عزل ملف مشتبه به
+    
+    # === مرحلة التحقق الرقمي ===
+    PRE_VALIDATION_PASSED = "PRE_VALIDATION_PASSED"
+    PRE_VALIDATION_FAILED = "PRE_VALIDATION_FAILED"
+    AUTHENTICITY_VERIFIED = "AUTHENTICITY_VERIFIED"
+    AUTHENTICITY_FAILED = "AUTHENTICITY_FAILED"
+    
+    # === مرحلة الربط بالأصول ===
+    ASSET_LINKED = "ASSET_LINKED"                # ربط الملف بأصل (جهاز/دفعة)
+    ASSET_REPLACED = "ASSET_REPLACED"            # استبدال أصل بآخر
+    
+    # === مرحلة القرار النهائي ===
+    FINAL_VERDICT_SAFE = "FINAL_VERDICT_SAFE"
+    FINAL_VERDICT_PARTIAL = "FINAL_VERDICT_PARTIAL"
+    FINAL_VERDICT_DISCARD = "FINAL_VERDICT_DISCARD"
+    
+    # === مرحلة التدقيق والتحقق ===
+    ARCHIVE_VERIFIED = "ARCHIVE_VERIFIED"        # تحقق دوري من سلامة الأرشيف
+    ARCHIVE_VERIFY_FAILED = "ARCHIVE_VERIFY_FAILED"
+    LEDGER_INTEGRITY_CHECK = "LEDGER_INTEGRITY_CHECK"
