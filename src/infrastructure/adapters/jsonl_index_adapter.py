@@ -16,7 +16,31 @@ from pathlib import Path
 from datetime import datetime, timezone
 from typing import Iterable, Optional
 
-from filelock import FileLock
+import os
+import warnings
+
+try:
+    from filelock import FileLock
+except ImportError:  # pragma: no cover
+    # default to non-production so tests can run without installing filelock
+    if os.getenv("CCI_ENV", "dev") == "prod":
+        # In production we cannot proceed without a real lock
+        raise ImportError(
+            "filelock is required in production to protect ledger integrity. "
+            "Install with: pip install filelock"
+        )
+    warnings.warn(
+        "filelock missing — using no-op lock (unsafe for concurrency)",
+        RuntimeWarning,
+    )
+
+    class FileLock:  # simple context manager stub
+        def __init__(self, *args, **kwargs):
+            pass
+        def __enter__(self):
+            return self
+        def __exit__(self, exc_type, exc, tb):
+            return False
 
 from src.application.ports.archive_index_port import ArchiveIndexPort
 from src.domain.entities.archive_record import ArchiveRecord, ArchiveStatus

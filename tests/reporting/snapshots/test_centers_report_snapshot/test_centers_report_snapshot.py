@@ -60,4 +60,4 @@ def test_centers_report_snapshot(tmp_path, sample_centers, snapshot):
     
     content = output_file.read_text(encoding="utf-8")
     
-    snapshot.assert_match(content)
+    snapshot.assert_match(content, "centers_report.tsv")

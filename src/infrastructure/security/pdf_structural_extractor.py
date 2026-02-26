@@ -1,6 +1,8 @@
 # infrastructure/security/pdf_structural_extractor.py
 """استخراج القيم السيادية من تقارير Berlinger PDF للمقارنة مع ملفات TXT الموقعة"""
 
+from __future__ import annotations
+
 try:
     import fitz  # PyMuPDF
 except ImportError:  # pragma: no cover
@@ -138,7 +140,7 @@ class PDFStructuralExtractor:
                 sha256_hash.update(byte_block)
         return sha256_hash.hexdigest()
     
-    def _extract_full_text(self, doc: fitz.Document) -> str:
+    def _extract_full_text(self, doc: "fitz.Document") -> str:
         """استخراج النص الكامل من جميع صفحات المستند"""
         texts = []
         for page_num, page in enumerate(doc):

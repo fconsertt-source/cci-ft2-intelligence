@@ -5,6 +5,31 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Tuple
+import os
+import warnings
+
+# filelock is required for cross-process safety
+try:
+    from filelock import FileLock
+except ImportError:  # pragma: no cover
+    # default to non-prod so unit/integration tests don't force installation
+    if os.getenv("CCI_ENV", "dev") == "prod":
+        raise RuntimeError(
+            "filelock dependency missing - install with `pip install filelock` "
+            "to enable cross-process ledger writes."
+        )
+    warnings.warn(
+        "filelock missing - using no-op lock (unsafe for concurrency)",
+        RuntimeWarning,
+    )
+
+    class FileLock:
+        def __init__(self, *args, **kwargs):
+            pass
+        def __enter__(self):
+            return self
+        def __exit__(self, exc_type, exc, tb):
+            return False
 
 from src.application.ports.ledger_writer_port import LedgerWriterPort
 from src.domain.ledger.models import LedgerEntry, LedgerChainState
@@ -47,6 +72,9 @@ class HashChainedLedgerWriter(LedgerWriterPort):
         
         # ✅ قفل لضمان thread safety
         self._lock = threading.Lock()
+        # ✅ file lock لضمان safety عبر عمليات متعددة
+        lock_path = str(self.ledger_path) + ".lock"
+        self._file_lock = FileLock(lock_path, timeout=60)
         
         # ✅ Cache لآخر hash للأداء
         self._cached_last_hash: Optional[str] = None
@@ -112,24 +140,28 @@ class HashChainedLedgerWriter(LedgerWriterPort):
         ✅ Thread-safe: العملية بأكملها داخل lock
         ✅ Uses cached last hash للأداء
         """
-        with self._lock:
-            if event_id is None:
-                event_id = str(uuid.uuid4())
-            
-            # الحصول على previous_hash من cache أو state
-            previous_hash = self._cached_last_hash or self._chain_state.last_entry_hash
-            
-            # إنشاء entry مبدئي
-            entry = LedgerEntry(
-                event_id=event_id,
-                event_type=event_type,
-                timestamp=datetime.now(timezone.utc).isoformat(),
-                file_hash=file_hash,
-                **context
-            )
-            
-            # ربط السلسلة وحساب hash النهائي
-            final_entry = entry.with_computed_hash(previous_hash=previous_hash)
+        # Acquire file lock first to prevent other processes from interleaving
+        with self._file_lock:
+            with self._lock:
+                if event_id is None:
+                    event_id = str(uuid.uuid4())
+                
+                # refresh previous_hash by reading ledger end (avoid stale cache)
+                previous_hash = get_last_hash_from_ledger(self.ledger_path) or self._chain_state.last_entry_hash
+                # update cache as well
+                self._cached_last_hash = previous_hash
+                
+                # إنشاء entry مبدئي
+                entry = LedgerEntry(
+                    event_id=event_id,
+                    event_type=event_type,
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                    file_hash=file_hash,
+                    **context
+                )
+                
+                # ربط السلسلة وحساب hash النهائي
+                final_entry = entry.with_computed_hash(previous_hash=previous_hash)
             
             # كتابة المدخلة في ledger (نفس تنسيق hash)
             data_to_write = final_entry._to_serializable_dict(include_current_hash=True)

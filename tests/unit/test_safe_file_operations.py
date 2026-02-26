@@ -62,12 +62,12 @@ def test_atomic_move(file_ops, test_files):
     assert dst_hash == src_hash
     assert dst_size == src_size
 
-def test_atomic_move_raises_error(file_ops, test_files, mocker):
+def test_atomic_move_raises_error(file_ops, test_files, monkeypatch):
     src_dir, dst_dir, src_file = test_files
     dst_file = dst_dir / src_file.name
 
-    # Mock os.replace to fail
-    mocker.patch('os.replace', side_effect=OSError("Mocked error"))
+    # Mock os.replace to fail using built-in monkeypatch
+    monkeypatch.setattr('os.replace', lambda src, dst: (_ for _ in ()).throw(OSError("Mocked error")))
 
     with pytest.raises(RuntimeError, match="Atomic move failed: Mocked error"):
         file_ops.atomic_move(src_file, dst_file)

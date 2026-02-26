@@ -1,4 +1,4 @@
-pandas
-reportlab
-pytest
-pytest-snapshot
+cffi==2.0.0
+cryptography==46.0.5
+pycparser==3.0
+filelock==3.12.0

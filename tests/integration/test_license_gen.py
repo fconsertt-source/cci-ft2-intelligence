@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -11,7 +12,7 @@ def test_license_gen_creates_files():
 
         try:
             result = subprocess.run(
-                ["python", "scripts/license-gen.py", "--install", "--expiry", "1"],
+                [sys.executable, "scripts/license-gen.py", "--install", "--expiry", "1"],
                 capture_output=True,
                 text=True,
                 timeout=10

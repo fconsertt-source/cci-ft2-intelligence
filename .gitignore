@@ -73,3 +73,46 @@ assets/runtime/jdk*/
 # استثناء ملفات JAR الكبيرة إذا كانت تتغير
 # (أو احتفظ بها إذا كانت إصدارًا ثابتًا معتمدًا)
 assets/verifiers/*.jar
+
+# ═══════════════════════════════════════════════════════════════
+# Large Binary Files (GitHub 100MB limit)
+# ═══════════════════════════════════════════════════════════════
+*.msi
+*.exe
+*.jar
+*.zip
+*.tar.gz
+*.bak
+*.backup
+
+# Runtime artifacts
+assets/runtime/
+assets/verifiers/
+
+# Temporary files
+-H
+-v
+.continue/
+.coverage
+__pycache__/
+*.pyc
+
+# Data (should not be in repo)
+data/archive/
+data/input_ft2/
+data/input_raw/
+data/ledger/
+data/output/
+logs/
+backups/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# IDE Configurations
+.continue/
+.vscode/
+.idea/
