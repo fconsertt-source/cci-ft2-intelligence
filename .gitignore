@@ -1,118 +1,136 @@
-# ===============================
-# Python virtual environments
-# ===============================
+# ═══════════════════════════════════════════════════════════════
+# CCI-FT2-Intelligence - Production .gitignore
+# Last Updated: 2026-02-27
+# ═══════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════
+# Python Virtual Environments
+# ═══════════════════════════════════════════════════════════════
 .venv/
 venv/
 env/
 ENV/
 
-# ===============================
-# Python cache files
-# ===============================
+# ═══════════════════════════════════════════════════════════════
+# Python Cache & Build Artifacts
+# ═══════════════════════════════════════════════════════════════
 __pycache__/
 *.py[cod]
 *$py.class
-
-# ===============================
-# Backup files / temporary
-# ===============================
-backup/
-backup/*.tar.gz
-*.bak
-*.swp
-*.tmp
-
-# ===============================
-# IDE / Editor settings
-# ===============================
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# ===============================
-# OS generated files
-# ===============================
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# ===============================
-# Logs
-# ===============================
-*.log
-
-# ===============================
-# Compiled / build artifacts
-# ===============================
 *.pyc
 *.pyo
 *.pyd
 build/
 dist/
 *.egg-info/
-
-# ===============================
-# Optional: test output
-# ===============================
-htmlcov/
-.coverage
-*.cover
-nosetests.xml
-coverage.xml
-
-# في ملف .gitignore الرئيسي
-
-# استثناء بيئات التشغيل الكاملة (يتم تحميلها عند النشر)
-assets/runtime/jre*/
-assets/runtime/jdk*/
-
-# الاحتفاظ بملف التعريف فقط (للتدقيق والمسارات)
-!assets/runtime/runtime_manifest.json
-
-# استثناء ملفات JAR الكبيرة إذا كانت تتغير
-# (أو احتفظ بها إذا كانت إصدارًا ثابتًا معتمدًا)
-assets/verifiers/*.jar
+.eggs/
 
 # ═══════════════════════════════════════════════════════════════
-# Large Binary Files (GitHub 100MB limit)
+# Large Binary Files (GitHub 100MB Limit)
 # ═══════════════════════════════════════════════════════════════
 *.msi
 *.exe
 *.jar
 *.zip
 *.tar.gz
-*.bak
-*.backup
+*.rar
+*.7z
 
-# Runtime artifacts
+# ═══════════════════════════════════════════════════════════════
+# Runtime Artifacts (Download Separately)
+# ═══════════════════════════════════════════════════════════════
 assets/runtime/
 assets/verifiers/
 
-# Temporary files
--H
--v
-.continue/
-.coverage
-__pycache__/
-*.pyc
+# Keep manifest only (for auditing)
+!assets/runtime/runtime_manifest.json
+!assets/verifiers/berlinger/LICENSE.txt
 
-# Data (should not be in repo)
+# ═══════════════════════════════════════════════════════════════
+# Data Directory (Production Data - Never Commit)
+# ═══════════════════════════════════════════════════════════════
 data/archive/
 data/input_ft2/
 data/input_raw/
 data/ledger/
 data/output/
+data/processed/
+data/raw/
+data/reports/
+
+# Keep .gitkeep for empty directories
+!data/.gitkeep
+!data/archive/.gitkeep
+!data/input_ft2/.gitkeep
+!data/input_raw/.gitkeep
+!data/ledger/.gitkeep
+!data/output/.gitkeep
+
+# ═══════════════════════════════════════════════════════════════
+# Logs & Backups
+# ═══════════════════════════════════════════════════════════════
+*.log
 logs/
+backup/
 backups/
-
-# IDE
-.vscode/
-.idea/
+*.bak
+*.backup
 *.swp
-*.swo
+*.tmp
+*.temp
 
-# IDE Configurations
-.continue/
+# ═══════════════════════════════════════════════════════════════
+# IDE & Editor Configurations (Developer-Specific)
+# ═══════════════════════════════════════════════════════════════
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
+.continue/
+.qodo/
+
+# ═══════════════════════════════════════════════════════════════
+# OS Generated Files
+# ═══════════════════════════════════════════════════════════════
+.DS_Store
+Thumbs.db
+desktop.ini
+*.DS_Store
+._*
+
+# ═══════════════════════════════════════════════════════════════
+# Test & Coverage Artifacts
+# ═══════════════════════════════════════════════════════════════
+.coverage
+*.cover
+*.coverage
+htmlcov/
+nosetests.xml
+coverage.xml
+.pytest_cache/
+.tox/
+
+# ═══════════════════════════════════════════════════════════════
+# Weird Files (From Previous Sessions)
+# ═══════════════════════════════════════════════════════════════
+-H
+-v
+*import*
+*from*
+
+# ═══════════════════════════════════════════════════════════════
+# Environment Secrets (Never Commit)
+# ═══════════════════════════════════════════════════════════════
+.env
+.env.local
+.env.production
+*.pem
+*.key
+secrets/
+credentials/
+
+# ═══════════════════════════════════════════════════════════════
+# Documentation Build (If Applicable)
+# ═══════════════════════════════════════════════════════════════
+docs/_build/
+site/
