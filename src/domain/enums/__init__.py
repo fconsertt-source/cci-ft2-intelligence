@@ -1,0 +1,1 @@
+"""Domain enums — controlled vocabularies."""

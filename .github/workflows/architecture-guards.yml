@@ -1,0 +1,14 @@
+# .github/CODEOWNERS
+# Architecture guardians - require review for critical paths
+
+# Domain layer (immutable)
+/src/domain/ @architecture-team
+
+# Application ports (contract changes)
+/src/application/ports/ @architecture-team
+
+# ADRs (architectural decisions)
+/docs/adr/ @architecture-team
+
+# Guards (enforcement mechanism)
+/scripts/check_*.py @architecture-team

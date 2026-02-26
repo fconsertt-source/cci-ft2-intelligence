@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-02-24",
+  "runtimes": {
+    "jre8_win_x64": {
+      "version": "8u481",
+      "sha256": "PUT_ACTUAL_HASH_HERE",
+      "source": "adoptium.net",
+      "license": "GPL+Classpath",
+      "path": "jre8_win_x64/bin/java.exe"
+    },
+    "jre8_win_x86": {
+      "version": "8u481",
+      "sha256": "PUT_ACTUAL_HASH_HERE",
+      "source": "adoptium.net",
+      "license": "GPL+Classpath",
+      "path": "jre8_win_x86/bin/java.exe"
+    }
+  },
+  "verifiers": {
+    "berlinger": {
+      "name": "Berlinger FT2 Verifier",
+      "version": "3.5-basic",
+      "sha256": "PUT_ACTUAL_HASH_HERE",
+      "path": "verifiers/berlinger/verifier-3.5-basic-with-dependencies.jar",
+      "redistribution_allowed": true
+    }
+  }
+}
