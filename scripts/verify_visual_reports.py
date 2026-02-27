@@ -40,10 +40,17 @@ def create_mock_data(path: str):
 
     logger.info("Mock data created at: %s", path)
 
-def main():
-    output_dir = "data/output/visual_tests"
+
+
+def generate_visual_reports(output_dir: str = "data/output/visual_tests", language: str = "ar") -> None:
+    """Helper used by scripts and tests to create all visual test files.
+
+    Args:
+        output_dir: directory where files will be written.
+        language: language code to pass to the PDF generator.
+    """
     os.makedirs(output_dir, exist_ok=True)
-    
+
     data_path = os.path.join(output_dir, "mock_visual_data.tsv")
     create_mock_data(data_path)
     
@@ -54,7 +61,7 @@ def main():
         logger.error("Could not import UnifiedPDFGenerator: %s", e)
         return
 
-    gen = UnifiedPDFGenerator(output_dir=output_dir)
+    gen = UnifiedPDFGenerator(output_dir=output_dir, language=language)
 
     logger.info(MessageProvider.get('VISUAL_REPORT_OFFICIAL'))
     official_path = gen.generate(ReportType.OFFICIAL, data_path, "visual_test_official.pdf")
@@ -67,6 +74,11 @@ def main():
     logger.info(MessageProvider.get('VISUAL_REPORT_ARABIC'))
     arabic_path = gen.generate(ReportType.ARABIC, data_path, "visual_test_arabic.pdf")
     logger.info("Done: %s", arabic_path)
+
+
+def main():
+    # preserve existing entrypoint signature
+    generate_visual_reports()
 
 if __name__ == "__main__":
     main()

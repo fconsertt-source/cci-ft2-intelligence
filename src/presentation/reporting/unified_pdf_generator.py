@@ -37,10 +37,30 @@ except Exception:  # pragma: no cover - provide lightweight fallbacks
     class _DummyColors:
         lightgrey = None
         whitesmoke = None
+        grey = None
+        white = None
+        lightcoral = None
+        lightgreen = None
+
+        @staticmethod
+        def HexColor(x):
+            return x
+
+        def __getattr__(self, name):
+            # return None for any other color attributes to avoid errors
+            return None
     colors = _DummyColors()
 
     def getSampleStyleSheet():
-        return {}
+        # provide minimal stylesheet with essential styles so PDF gen
+        # does not crash when reportlab is unavailable.
+        class Dummy(dict):
+            pass
+        sheet = Dummy()
+        sheet['Title'] = ParagraphStyle('Title')
+        sheet['Heading2'] = ParagraphStyle('Heading2')
+        sheet['Normal'] = ParagraphStyle('Normal')
+        return sheet
 
     class ParagraphStyle:  # type: ignore
         def __init__(self, *args, **kwargs):
@@ -195,6 +215,7 @@ except Exception:
         return s
 
 from src.infrastructure.utils.config_loader import ConfigLoader
+from src.shared.language_manager import lang
 
 if _HAS_MATPLOTLIB:
     matplotlib.use('Agg')
@@ -210,7 +231,15 @@ class UnifiedPDFGenerator:
     Uses a Builder-like approach to customize the report content.
     """
     
-    def __init__(self, output_dir: Optional[str] = None, theme_color: Optional[str] = None):
+    def __init__(self, language: str = "ar", output_dir: Optional[str] = None, theme_color: Optional[str] = None):
+        # set language early so translations are available
+        if language and language != lang.current_language:
+            try:
+                lang.set_language(language)
+            except Exception:
+                # language may not be loaded yet; ignore until explicit load
+                pass
+
         self.output_dir = output_dir or ConfigLoader.get("paths.reports_dir", "data/output/reports")
         
         theme = theme_color or ConfigLoader.get("reporting.default_theme_color", "#2C3E50")
@@ -368,7 +397,14 @@ class UnifiedPDFGenerator:
         if not os.path.exists(data_path):
             raise FileNotFoundError(f"Data file not found: {data_path}")
             
-        df = pd.read_csv(data_path, sep='\t')
+        # pandas may be unavailable in minimal environments; use csv fallback
+        if pd is None:
+            import csv
+            with open(data_path, newline='', encoding='utf-8') as f:
+                reader = csv.DictReader(f, delimiter='\t')
+                df = list(reader)  # list of dicts acts as simplified dataframe
+        else:
+            df = pd.read_csv(data_path, sep='\t')
         
         if not filename:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -411,13 +447,18 @@ class UnifiedPDFGenerator:
     def _build_header(self, report_type: str) -> List[Any]:
         """Builds the report header."""
         elements = []
-        titles = {
-            ReportType.OFFICIAL: "Official Cold Chain Safety Report",
-            ReportType.TECHNICAL: "Technical Analysis Report",
-            ReportType.ARABIC: "التقرير الرسمي لسلامة سلسلة التبريد"
-        }
+        # use language manager, falling back to defaults
+        if report_type == ReportType.OFFICIAL:
+            title_text = lang.get("report.official_title")
+        elif report_type == ReportType.TECHNICAL:
+            # no specific translation defined for technical title
+            title_text = lang.get("report.technical_title", "Technical Analysis Report")
+        elif report_type == ReportType.ARABIC:
+            title_text = lang.get("report.official_title")
+        else:
+            title_text = lang.get("report.official_title")
         
-        title_text = self._process_text(titles.get(report_type, "Cold Chain Report"))
+        title_text = self._process_text(title_text)
         elements.append(Paragraph(title_text, self.styles['Title']))
         
         org_name = ConfigLoader.get("reporting.organization_name", "")
@@ -444,12 +485,12 @@ class UnifiedPDFGenerator:
         # Localization
         is_ar = report_type == ReportType.ARABIC
         labels = {
-            "title": "ACTION REQUIRED: Executive Summary" if not is_ar else "إجراء عاجل: ملخص تنفيذي",
-            "msg": f"Critical alert: {rejected} vaccine batches failed safety protocols and {warning} require urgent redistribution." if not is_ar else f"تنبيه حرج: فشل {rejected} شحنة في معايير السلامة و {warning} شحنة تتطلب إعادة توزيع عاجلة.",
-            "h1": "Total Batches" if not is_ar else "إجمالي الشحنات",
-            "h2": "Safe" if not is_ar else "سليم",
-            "h3": "Warning" if not is_ar else "تحذير",
-            "h4": "Discard (Red)" if not is_ar else "إتلاف (أحمر)"
+            "title": lang.get("report.executive_summary"),
+            "msg": lang.get("report.executive_message", "Critical alert: {rejected} vaccine batches failed safety protocols and {warning} require urgent redistribution.").format(rejected=rejected, warning=warning),
+            "h1": lang.get("report.total_batches"),
+            "h2": lang.get("status.safe"),
+            "h3": lang.get("status.warning"),
+            "h4": lang.get("status.discard")
         }
 
         if rejected > 0 or warning > 0:
