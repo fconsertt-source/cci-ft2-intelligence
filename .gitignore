@@ -141,3 +141,7 @@ docs/project_retrospective.md
 # Old retrospective filenames (now in docs/retrospective/)
 docs/project-retrospective.md
 docs/project_retrospective.md
+# Large Binaries (>100MB)
+*.msi *.exe *.jar *.zip *.tar.gz
+assets/runtime/ assets/verifiers/
+data/archive/ data/ledger/ logs/ backups/
