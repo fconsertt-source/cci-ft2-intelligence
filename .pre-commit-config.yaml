@@ -11,7 +11,7 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-        stages: [commit]
+        stages: [pre-commit]
       
       - id: architectural-guard-di-container
         name: "Guard: DI Container Enforcement"
@@ -19,7 +19,7 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-        stages: [commit]
+        stages: [pre-commit]
       
       - id: architectural-guard-src-root
         name: "Guard: src/ Root Cleanliness"
@@ -27,4 +27,4 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-        stages: [commit]
+        stages: [pre-commit]
