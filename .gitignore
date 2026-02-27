@@ -4,29 +4,7 @@
 # ═══════════════════════════════════════════════════════════════
 
 # ═══════════════════════════════════════════════════════════════
-# Python Virtual Environments
-# ═══════════════════════════════════════════════════════════════
-.venv/
-venv/
-env/
-ENV/
-
-# ═══════════════════════════════════════════════════════════════
-# Python Cache & Build Artifacts
-# ═══════════════════════════════════════════════════════════════
-__pycache__/
-*.py[cod]
-*$py.class
-*.pyc
-*.pyo
-*.pyd
-build/
-dist/
-*.egg-info/
-.eggs/
-
-# ═══════════════════════════════════════════════════════════════
-# Large Binary Files (GitHub 100MB Limit)
+# Large Binary Files (>100MB GitHub Limit) - CRITICAL
 # ═══════════════════════════════════════════════════════════════
 *.msi
 *.exe
@@ -35,113 +13,60 @@ dist/
 *.tar.gz
 *.rar
 *.7z
+*.iso
+*.dmg
+*.pkg
 
 # ═══════════════════════════════════════════════════════════════
-# Runtime Artifacts (Download Separately)
+# Runtime & Verifiers (Download Separately)
 # ═══════════════════════════════════════════════════════════════
 assets/runtime/
-assets/verifiers/
-
-# Keep manifest only (for auditing)
+!assets/runtime/.gitkeep
 !assets/runtime/runtime_manifest.json
+assets/verifiers/
+!assets/verifiers/.gitkeep
 !assets/verifiers/berlinger/LICENSE.txt
 
 # ═══════════════════════════════════════════════════════════════
-# Data Directory (Production Data - Never Commit)
+# Data (Production Data - Never Commit)
 # ═══════════════════════════════════════════════════════════════
 data/archive/
 data/input_ft2/
 data/input_raw/
 data/ledger/
 data/output/
-data/processed/
-data/raw/
-data/reports/
-
-# Keep .gitkeep for empty directories
-!data/.gitkeep
-!data/archive/.gitkeep
-!data/input_ft2/.gitkeep
-!data/input_raw/.gitkeep
-!data/ledger/.gitkeep
-!data/output/.gitkeep
-
-# ═══════════════════════════════════════════════════════════════
-# Logs & Backups
-# ═══════════════════════════════════════════════════════════════
-*.log
 logs/
-backup/
 backups/
-*.bak
-*.backup
-*.swp
-*.tmp
-*.temp
 
 # ═══════════════════════════════════════════════════════════════
-# IDE & Editor Configurations (Developer-Specific)
+# Python
+# ═══════════════════════════════════════════════════════════════
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ═══════════════════════════════════════════════════════════════
+# IDE & Editor
 # ═══════════════════════════════════════════════════════════════
 .vscode/
 .idea/
-*.sublime-project
-*.sublime-workspace
+*.swp
+*.swo
 .continue/
 .qodo/
 
 # ═══════════════════════════════════════════════════════════════
-# OS Generated Files
+# OS Generated
 # ═══════════════════════════════════════════════════════════════
 .DS_Store
 Thumbs.db
 desktop.ini
-*.DS_Store
-._*
-
-# ═══════════════════════════════════════════════════════════════
-# Test & Coverage Artifacts
-# ═══════════════════════════════════════════════════════════════
-.coverage
-*.cover
-*.coverage
-htmlcov/
-nosetests.xml
-coverage.xml
-.pytest_cache/
-.tox/
-
-# ═══════════════════════════════════════════════════════════════
-# Weird Files (From Previous Sessions)
-# ═══════════════════════════════════════════════════════════════
 -H
 -v
-*import*
-*from*
-
-# ═══════════════════════════════════════════════════════════════
-# Environment Secrets (Never Commit)
-# ═══════════════════════════════════════════════════════════════
-.env
-.env.local
-.env.production
-*.pem
-*.key
-secrets/
-credentials/
-
-# ═══════════════════════════════════════════════════════════════
-# Documentation Build (If Applicable)
-# ═══════════════════════════════════════════════════════════════
-docs/_build/
-site/
-
-# Duplicate retrospective files (keep only in docs/retrospective/)
-docs/project-retrospective.md
-docs/project_retrospective.md
-# Old retrospective filenames (now in docs/retrospective/)
-docs/project-retrospective.md
-docs/project_retrospective.md
-# Large Binaries (>100MB)
-*.msi *.exe *.jar *.zip *.tar.gz
-assets/runtime/ assets/verifiers/
-data/archive/ data/ledger/ logs/ backups/
