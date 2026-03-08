@@ -33,10 +33,22 @@ tkinter_hidden = collect_submodules("tkinter")
 datas = tkinter_datas + [
     (str(tcl_dir), "tcl/tcl8.6"),
     (str(tk_dir), "tcl/tk8.6"),
+    ("assets/fonts", "assets/fonts"),
+    ("src/shared/fonts", "src/shared/fonts"),
+    ("src/shared/locales", "src/shared/locales"),
 ]
 
 hiddenimports = tkinter_hidden + [
     "_tkinter",
+    "reportlab",
+    "reportlab.pdfbase.ttfonts",
+    "reportlab.platypus",
+    "pdfminer",
+    "arabic_reshaper",
+    "bidi.algorithm",
+    "src.application.app_composer",
+    "src.infrastructure.adapters.reporting.pdf_strategy",
+    "src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper",
 ]
 
 # ============================================================
@@ -60,7 +72,7 @@ a = Analysis(
     hiddenimports=hiddenimports,
     hookspath=["./hooks"],
     hooksconfig={},
-    runtime_hooks=[],
+    runtime_hooks=["runtime_hooks/tkinter_init.py"],
     excludes=[
         "matplotlib",
         "numpy.tests",
