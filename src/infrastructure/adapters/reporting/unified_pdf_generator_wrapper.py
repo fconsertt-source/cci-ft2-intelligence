@@ -45,7 +45,7 @@ def _register_arabic_font() -> str:
     for name, path in candidates:
         if os.path.exists(path):
             try:
-                pdfmetrics.registerFont(TTFont(name, path))
+                pdfmetrics.registerFont(TTFont("ArabicFont", path))
                 # signal to callers/tests that an Arabic-capable font
                 # was successfully registered.
                 return "ArabicFont"
@@ -155,7 +155,9 @@ class UnifiedPDFGeneratorWrapper:
         if self._engine:
             try:
                 # ``generate`` signature varies; new engine understands ``dto``
-                return self._engine.generate(dto)
+                return self._engine.generate(
+                    dto, report_type=force_report_type or "official"
+                )
             except Exception as exc:  # pragma: no cover - tested via monkeypatch
                 # If the failure is due to missing dependencies we treat this as
                 # "engine not really available" and return a larger placeholder
