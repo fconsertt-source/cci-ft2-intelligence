@@ -1,0 +1,254 @@
+..................................F..................................... [ 23%]
+......................................................s................. [ 47%]
+........................................................................ [ 70%]
+..FFF.....ss...................................F........................ [ 94%]
+..................                                                       [100%]
+=================================== FAILURES ===================================
+________________ TestPDFGoldenMaster.test_arabic_text_roundtrip ________________
+tests/golden/test_pdf_golden_master.py:170: in test_arabic_text_roundtrip
+    assert arabic_text in text, \
+E   AssertionError: arabic: Arabic text missing: ﻲﻤﻗﺮﻟﺍ ﺱﺭﺎﺤﻟﺍ
+E   assert 'ﻲﻤﻗﺮﻟﺍ ﺱﺭﺎﺤﻟﺍ' in '\x0c'
+----------------------------- Captured stderr call -----------------------------
+2026-03-04 00:05:21,877 - ERROR - ReportLab generation failed
+Traceback (most recent call last):
+  File "/home/amer11974/projects/cci-ft2-intelligence/src/infrastructure/adapters/reporting/new_pdf_engine.py", line 111, in generate
+    doc.build(elements)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1322, in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1083, in build
+    self.handle_flowable(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 908, in handle_flowable
+    self.handle_keepWithNext(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 873, in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'getKeepWithNext'
+------------------------------ Captured log call -------------------------------
+ERROR    src.infrastructure.adapters.reporting.new_pdf_engine:new_pdf_engine.py:125 ReportLab generation failed
+Traceback (most recent call last):
+  File "/home/amer11974/projects/cci-ft2-intelligence/src/infrastructure/adapters/reporting/new_pdf_engine.py", line 111, in generate
+    doc.build(elements)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1322, in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1083, in build
+    self.handle_flowable(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 908, in handle_flowable
+    self.handle_keepWithNext(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 873, in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'getKeepWithNext'
+CRITICAL src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper:unified_pdf_generator_wrapper.py:132 New PDF engine failed unexpectedly
+_________________________ test_generate_returns_bytes __________________________
+tests/unit/test_new_pdf_engine.py:38: in test_generate_returns_bytes
+    pdf = gen.generate(make_dto())
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+src/infrastructure/adapters/reporting/new_pdf_engine.py:111: in generate
+    doc.build(elements)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:1322: in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:1083: in build
+    self.handle_flowable(flowables)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:908: in handle_flowable
+    self.handle_keepWithNext(flowables)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:873: in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'str' object has no attribute 'getKeepWithNext'
+----------------------------- Captured stderr call -----------------------------
+2026-03-04 00:06:09,890 - ERROR - ReportLab generation failed
+Traceback (most recent call last):
+  File "/home/amer11974/projects/cci-ft2-intelligence/src/infrastructure/adapters/reporting/new_pdf_engine.py", line 111, in generate
+    doc.build(elements)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1322, in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1083, in build
+    self.handle_flowable(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 908, in handle_flowable
+    self.handle_keepWithNext(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 873, in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'getKeepWithNext'
+------------------------------ Captured log call -------------------------------
+ERROR    src.infrastructure.adapters.reporting.new_pdf_engine:new_pdf_engine.py:125 ReportLab generation failed
+Traceback (most recent call last):
+  File "/home/amer11974/projects/cci-ft2-intelligence/src/infrastructure/adapters/reporting/new_pdf_engine.py", line 111, in generate
+    doc.build(elements)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1322, in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1083, in build
+    self.handle_flowable(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 908, in handle_flowable
+    self.handle_keepWithNext(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 873, in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'getKeepWithNext'
+________________________ test_generate_with_report_type ________________________
+tests/unit/test_new_pdf_engine.py:49: in test_generate_with_report_type
+    pdf = gen.generate(make_dto(), report_type="technical")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/infrastructure/adapters/reporting/new_pdf_engine.py:111: in generate
+    doc.build(elements)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:1322: in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:1083: in build
+    self.handle_flowable(flowables)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:908: in handle_flowable
+    self.handle_keepWithNext(flowables)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:873: in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'str' object has no attribute 'getKeepWithNext'
+----------------------------- Captured stderr call -----------------------------
+2026-03-04 00:06:09,951 - ERROR - ReportLab generation failed
+Traceback (most recent call last):
+  File "/home/amer11974/projects/cci-ft2-intelligence/src/infrastructure/adapters/reporting/new_pdf_engine.py", line 111, in generate
+    doc.build(elements)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1322, in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1083, in build
+    self.handle_flowable(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 908, in handle_flowable
+    self.handle_keepWithNext(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 873, in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'getKeepWithNext'
+------------------------------ Captured log call -------------------------------
+ERROR    src.infrastructure.adapters.reporting.new_pdf_engine:new_pdf_engine.py:125 ReportLab generation failed
+Traceback (most recent call last):
+  File "/home/amer11974/projects/cci-ft2-intelligence/src/infrastructure/adapters/reporting/new_pdf_engine.py", line 111, in generate
+    doc.build(elements)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1322, in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1083, in build
+    self.handle_flowable(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 908, in handle_flowable
+    self.handle_keepWithNext(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 873, in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'getKeepWithNext'
+_________________________ test_generate_contains_page __________________________
+tests/unit/test_new_pdf_engine.py:55: in test_generate_contains_page
+    pdf = gen.generate(make_dto(), report_type="official")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/infrastructure/adapters/reporting/new_pdf_engine.py:111: in generate
+    doc.build(elements)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:1322: in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:1083: in build
+    self.handle_flowable(flowables)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:908: in handle_flowable
+    self.handle_keepWithNext(flowables)
+venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py:873: in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'str' object has no attribute 'getKeepWithNext'
+----------------------------- Captured stderr call -----------------------------
+2026-03-04 00:06:10,009 - ERROR - ReportLab generation failed
+Traceback (most recent call last):
+  File "/home/amer11974/projects/cci-ft2-intelligence/src/infrastructure/adapters/reporting/new_pdf_engine.py", line 111, in generate
+    doc.build(elements)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1322, in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1083, in build
+    self.handle_flowable(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 908, in handle_flowable
+    self.handle_keepWithNext(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 873, in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'getKeepWithNext'
+------------------------------ Captured log call -------------------------------
+ERROR    src.infrastructure.adapters.reporting.new_pdf_engine:new_pdf_engine.py:125 ReportLab generation failed
+Traceback (most recent call last):
+  File "/home/amer11974/projects/cci-ft2-intelligence/src/infrastructure/adapters/reporting/new_pdf_engine.py", line 111, in generate
+    doc.build(elements)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1322, in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1083, in build
+    self.handle_flowable(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 908, in handle_flowable
+    self.handle_keepWithNext(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 873, in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'getKeepWithNext'
+_________ TestUnifiedPDFGeneratorWrapper.test_render_returns_valid_pdf _________
+tests/unit/test_unified_pdf_generator_wrapper.py:70: in test_render_returns_valid_pdf
+    assert len(pdf_bytes) > 1000, "PDF must have reasonable size"
+E   AssertionError: PDF must have reasonable size
+E   assert 320 > 1000
+E    +  where 320 = len(b'%PDF-1.4\n1 0 obj <</Type /Catalog /Pages 2 0 R>> endobj\n2 0 obj <</Type /Pages /Kids [3 0 R] /Count 1>> endobj\n3 ...n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \ntrailer <</Size 4 /Root 1 0 R>>\nstartxref\n193\n%%EOF')
+----------------------------- Captured stderr call -----------------------------
+2026-03-04 00:06:10,549 - ERROR - ReportLab generation failed
+Traceback (most recent call last):
+  File "/home/amer11974/projects/cci-ft2-intelligence/src/infrastructure/adapters/reporting/new_pdf_engine.py", line 111, in generate
+    doc.build(elements)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1322, in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1083, in build
+    self.handle_flowable(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 908, in handle_flowable
+    self.handle_keepWithNext(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 873, in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'getKeepWithNext'
+------------------------------ Captured log call -------------------------------
+ERROR    src.infrastructure.adapters.reporting.new_pdf_engine:new_pdf_engine.py:125 ReportLab generation failed
+Traceback (most recent call last):
+  File "/home/amer11974/projects/cci-ft2-intelligence/src/infrastructure/adapters/reporting/new_pdf_engine.py", line 111, in generate
+    doc.build(elements)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1322, in build
+    BaseDocTemplate.build(self,flowables, canvasmaker=canvasmaker)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 1083, in build
+    self.handle_flowable(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 908, in handle_flowable
+    self.handle_keepWithNext(flowables)
+  File "/home/amer11974/projects/cci-ft2-intelligence/venv/lib/python3.12/site-packages/reportlab/platypus/doctemplate.py", line 873, in handle_keepWithNext
+    while i<n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]): i += 1
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'getKeepWithNext'
+CRITICAL src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper:unified_pdf_generator_wrapper.py:132 New PDF engine failed unexpectedly
+=============================== warnings summary ===============================
+tests/golden/test_pdf_golden_master.py::TestPDFGoldenMaster::test_pdf_structure_basic
+tests/golden/test_pdf_golden_master.py::TestPDFGoldenMaster::test_pdf_structure_basic
+tests/golden/test_pdf_golden_master.py::TestPDFGoldenMaster::test_pdf_structure_basic
+tests/golden/test_pdf_golden_master.py::TestPDFGoldenMaster::test_pdf_stable_fingerprint
+tests/golden/test_pdf_golden_master.py::TestPDFGoldenMaster::test_pdf_stable_fingerprint
+tests/golden/test_pdf_golden_master.py::TestPDFGoldenMaster::test_pdf_stable_fingerprint
+tests/golden/test_pdf_golden_master.py::TestPDFGoldenMaster::test_arabic_text_roundtrip
+  /home/amer11974/projects/cci-ft2-intelligence/tests/golden/test_pdf_golden_master.py:56: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    generated_at=datetime.utcnow().isoformat(),
+
+tests/unit/test_capture_baseline.py::test_capture_baseline_default
+tests/unit/test_capture_baseline.py::test_capture_baseline_multiple_languages
+  /home/amer11974/projects/cci-ft2-intelligence/scripts/capture_golden_baseline.py:51: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    generated_at=datetime.utcnow().isoformat(),
+
+tests/unit/test_new_pdf_engine.py::test_generate_returns_bytes
+tests/unit/test_new_pdf_engine.py::test_generate_with_report_type
+tests/unit/test_new_pdf_engine.py::test_generate_contains_page
+  /home/amer11974/projects/cci-ft2-intelligence/tests/unit/test_new_pdf_engine.py:32: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    generated_at=datetime.utcnow().isoformat(),
+
+tests/unit/test_pdf_strategies_generation.py::test_strategies_generate
+  /home/amer11974/projects/cci-ft2-intelligence/tests/unit/test_pdf_strategies_generation.py:19: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    generated_at=datetime.utcnow().isoformat(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/integration/test_visual_reports_generation.py:12: Skipping visual report generation integration tests - missing dependencies
+SKIPPED [1] tests/unit/presentation/test_cli_composition.py:14: typer not installed, skipping CLI tests
+SKIPPED [1] tests/unit/test_pdf_structural_extractor.py:76: ملف الاختبار غير موجود
+SKIPPED [1] tests/unit/test_pdf_structural_extractor.py:92: ملفات الاختبار غير مكتملة
+FAILED tests/golden/test_pdf_golden_master.py::TestPDFGoldenMaster::test_arabic_text_roundtrip
+FAILED tests/unit/test_new_pdf_engine.py::test_generate_returns_bytes - Attri...
+FAILED tests/unit/test_new_pdf_engine.py::test_generate_with_report_type - At...
+FAILED tests/unit/test_new_pdf_engine.py::test_generate_contains_page - Attri...
+FAILED tests/unit/test_unified_pdf_generator_wrapper.py::TestUnifiedPDFGeneratorWrapper::test_render_returns_valid_pdf

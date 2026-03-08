@@ -1,12 +1,17 @@
-import pytest
-from unittest.mock import Mock, ANY
-from pathlib import Path
 import hashlib
 import uuid
+from pathlib import Path
+from unittest.mock import ANY, Mock
+
+import pytest
 
 from src.application.use_cases.verify_and_record_uc import VerifyAndRecordUseCase
-from src.domain.evidence.verification_result import VerificationResult, VerificationStatus
-from src.domain.ledger.events import LedgerEvent
+from src.domain.enums.ledger_event import LedgerEvent
+from src.domain.evidence.verification_result import (
+    VerificationResult,
+    VerificationStatus,
+)
+
 
 class TestVerifyAndRecordUseCaseBDD:
     """
@@ -26,10 +31,12 @@ class TestVerifyAndRecordUseCaseBDD:
     def use_case(self, mock_verifier, mock_ledger):
         return VerifyAndRecordUseCase(mock_verifier, mock_ledger)
 
-    def test_scenario_valid_file_verification(self, use_case, mock_verifier, mock_ledger, tmp_path):
+    def test_scenario_valid_file_verification(
+        self, use_case, mock_verifier, mock_ledger, tmp_path
+    ):
         """
         Scenario: A valid file is verified and recorded successfully.
-        
+
         Given a valid file exists
         And the verifier confirms it is authentic
         When the verification process is executed
@@ -45,8 +52,7 @@ class TestVerifyAndRecordUseCaseBDD:
 
         # Mock successful verification
         mock_verifier.verify_file.return_value = VerificationResult(
-            status=VerificationStatus.SUCCESS,
-            diagnostics="Signature Valid"
+            status=VerificationStatus.SUCCESS, diagnostics="Signature Valid"
         )
 
         # When
@@ -54,22 +60,24 @@ class TestVerifyAndRecordUseCaseBDD:
 
         # Then
         assert result.status == VerificationStatus.SUCCESS
-        
+
         # Verify ledger interaction
         mock_ledger.append.assert_called_once()
         call_kwargs = mock_ledger.append.call_args[1]
-        
-        assert call_kwargs['event_type'] == LedgerEvent.AUTHENTICITY_VERIFIED
-        assert call_kwargs['file_hash'] == expected_hash
-        assert call_kwargs['authenticity_status'] == VerificationStatus.SUCCESS.value
-        assert call_kwargs['source_path'] == str(file_path)
-        # Ensure a UUID is generated for event_id
-        assert uuid.UUID(call_kwargs['event_id'])
 
-    def test_scenario_tampered_file_verification(self, use_case, mock_verifier, mock_ledger, tmp_path):
+        assert call_kwargs["event_type"] == LedgerEvent.AUTHENTICITY_VERIFIED
+        assert call_kwargs["file_hash"] == expected_hash
+        assert call_kwargs["authenticity_status"] == VerificationStatus.SUCCESS.value
+        assert call_kwargs["source_path"] == str(file_path)
+        # Ensure a UUID is generated for event_id
+        assert uuid.UUID(call_kwargs["event_id"])
+
+    def test_scenario_tampered_file_verification(
+        self, use_case, mock_verifier, mock_ledger, tmp_path
+    ):
         """
         Scenario: A tampered file is detected and recorded as failed.
-        
+
         Given a file exists
         And the verifier reports a crypto failure
         When the verification process is executed
@@ -82,8 +90,7 @@ class TestVerifyAndRecordUseCaseBDD:
 
         # Mock failed verification
         mock_verifier.verify_file.return_value = VerificationResult(
-            status=VerificationStatus.CRYPTO_FAILURE,
-            diagnostics="Hash mismatch"
+            status=VerificationStatus.CRYPTO_FAILURE, diagnostics="Hash mismatch"
         )
 
         # When
@@ -95,20 +102,24 @@ class TestVerifyAndRecordUseCaseBDD:
         # Verify ledger interaction
         mock_ledger.append.assert_called_once()
         call_kwargs = mock_ledger.append.call_args[1]
-        
-        assert call_kwargs['event_type'] == LedgerEvent.AUTHENTICITY_FAILED
-        assert call_kwargs['authenticity_status'] == VerificationStatus.CRYPTO_FAILURE.value
-        assert call_kwargs['source_path'] == str(file_path)
 
-    def test_scenario_file_not_found(self, use_case, mock_verifier, mock_ledger, tmp_path):
+        assert call_kwargs["event_type"] == LedgerEvent.AUTHENTICITY_FAILED
+        assert (
+            call_kwargs["authenticity_status"]
+            == VerificationStatus.CRYPTO_FAILURE.value
+        )
+        assert call_kwargs["source_path"] == str(file_path)
+
+    def test_scenario_file_not_found(
+        self, use_case, mock_verifier, mock_ledger, tmp_path
+    ):
         """
         Scenario: File not found handling.
         """
         # Given
         missing_path = tmp_path / "non_existent.txt"
         mock_verifier.verify_file.return_value = VerificationResult(
-            status=VerificationStatus.MALFORMED_STRUCTURE,
-            diagnostics="File not found"
+            status=VerificationStatus.MALFORMED_STRUCTURE, diagnostics="File not found"
         )
 
         # When
@@ -116,5 +127,5 @@ class TestVerifyAndRecordUseCaseBDD:
 
         # Then
         call_kwargs = mock_ledger.append.call_args[1]
-        assert call_kwargs['file_hash'] == "FILE_NOT_FOUND"
-        assert call_kwargs['event_type'] == LedgerEvent.AUTHENTICITY_FAILED
+        assert call_kwargs["file_hash"] == "FILE_NOT_FOUND"
+        assert call_kwargs["event_type"] == LedgerEvent.AUTHENTICITY_FAILED

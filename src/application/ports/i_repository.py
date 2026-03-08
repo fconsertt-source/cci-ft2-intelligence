@@ -3,8 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Iterable
 
-from src.application.dtos.center_dto import CenterDTO
-from src.application.dtos.vaccine_dto import VaccineDTO
+from src.domain.dtos.center_dto import CenterDTO
+from src.domain.dtos.vaccine_dto import VaccineDTO
 
 
 class IDataRepository(ABC):

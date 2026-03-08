@@ -22,13 +22,13 @@ Usage:
 Trial Period: 90 days starting 2026-02-25
 """
 
+import argparse
+import json
 import subprocess
 import sys
-import json
-import argparse
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
 
 # ═══════════════════════════════════════════════════════════════
 # Configuration
@@ -46,27 +46,27 @@ CRITICAL_CHECKS = [
     {
         "description": "Check for no direct imports from core entities",
         "cmd": ["python", "scripts/check_no_core_entity_imports.py"],
-        "category": "architecture"
+        "category": "architecture",
     },
     {
         "description": "Check DI container usage",
         "cmd": ["python", "scripts/check_di_container_usage.py"],
-        "category": "architecture"
+        "category": "architecture",
     },
     {
         "description": "Check layer dependencies",
         "cmd": ["python", "scripts/check_layer_dependencies.py"],
-        "category": "architecture"
+        "category": "architecture",
     },
     {
         "description": "Check Ledger integrity",
         "cmd": ["python", "-m", "scripts.audit_ledger"],
-        "category": "system"
+        "category": "system",
     },
     {
         "description": "Verify archive structure",
         "cmd": ["python", "-m", "scripts.verify_lifecycle"],
-        "category": "system"
+        "category": "system",
     },
 ]
 
@@ -74,27 +74,27 @@ FULL_CHECKS = CRITICAL_CHECKS + [
     {
         "description": "Check src root clean",
         "cmd": ["python", "scripts/check_src_root_clean.py"],
-        "category": "architecture"
+        "category": "architecture",
     },
     {
         "description": "Run all unit and integration tests",
         "cmd": ["pytest", "-q", "--tb=short"],
-        "category": "tests"
+        "category": "tests",
     },
     {
         "description": "Run BDD tests",
         "cmd": ["pytest", "tests/bdd/", "-v"],
-        "category": "tests"
+        "category": "tests",
     },
     {
         "description": "Check Python dependencies",
         "cmd": ["pip", "check"],
-        "category": "dependencies"
+        "category": "dependencies",
     },
     {
         "description": "Check disk space (min 10GB free)",
         "cmd": ["python", "scripts/check_disk_space.py", "--min-gb", "10"],
-        "category": "system"
+        "category": "system",
     },
 ]
 
@@ -102,54 +102,55 @@ FULL_CHECKS = CRITICAL_CHECKS + [
 # Helper Functions
 # ═══════════════════════════════════════════════════════════════
 
-def run_command(cmd: List[str], description: str, timeout: int = DEFAULT_TIMEOUT) -> Tuple[bool, str, str]:
+
+def run_command(
+    cmd: List[str], description: str, timeout: int = DEFAULT_TIMEOUT
+) -> Tuple[bool, str, str]:
     """
     Run a command and capture result.
-    
+
     Returns:
         Tuple[bool, str, str]: (passed, stdout, stderr)
     """
     print(f"\n🔹 Running: {description}")
     print(f"  Command: {' '.join(cmd)}")
     print(f"  Timeout: {timeout}s")
-    
+
     try:
         result = subprocess.run(
-            cmd,
-            check=True,
-            text=True,
-            capture_output=True,
-            timeout=timeout
+            cmd, check=True, text=True, capture_output=True, timeout=timeout
         )
         print(f"✅ {description} PASSED")
         return True, result.stdout, None
-        
+
     except subprocess.CalledProcessError as e:
         print(f"❌ {description} FAILED")
         print(f"  Exit Code: {e.returncode}")
         if e.stderr:
             print(f"  Stderr: {e.stderr[:500]}...")
         return False, e.stdout, e.stderr
-        
+
     except subprocess.TimeoutExpired as e:
         print(f"❌ {description} TIMEOUT ({timeout}s)")
         return False, None, "Timeout expired"
-        
+
     except FileNotFoundError:
         print(f"❌ {description} FAILED - Command not found")
         return False, None, "Command not found"
 
 
-def generate_report(results: List[Dict], output_path: Path, ledger_log: bool = False) -> Dict:
+def generate_report(
+    results: List[Dict], output_path: Path, ledger_log: bool = False
+) -> Dict:
     """
     Generate JSON report for archival.
-    
+
     Optionally logs to Ledger for forensic audit trail.
     """
     passed = sum(1 for r in results if r["passed"])
     failed = sum(1 for r in results if not r["passed"])
     total = len(results)
-    
+
     report = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "total_checks": total,
@@ -161,45 +162,45 @@ def generate_report(results: List[Dict], output_path: Path, ledger_log: bool = F
         "trial_period": {
             "start_date": "2026-02-25",
             "end_date": "2026-05-26",
-            "duration_days": 90
-        }
+            "duration_days": 90,
+        },
     }
-    
+
     # Save report
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'w', encoding='utf-8') as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, ensure_ascii=False)
-    
+
     print(f"\n📝 Report saved: {output_path}")
-    
+
     # Log to Ledger if requested
     if ledger_log and failed == 0:
         try:
-            from src.shared.di_container import container
             from src.application.ports.ledger_writer_port import LedgerWriterPort
-            from src.domain.ledger.events import LedgerEvent
-            
+            from src.domain.enums.ledger_event import LedgerEvent
+            from src.shared.di_container import container
+
             ledger = container.resolve(LedgerWriterPort)
             ledger.append(
                 event_type=LedgerEvent.LEDGER_INTEGRITY_CHECK,
                 file_hash="PRE_RELEASE_CHECK",
                 event_id=f"prerelease-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}",
                 ft2_serial="SYSTEM",
-                authenticity_status=report["status"]
+                authenticity_status=report["status"],
             )
             print("✅ Results logged to Ledger for audit trail")
         except Exception as e:
             print(f"⚠️  Failed to log to Ledger: {e}")
-    
+
     return report
 
 
 def print_summary(results: List[Dict]) -> None:
     """Print formatted summary"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📊 PRE-RELEASE CHECK SUMMARY")
-    print("="*60)
-    
+    print("=" * 60)
+
     by_category = {}
     for r in results:
         cat = r.get("category", "unknown")
@@ -209,14 +210,14 @@ def print_summary(results: List[Dict]) -> None:
             by_category[cat]["passed"] += 1
         else:
             by_category[cat]["failed"] += 1
-    
+
     for cat, stats in sorted(by_category.items()):
         total = stats["passed"] + stats["failed"]
         print(f"\n{cat.upper()}:")
         print(f"  ✅ Passed: {stats['passed']}/{total}")
         if stats["failed"] > 0:
             print(f"  ❌ Failed: {stats['failed']}/{total}")
-    
+
     total_passed = sum(1 for r in results if r["passed"])
     print(f"\n{'='*60}")
     print(f"TOTAL: {total_passed}/{len(results)} checks passed")
@@ -226,6 +227,7 @@ def print_summary(results: List[Dict]) -> None:
 # ═══════════════════════════════════════════════════════════════
 # Main
 # ═══════════════════════════════════════════════════════════════
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -237,32 +239,28 @@ Examples:
     python pre_release_check.py --quick
     python pre_release_check.py --skip-tests
     python pre_release_check.py --ledger-log
-        """
+        """,
     )
     parser.add_argument(
         "--skip-tests",
         action="store_true",
-        help="Skip pytest (for quick architecture checks)"
+        help="Skip pytest (for quick architecture checks)",
     )
-    parser.add_argument(
-        "--quick",
-        action="store_true",
-        help="Run only critical checks"
-    )
+    parser.add_argument("--quick", action="store_true", help="Run only critical checks")
     parser.add_argument(
         "--report",
         type=Path,
         default=REPORT_PATH,
-        help=f"Path for JSON report output (default: {REPORT_PATH})"
+        help=f"Path for JSON report output (default: {REPORT_PATH})",
     )
     parser.add_argument(
         "--ledger-log",
         action="store_true",
-        help="Log results to Ledger for audit trail"
+        help="Log results to Ledger for audit trail",
     )
-    
+
     args = parser.parse_args()
-    
+
     # Select checks based on flags
     if args.quick:
         checks = CRITICAL_CHECKS
@@ -270,10 +268,10 @@ Examples:
         checks = [c for c in FULL_CHECKS if c["category"] != "tests"]
     else:
         checks = FULL_CHECKS
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
     print("🛡️  CCI-FT2-INTELLIGENCE - PRE-RELEASE CHECK")
-    print("="*60)
+    print("=" * 60)
     print(f"📅 Timestamp: {datetime.now(timezone.utc).isoformat()}")
     print(f"📋 Total Checks: {len(checks)}")
     print(f"📝 Report: {args.report}")
@@ -281,30 +279,32 @@ Examples:
         print("⚡ Mode: QUICK (critical checks only)")
     elif args.skip_tests:
         print("⚡ Mode: NO TESTS (architecture + system only)")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Run checks
     results = []
     for check in checks:
         passed, stdout, stderr = run_command(check["cmd"], check["description"])
-        results.append({
-            "description": check["description"],
-            "category": check.get("category", "unknown"),
-            "passed": passed,
-            "command": " ".join(check["cmd"]),
-            "stdout": stdout[:1000] if stdout else None,  # Limit for report
-            "stderr": stderr[:1000] if stderr else None
-        })
-    
+        results.append(
+            {
+                "description": check["description"],
+                "category": check.get("category", "unknown"),
+                "passed": passed,
+                "command": " ".join(check["cmd"]),
+                "stdout": stdout[:1000] if stdout else None,  # Limit for report
+                "stderr": stderr[:1000] if stderr else None,
+            }
+        )
+
     # Generate report
     generate_report(results, args.report, args.ledger_log)
-    
+
     # Print summary
     print_summary(results)
-    
+
     # Final verdict
     all_passed = all(r["passed"] for r in results)
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     if all_passed:
         print("🎯 ALL CHECKS PASSED")
         print("✅ System is READY for trial deployment!")

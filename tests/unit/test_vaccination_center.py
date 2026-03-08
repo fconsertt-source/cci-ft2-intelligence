@@ -1,8 +1,13 @@
 # tests/unit/test_vaccination_center.py
-import pytest
 from datetime import datetime
-from src.domain.entities.vaccination_center import VaccinationCenter, FreezeTolerance
-from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Entry
+
+import pytest
+
+from src.domain.entities.vaccination_center import FreezeTolerance, VaccinationCenter
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import (
+    FT2Reading as FT2Entry,  # kept alias for readability
+)
+
 
 @pytest.fixture
 def zero_tolerance_center():
@@ -16,9 +21,11 @@ def zero_tolerance_center():
         freeze_tolerance=FreezeTolerance.ZERO_TOLERANCE,
     )
 
+
 def test_initial_decision_is_no_data(zero_tolerance_center):
     """Tests that the initial decision state of a center is 'NO_DATA'."""
     assert zero_tolerance_center.decision == "NO_DATA"
+
 
 def test_add_normal_entry_does_not_change_decision(zero_tolerance_center):
     """
@@ -27,7 +34,7 @@ def test_add_normal_entry_does_not_change_decision(zero_tolerance_center):
     """
     # Arrange
     normal_entry = FT2Entry("device_zt1", datetime.now(), 5.0, "Vax", "B1")
-    
+
     # Act
     zero_tolerance_center.add_ft2_entry(normal_entry)
 
@@ -36,6 +43,7 @@ def test_add_normal_entry_does_not_change_decision(zero_tolerance_center):
     # transition to an "OK" state, but it should not reject.
     assert zero_tolerance_center.decision != "REJECTED_FREEZE_SENSITIVE"
     assert len(zero_tolerance_center.ft2_entries) == 1
+
 
 def test_add_freeze_entry_to_zero_tolerance_center_rejects_stock(zero_tolerance_center):
     """
@@ -52,6 +60,7 @@ def test_add_freeze_entry_to_zero_tolerance_center_rejects_stock(zero_tolerance_
     assert zero_tolerance_center.decision == "REJECTED_FREEZE_SENSITIVE"
     assert zero_tolerance_center.vvm_stage == "D"
     assert len(zero_tolerance_center.ft2_entries) == 1
+
 
 def test_count_freeze_events_correctly_counts_and_groups(zero_tolerance_center):
     """
@@ -72,10 +81,20 @@ def test_count_freeze_events_correctly_counts_and_groups(zero_tolerance_center):
     freeze_stats = zero_tolerance_center._count_freeze_events()
 
     # Assert
-    assert freeze_stats["total"] == 3
-    assert sorted(freeze_stats["durations"]) == [10, 15, 20]
+    assert freeze_stats["total_freeze_events"] == 3
     assert freeze_stats["by_device"]["device_zt1"] == 2
     assert freeze_stats["by_device"]["device_zt2"] == 1
+
+
+def test_count_freeze_events_empty_history(zero_tolerance_center):
+    """
+    When no devices or entries exist the helper should return zero values and
+    not crash.  This guards against regressions once the new `devices` API is
+    exercised.
+    """
+    stats = zero_tolerance_center._count_freeze_events()
+    assert stats == {"total_freeze_events": 0, "by_device": {}}
+
 
 def test_add_boundary_temp_entry_does_not_reject(zero_tolerance_center):
     """

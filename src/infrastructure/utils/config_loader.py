@@ -1,6 +1,10 @@
-import yaml
+# src/infrastructure/utils/config_loader.py
+
 import os
-from typing import Dict, Any
+from typing import Any, Dict
+
+import yaml
+
 
 class ConfigLoader:
     _config = None
@@ -12,10 +16,10 @@ class ConfigLoader:
             if not os.path.exists(config_path):
                 # Fallback or default values if config is missing
                 return {}
-            
-            with open(config_path, 'r', encoding='utf-8') as f:
+
+            with open(config_path, "r", encoding="utf-8") as f:
                 cls._config = yaml.safe_load(f)
-        
+
         return cls._config
 
     @classmethod
@@ -25,8 +29,8 @@ class ConfigLoader:
         Example: get("paths.fonts_dir")
         """
         config = cls.load()
-        keys = key_path.split('.')
-        
+        keys = key_path.split(".")
+
         value = config
         for key in keys:
             if isinstance(value, dict) and key in value:

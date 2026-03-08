@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  lite:
+    name: Lite tests (no heavy deps)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare lite requirements
+        run: |
+          # filter out packages that are large or problematic in lite job
+          grep -Ev 'reportlab|freezegun|pdfminer|pillow|python-bidi|arabic-reshaper' requirements-dev.txt > lite-reqs.txt
+      - name: Install dependencies (lite)
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt -r lite-reqs.txt
+      - name: Run tests
+        run: |
+          pytest -q
+
+  full:
+    name: Full tests (all dependencies)
+    runs-on: ubuntu-latest
+    needs: lite
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies (full)
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt -r requirements-dev.txt
+      - name: Run tests
+        run: |
+          pytest -q

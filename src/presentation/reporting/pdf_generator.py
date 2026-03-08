@@ -1,3 +1,5 @@
+# src\presentation\reporting\pdf_generator.py
+
 """Lightweight PDF generator shim used when no concrete PDF generator
 implementation is available. Tests will typically patch `PDFReportGenerator`.
 """
@@ -24,7 +26,9 @@ class PDFReportGenerator:
         NotImplementedError by default to signal tests or deployments should
         provide an implementation (tests patch `PDFReportGenerator`).
         """
-        raise NotImplementedError("PDFReportGenerator.generate_report is not implemented in this environment")
+        raise NotImplementedError(
+            "PDFReportGenerator.generate_report is not implemented in this environment"
+        )
 
 
 def generate_pdf_report() -> Optional[str]:
@@ -37,3 +41,7 @@ def generate_pdf_report() -> Optional[str]:
     gen = PDFReportGenerator()
     return gen.generate_report(tsv_path)
 
+
+1
+1
+1

@@ -11,6 +11,6 @@ __all__ = [
     "pdf_generator",
 ]
 
-# Public API exports — required for patching in tests
-from . import unified_pdf_generator
-# تعديل تجريبي
+# Avoid importing heavy submodules at package import time to prevent
+# circular dependencies during testing.  Consumers should import the
+# specific submodule they need.

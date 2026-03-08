@@ -1,0 +1,34 @@
+{
+  "reports": {
+    "official-ar": {
+      "file": "official-ar.pdf",
+      "size": 1682,
+      "hash": "f2e8597982e2bed5d4a002eaf50295ec95d405a942617715859b4dddacd20d9c"
+    },
+    "technical-ar": {
+      "file": "technical-ar.pdf",
+      "size": 1683,
+      "hash": "bc87b4ce07c332cd09be844314413b3cd71bf30cd938828db49b25e050cf1b5d"
+    },
+    "arabic-ar": {
+      "file": "arabic-ar.pdf",
+      "size": 1797,
+      "hash": "c03e6e803d28e4dfa092a008590fe117ca149c726cfd13a3c429ac20251f2180"
+    },
+    "official-en": {
+      "file": "official-en.pdf",
+      "size": 1682,
+      "hash": "8025d2b02d6899921d6bce50e93af8a48177078841062d53d8176a7b2104cdcd"
+    },
+    "technical-en": {
+      "file": "technical-en.pdf",
+      "size": 1683,
+      "hash": "4387a700cf48ddca959303e12fe08f719b1233459a98890f2b7ad2eade6b3e88"
+    },
+    "arabic-en": {
+      "file": "arabic-en.pdf",
+      "size": 1797,
+      "hash": "47ebdef61a83f831bab4fc3c372bdae28e2bfe5c5dea4d8bbd62a066e352340e"
+    }
+  }
+}

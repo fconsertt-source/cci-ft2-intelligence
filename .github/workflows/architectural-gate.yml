@@ -1,0 +1,62 @@
+# .github/workflows/architectural-gate.yml
+# CI Quality Gate — يفشل البناء عند انتهاكات معمارية
+
+name: Architectural Quality Gate
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  architectural-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements-test.txt
+          pip install libcst  # لـ unify_imports الآمن
+
+      - name: Detect Duplicate Entities
+        run: |
+          python scripts/detect_duplicate_entities.py
+          if [ $? -ne 0 ]; then
+            echo "❌ Architectural violations detected"
+            exit 1
+          fi
+
+      - name: Architecture Contracts
+        run: |
+          pytest tests/contracts/test_architecture_contracts.py -v
+          if [ $? -ne 0 ]; then
+            echo "❌ Contract tests failed"
+            exit 1
+          fi
+
+      - name: Layer Boundary Tests
+        run: |
+          pytest tests/contracts/ -k "layer" -v
+          if [ $? -ne 0 ]; then
+            echo "❌ Layer boundary violations"
+            exit 1
+          fi
+
+      - name: Generate Architecture Report
+        run: |
+          python scripts/detect_duplicate_entities.py &gt; architecture_report.txt
+          cat architecture_report.txt
+
+      - name: Upload Architecture Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: architecture-report
+          path: architecture_report.txt
