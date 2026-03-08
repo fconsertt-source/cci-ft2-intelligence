@@ -2,13 +2,13 @@
 # Architecture guardians - require review for critical paths
 
 # Domain layer (immutable)
-/src/domain/ @architecture-team
+/src/domain/ @fconsertt-source
 
 # Application ports (contract changes)
-/src/application/ports/ @architecture-team
+/src/application/ports/ @fconsertt-source
 
 # ADRs (architectural decisions)
-/docs/adr/ @architecture-team
+/docs/adr/ @fconsertt-source
 
 # Guards (enforcement mechanism)
-/scripts/check_*.py @architecture-team
+/scripts/check_*.py @fconsertt-source
