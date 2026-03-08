@@ -9,9 +9,8 @@ from src.application.app_composer import AppComposer
 
 def test_generate_report_speed():
     """benchmark only: generating a report should be reasonably fast"""
-    uc = AppComposer.create_generate_device_report_uc()
     start = time.time()
-    # we won't execute fully because it may require data; just measure build time
+    uc = AppComposer.create_generate_device_report_uc()
     end = time.time()
     elapsed = end - start
     # assert composition is fast (< 0.01s)
