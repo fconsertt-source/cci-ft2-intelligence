@@ -61,7 +61,11 @@ class GuardianGUI:
     def __init__(self):
         self.root = tk.Tk()
         self._init_language()
-        self.root.title(self._get_text("app.title"))
+        self.root.title(
+            lang.get_raw("app.title")
+            if LANG_AVAILABLE and lang
+            else self._get_text("app.title")
+        )
         self.root.geometry("1200x800")
 
         self.cycle_id = f"CC-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
@@ -97,6 +101,9 @@ class GuardianGUI:
     # ========================== دعم اللغة ==========================
     def _init_language(self):
         """تهيئة اللغة الافتراضية (العربية) مع fallback للإنجليزية."""
+        import os
+
+        requested_lang = os.environ.get("CCI_LANG", "ar")
         self.current_lang = "en"
         if not LANG_AVAILABLE or not lang:
             logger.warning("LanguageManager غير متاح، استخدام الإنجليزية")
@@ -104,8 +111,8 @@ class GuardianGUI:
 
         try:
             locales_dir = Path(__file__).parent.parent.parent / "shared" / "locales"
-            lang.load_language("ar", translations_dir=locales_dir)
-            self.current_lang = "ar"
+            lang.load_language(requested_lang, translations_dir=locales_dir)
+            self.current_lang = requested_lang
             lang.set_language(self.current_lang)
             logger.info("تم تحميل الترجمة العربية بنجاح")
         except Exception as e:
@@ -175,11 +182,25 @@ class GuardianGUI:
 
             lang.set_language(lang_code)
             self.current_lang = lang_code
-            self._refresh_ui_texts()
+            logger.info(f"تم تبديل اللغة إلى: {lang_code}")
+            # إعادة تشغيل الواجهة باللغة الجديدة
+            self.root.destroy()
+            import os
+            import subprocess
+            import sys
 
-            messagebox.showinfo(
-                self._get_text("menu.language"), self._get_text("msg.lang_changed")
+            env = {
+                **os.environ,
+                "CCI_LANG": lang_code,
+                "PYTHONPATH": str(Path(__file__).parent.parent.parent.parent),
+            }
+            import signal
+
+            env["CCI_PARENT_PID"] = str(os.getpid())
+            subprocess.Popen(
+                [sys.executable, __file__], env=env, start_new_session=True
             )
+            os.kill(os.getpid(), signal.SIGKILL)
         except Exception as e:
             logger.exception(f"فشل تبديل اللغة: {e}")
             messagebox.showerror(self._get_text("error.title"), str(e))
@@ -187,7 +208,11 @@ class GuardianGUI:
     def _refresh_ui_texts(self):
         """تحديث جميع النصوص في الواجهة بعد تغيير اللغة."""
         # عنوان النافذة
-        self.root.title(self._get_text("app.title"))
+        self.root.title(
+            lang.get_raw("app.title")
+            if LANG_AVAILABLE and lang
+            else self._get_text("app.title")
+        )
 
         # الهيدر
         if "header" in self.ui_refs:
@@ -274,11 +299,17 @@ class GuardianGUI:
         )
         menubar.add_cascade(label=self._get_text("menu.file"), menu=file_menu)
 
-        # اللغة
-        lang_menu = tk.Menu(menubar, tearoff=0)
-        lang_menu.add_command(label="العربية", command=lambda: self._switch_lang("ar"))
-        lang_menu.add_command(label="English", command=lambda: self._switch_lang("en"))
-        menubar.add_cascade(label=self._get_text("menu.language"), menu=lang_menu)
+        # زر toggle للغة - يتبدل تلقائياً
+        toggle_label = (
+            "English"
+            if self.current_lang == "ar"
+            else (lang._shape_arabic("عربي") if LANG_AVAILABLE and lang else "عربي")
+        )
+        target_lang = "en" if self.current_lang == "ar" else "ar"
+        menubar.add_command(
+            label=toggle_label, command=lambda: self._switch_lang(target_lang)
+        )
+        self.ui_refs["lang_toggle"] = menubar
 
         # مساعدة
         help_menu = tk.Menu(menubar, tearoff=0)
@@ -570,11 +601,19 @@ class GuardianGUI:
         )
 
     def _on_closing(self):
-        if messagebox.askokcancel(
-            self._get_text("msg.quit"), self._get_text("msg.quit_confirm")
-        ):
+        title = (
+            lang.get_raw("msg.quit")
+            if LANG_AVAILABLE and lang
+            else self._get_text("msg.quit")
+        )
+        msg = self._get_text("msg.quit_confirm")
+        if messagebox.askokcancel(title, msg):
             self._save_cycle()
+            import os
+            import signal
+
             self.root.destroy()
+            os.kill(os.getpid(), signal.SIGKILL)
 
     # ========================== تشغيل ==========================
     def run(self):

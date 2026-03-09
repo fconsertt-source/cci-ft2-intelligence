@@ -64,10 +64,40 @@ class LanguageManager:
             lang_dict = self._translations.get(lang, {})
             if key in lang_dict:
                 template = lang_dict[key]
-                return template.format(**kwargs) if kwargs else template
+                text = template.format(**kwargs) if kwargs else template
+                if self._current_lang == "ar":
+                    text = self._shape_arabic(text)
+                return text
 
         # Fallback to key itself
         return key
+
+    def get_raw(self, key: str, **kwargs) -> str:
+        """الحصول على النص المترجم بدون Arabic shaping - للاستخدام في title bar."""
+        key = key.strip()
+        for lang in self._fallback_chain:
+            lang_dict = self._translations.get(lang, {})
+            if key in lang_dict:
+                template = lang_dict[key]
+                return template.format(**kwargs) if kwargs else template
+        return key
+
+    def _shape_arabic(self, text: str) -> str:
+        """تطبيق Arabic reshaping و bidi لعرض صحيح في Tkinter."""
+        try:
+            import re
+
+            import arabic_reshaper
+            from bidi.algorithm import get_display
+
+            reshaped = arabic_reshaper.reshape(text)
+            # النصوص المختلطة تحتاج base_dir='R' للحفاظ على ترتيب العناصر
+            has_latin = bool(re.search(r"[a-zA-Z0-9]", text))
+            if has_latin:
+                return get_display(reshaped, base_dir="R")
+            return get_display(reshaped)
+        except ImportError:
+            return text
 
     def set_language(self, lang_code: str) -> None:
         """تغيير اللغة (يجب أن تكون محملة مسبقاً)"""
