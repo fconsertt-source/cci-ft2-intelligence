@@ -38,9 +38,9 @@ def _register_arabic_font() -> str:
     # search both the legacy "assets" location and the new shared fonts
     candidates = [
         ("Amiri", "assets/fonts/Amiri-Regular.ttf"),
+        ("Tajawal", "src/shared/fonts/Tajawal-Regular.ttf"),
         ("DejaVu", "assets/fonts/DejaVuSans.ttf"),
         ("Arabic", "src/shared/fonts/arabic.ttf"),
-        ("Tajawal", "src/shared/fonts/Tajawal-Regular.ttf"),
     ]
     for name, path in candidates:
         if os.path.exists(path):

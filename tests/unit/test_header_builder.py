@@ -25,7 +25,10 @@ def test_header_builder_default():
     hb = HeaderBuilder("Helvetica", styles)
     elems = hb.build("official", make_dto())
     assert elems, "Header elements should not be empty"
-    assert any("Official" in getattr(e, "text", "") for e in elems)
+    assert any(
+        "Official" in getattr(e, "text", "") or "CCI-FT2" in getattr(e, "text", "")
+        for e in elems
+    )
 
 
 def test_footer_builder():

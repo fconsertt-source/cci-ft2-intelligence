@@ -29,11 +29,6 @@ class ChartBuilder:
 
                 styles = getSampleStyleSheet()
                 text = "Chart unavailable"
-                if report_type == "official":
-                    # Arabic placeholder when appropriate
-                    text = (
-                        "الرسم البياني غير متوفر" if report_type == "official" else text
-                    )
                 return [Paragraph(text, styles.get("Normal")), Spacer(1, 12)]
             except Exception:
 
@@ -51,8 +46,6 @@ class ChartBuilder:
 
                 styles = getSampleStyleSheet()
                 text = "Chart unavailable"
-                if report_type == "official":
-                    text = "الرسم البياني غير متوفر"
                 return [Paragraph(text, styles.get("Normal")), Spacer(1, 12)]
             except Exception:
 
