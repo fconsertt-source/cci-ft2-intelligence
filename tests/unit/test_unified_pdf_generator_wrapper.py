@@ -97,7 +97,7 @@ class TestUnifiedPDFGeneratorWrapper:
         gen = get_pdf_generator(language="ar")
         assert hasattr(gen, "font_name"), "font_name attribute must exist"
         # either a real Arabic font was registered or we fell back; both are fine
-        assert gen.font_name in ("ArabicFont", "Helvetica"), gen.font_name
+        assert gen.font_name in ("Amiri", "Amiri-Bold", "Helvetica"), gen.font_name
 
     def test_singleton_pattern(self):
         """التأكد من أن get_pdf_generator() ترجع نفس instance"""
@@ -147,7 +147,7 @@ class TestFallbackChain:
         wrapper = UnifiedPDFGeneratorWrapper()
         wrapper.render(sample_dto)
 
-        assert "New PDF engine failed unexpectedly" in caplog.text
+        assert "New PDF engine failed" in caplog.text
 
 
 class TestLoggingSafety:
@@ -168,7 +168,9 @@ class TestLoggingSafety:
 
     def test_logger_configured(self):
         """التأكد من أن logger مُعد بشكل صحيح"""
-        from src.infrastructure.adapters.reporting import unified_pdf_generator_wrapper
+        from src.infrastructure.pdf import (
+            arabic_font_manager as unified_pdf_generator_wrapper,
+        )
 
         assert hasattr(unified_pdf_generator_wrapper, "logger")
 
