@@ -40,7 +40,8 @@ def register_arabic_fonts():
     """تسجيل خط Amiri العربي في ReportLab مع مسارات مرنة"""
     # قائمة المسارات المحتملة
     possible_paths = [
-        Path(__file__).parent.parent.parent.parent / "assets/fonts/Amiri-Regular.ttf",
+        Path(__file__).parent.parent.parent.parent.parent
+        / "assets/fonts/Amiri-Regular.ttf",
         Path(__file__).parent.parent.parent / "assets/fonts/Amiri-Regular.ttf",
         Path("assets/fonts/Amiri-Regular.ttf"),
     ]
