@@ -1,7 +1,18 @@
 # tests/unit/presentation/test_gui_composition.py
 """Ensure the GUI uses AppComposer rather than manual DI."""
+import pytest
 
 from src.presentation.cli import gui_main
+
+
+def _display_available() -> bool:
+    try:
+        import tkinter
+
+        tkinter.Tk().destroy()
+        return True
+    except Exception:
+        return False
 
 
 def test_gui_has_composer_available():
@@ -11,6 +22,9 @@ def test_gui_has_composer_available():
     ), "COMPOSER_AVAILABLE should be True in test environment"
 
 
+@pytest.mark.skipif(
+    not _display_available(), reason="No display available (headless environment)"
+)
 def test_gui_generates_use_case_via_composer(monkeypatch):
     # Monkeypatch the composer to track call
     called = {}
@@ -28,11 +42,7 @@ def test_gui_generates_use_case_via_composer(monkeypatch):
         staticmethod(fake_create),
     )
 
-    # invoke the part of GUI that builds a use case
-    # we can call the private method directly
     gui = gui_main.GuardianGUI()
-    # simulate the dialog path that chooses yes and enters device id, but we won't run through full UI
-    # Instead just call the composition part directly
     use_case = gui_main.AppComposer.create_generate_device_report_uc()
     assert called.get("called", False)
     assert isinstance(use_case, DummyUC)
