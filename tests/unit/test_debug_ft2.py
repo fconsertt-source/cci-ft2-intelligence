@@ -1,4 +1,5 @@
 import os
+
 from scripts import debug_ft2
 
 
@@ -11,16 +12,16 @@ def test_clean_bad_files_removes_empty(tmp_path):
 
     # run cleanup (it operates on fixed path, so create the expected folder)
     proj_root = os.getcwd()
-    target_dir = os.path.join(proj_root, 'data', 'input_ft2')
-    os.makedirs(os.path.dirname(target_dir), exist_ok=True)
+    target_dir = os.path.join(proj_root, "data", "input_ft2")
+    os.makedirs(target_dir, exist_ok=True)
     # Copy our test file into project location
-    with open(target_dir + '/bad1.txt', 'w', encoding='utf-8') as f:
-        f.write('')
+    with open(target_dir + "/bad1.txt", "w", encoding="utf-8") as f:
+        f.write("")
 
     debug_ft2.clean_bad_files()
 
     # file should be removed
-    assert not os.path.exists(target_dir + '/bad1.txt')
+    assert not os.path.exists(target_dir + "/bad1.txt")
 
 
 def test_debug_raw_files_handles_missing_dir(monkeypatch, caplog):
