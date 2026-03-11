@@ -139,7 +139,16 @@ class VaccinationCenter:
         """تجميع أحداث التجميد من إدخالات FT2"""
         events = {"total": 0, "durations": [], "by_device": {}}
         for entry in self.ft2_entries:
-            if getattr(entry, "has_freezing", entry.temperature < -0.5):
+            if getattr(
+                entry,
+                "has_freezing",
+                getattr(
+                    entry,
+                    "temperature",
+                    getattr(entry, "temperatures", {}).get("min", 0),
+                )
+                < -0.5,
+            ):
                 events["total"] += 1
                 events["durations"].append(getattr(entry, "freeze_minutes", None))
                 device_id = getattr(entry, "device_id", None)
