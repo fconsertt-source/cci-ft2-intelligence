@@ -1,4 +1,42 @@
-cffi==2.0.0
+# ═══════════════════════════════════════════════════════════
+# CCI-FT2-Intelligence — Production Dependencies
+# ═══════════════════════════════════════════════════════════
+# تحديث: مارس 2026 — Phase 4 Production Hardening
+# ───────────────────────────────────────────────────────────
+# الاستخدام:
+#   pip install -r requirements.txt
+# ═══════════════════════════════════════════════════════════
+
+# ── Core PDF Generation ─────────────────────────────────────
+# مثبّت بدقة لضمان استقرار Golden PDF Hash
+reportlab==4.4.9
+pillow==12.1.0
+
+# ── Arabic RTL Support ──────────────────────────────────────
+arabic-reshaper==3.0.0
+python-bidi==0.6.7
+
+# ── Visualization ────────────────────────────────────────────
+matplotlib==3.10.8
+
+# ── CLI ──────────────────────────────────────────────────────
+typer==0.12.3
+click==8.1.7
+
+# ── PDF Analysis ─────────────────────────────────────────────
+pdfminer.six==20260107
+pypdf==6.7.4
+
+# ── Security & Crypto ────────────────────────────────────────
 cryptography==46.0.5
+cffi==2.0.0
 pycparser==3.0
-filelock==3.12.0
+
+# ── Utilities ────────────────────────────────────────────────
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.1
+PyYAML==6.0.3
+packaging==26.0
+charset-normalizer==3.4.4
+six==1.17.0
+filelock>=3.12.0
