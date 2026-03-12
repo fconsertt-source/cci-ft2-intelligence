@@ -53,7 +53,7 @@ jobs:
 
       - name: Generate Architecture Report
         run: |
-          python scripts/detect_duplicate_entities.py &gt; architecture_report.txt
+          python scripts/detect_duplicate_entities.py > architecture_report.txt
           cat architecture_report.txt
 
       - name: Upload Architecture Report
