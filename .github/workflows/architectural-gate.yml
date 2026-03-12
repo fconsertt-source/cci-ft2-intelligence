@@ -23,8 +23,9 @@ jobs:
 
       - name: Install dependencies
         run: |
+          pip install -r requirements.txt
           pip install -r requirements-test.txt
-          pip install libcst  # لـ unify_imports الآمن
+          pip install libcst
 
       - name: Detect Duplicate Entities
         run: |
