@@ -20,16 +20,24 @@ jobs:
 
       - name: Prepare lite requirements
         run: |
-          grep -Ev 'reportlab|freezegun|pdfminer|pillow|python-bidi|arabic-reshaper|^-r' requirements-dev.txt > lite-reqs.txt
+          grep -Ev 'reportlab|freezegun|pdfminer|pillow|python-bidi|arabic-reshaper|^-r' \
+            requirements-dev.txt > lite-reqs.txt
 
       - name: Install dependencies (lite)
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install -r requirements.txt -r lite-reqs.txt
+          python3 -m pip install -r lite-reqs.txt
 
       - name: Run tests (lite)
         run: |
-          pytest -q --ignore=tests/golden --ignore=tests/performance
+          pytest -q \
+            --ignore=tests/golden \
+            --ignore=tests/performance \
+            --ignore=tests/integration/test_visual_reports_generation.py \
+            --ignore=tests/unit/test_chart_builder.py \
+            --ignore=tests/unit/test_new_pdf_engine.py \
+            --ignore=tests/unit/test_header_builder.py \
+            --ignore=tests/unit/test_table_builder.py
 
   full:
     name: Full tests (all dependencies)
