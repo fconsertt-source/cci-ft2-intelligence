@@ -22,6 +22,8 @@ jobs:
         run: |
           grep -Ev 'reportlab|freezegun|pdfminer|pillow|python-bidi|arabic-reshaper|^-r' \
             requirements-dev.txt > lite-reqs.txt
+          grep -Ev 'reportlab|pdfminer|pillow|python-bidi|arabic-reshaper|matplotlib' \
+            requirements.txt >> lite-reqs.txt
 
       - name: Install dependencies (lite)
         run: |
