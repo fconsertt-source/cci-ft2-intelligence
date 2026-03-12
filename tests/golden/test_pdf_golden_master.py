@@ -152,10 +152,10 @@ class TestPDFGoldenMaster:
 
             # ✅ تحقق من الخط العربي المسجل
             try:
-    from reportlab.pdfbase import pdfmetrics
-    REPORTLAB_AVAILABLE = True
-except ImportError:
-    REPORTLAB_AVAILABLE = False
+                from reportlab.pdfbase import pdfmetrics
+            except ImportError:
+                pytest.skip("reportlab not available")
+
 
             if "Amiri" not in pdfmetrics.getRegisteredFontNames():
                 pytest.skip("Arabic font 'Amiri' not registered")
