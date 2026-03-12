@@ -39,7 +39,8 @@ jobs:
             --ignore=tests/unit/test_chart_builder.py \
             --ignore=tests/unit/test_new_pdf_engine.py \
             --ignore=tests/unit/test_header_builder.py \
-            --ignore=tests/unit/test_table_builder.py
+            --ignore=tests/unit/test_table_builder.py \
+            --ignore=tests/unit/test_unified_pdf_generator_wrapper.py
 
   full:
     name: Full tests (all dependencies)

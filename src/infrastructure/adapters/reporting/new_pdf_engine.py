@@ -18,7 +18,11 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-from reportlab.pdfbase import pdfmetrics
+try:
+    from reportlab.pdfbase import pdfmetrics
+    REPORTLAB_AVAILABLE = True
+except ImportError:
+    REPORTLAB_AVAILABLE = False
 from reportlab.pdfbase.ttfonts import TTFont
 
 # ✅ Add logging
