@@ -44,7 +44,11 @@ def shape_arabic_text(text: str) -> str:
 
 def register_arabic_font() -> str:
     try:
-        from reportlab.pdfbase import pdfmetrics
+        try:
+    from reportlab.pdfbase import pdfmetrics
+    REPORTLAB_AVAILABLE = True
+except ImportError:
+    REPORTLAB_AVAILABLE = False
         from reportlab.pdfbase.ttfonts import TTFont
     except ImportError:
         return FALLBACK_FONT_NAME

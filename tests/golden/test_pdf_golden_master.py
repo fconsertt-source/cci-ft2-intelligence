@@ -151,7 +151,11 @@ class TestPDFGoldenMaster:
             dto = create_test_dto()
 
             # ✅ تحقق من الخط العربي المسجل
-            from reportlab.pdfbase import pdfmetrics
+            try:
+    from reportlab.pdfbase import pdfmetrics
+    REPORTLAB_AVAILABLE = True
+except ImportError:
+    REPORTLAB_AVAILABLE = False
 
             if "Amiri" not in pdfmetrics.getRegisteredFontNames():
                 pytest.skip("Arabic font 'Amiri' not registered")

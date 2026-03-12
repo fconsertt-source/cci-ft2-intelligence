@@ -1,0 +1,67 @@
+name: CI
+on:
+  push:
+    branches: ["main", "master", "feature/*"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  lite:
+    name: Lite tests (no heavy deps)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Prepare lite requirements
+        run: |
+          grep -Ev 'reportlab|freezegun|pdfminer|pillow|python-bidi|arabic-reshaper|^-r' \
+            requirements-dev.txt > lite-reqs.txt
+
+      - name: Install dependencies (lite)
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r lite-reqs.txt
+
+      - name: Run tests (lite)
+        run: |
+          pytest -q \
+            --ignore=tests/golden \
+            --ignore=tests/performance \
+            --ignore=tests/integration/test_visual_reports_generation.py \
+            --ignore=tests/unit/test_chart_builder.py \
+            --ignore=tests/unit/test_new_pdf_engine.py \
+            --ignore=tests/unit/test_header_builder.py \
+            --ignore=tests/unit/test_table_builder.py \
+            --ignore=tests/unit/test_unified_pdf_generator_wrapper.py
+
+  full:
+    name: Full tests (all dependencies)
+    runs-on: ubuntu-latest
+    needs: lite
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies (full)
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run tests (full)
+        run: |
+          pytest -q
+
+      - name: Check pip consistency
+        run: |
+          pip check

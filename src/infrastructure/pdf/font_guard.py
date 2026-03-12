@@ -1,6 +1,10 @@
 from pathlib import Path
 
-from reportlab.pdfbase import pdfmetrics
+try:
+    from reportlab.pdfbase import pdfmetrics
+    REPORTLAB_AVAILABLE = True
+except ImportError:
+    REPORTLAB_AVAILABLE = False
 from reportlab.pdfbase.ttfonts import TTFont
 
 
