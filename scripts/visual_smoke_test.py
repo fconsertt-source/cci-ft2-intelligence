@@ -8,7 +8,7 @@ contained a syntax error.
 from datetime import datetime, timezone
 
 import pytest
-
+from src.utils.time import utc_now_iso
 from src.application.dtos.device_report_dto import DeviceReportDTO
 from src.infrastructure.pdf.unified_pdf_generator import get_pdf_generator
 
@@ -21,7 +21,7 @@ def _make_dto() -> DeviceReportDTO:
         excursions=[],
         final_status="safe",
         scientific_rationale="Smoke test",
-        generated_at=datetime.utcnow().isoformat(),
+        generated_at=utc_now_iso(),
     )
 
 

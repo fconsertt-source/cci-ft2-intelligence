@@ -8,7 +8,7 @@ import hashlib
 import json
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 from pathlib import Path
 
 # Ensure package root is on PYTHONPATH
@@ -50,7 +50,7 @@ def create_test_dto():
         excursions=[],
         final_status="safe",
         scientific_rationale="Golden baseline validation",
-        generated_at=datetime.utcnow().isoformat(),
+        generated_at=datetime.now(UTC).isoformat(),
     )
 
 

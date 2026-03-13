@@ -5,6 +5,7 @@ from datetime import datetime
 
 import pytest
 
+from src.utils.time import utc_now_iso
 from src.domain.dtos.device_report_dto import DeviceReportDTO
 from src.infrastructure.adapters.reporting.new_pdf_engine import PDFGenerator
 
@@ -31,7 +32,7 @@ def make_dto():
         excursions=[],
         final_status="safe",
         scientific_rationale="unit check",
-        generated_at=datetime.utcnow().isoformat(),
+        generated_at=utc_now_iso(),
     )
 
 
@@ -60,3 +61,5 @@ def test_generate_contains_page():
     # when reportlab present expect more than minimal size
     if len(pdf) > 200:
         assert b"/Type /Page" in pdf
+
+
