@@ -5,15 +5,14 @@ from datetime import datetime
 import pytest
 
 from src.domain.calculators.ccm_calculator import CCMCalculator, calculate_delta_minutes
-from src.domain.entities.temperature_reading import TemperatureReading
 
 # helper utilities moved to shared time_factory to avoid duplication across tests
-from tests.helpers.time_factory import create_reading, hours, minutes
+from tests.helpers.time_factory import create_reading, minutes
 
 
 def test_calculate_delta_minutes_helper():
     """Helper should return minute difference, not seconds."""
-    from datetime import datetime, timedelta
+    from datetime import datetime
 
     rec = {
         "previous_timestamp": datetime(2025, 1, 1, 0, 0, 0),

@@ -9,12 +9,11 @@ Usage:
 import ast
 import hashlib
 import io
-import os
 import tokenize
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional
 
 # ألوان للطباعة
 GREEN = "[92m"

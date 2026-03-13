@@ -8,7 +8,7 @@ from datetime import datetime
 import pytest
 
 # ✅ استيراد من المسار الصحيح
-from src.domain.dtos.device_report_dto import DeviceReportDTO, ReportStatus
+from src.domain.dtos.device_report_dto import DeviceReportDTO
 
 
 def create_realistic_dto() -> DeviceReportDTO:

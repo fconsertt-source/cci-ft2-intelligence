@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-import pytest
 
 from src.application.use_cases.evaluate_cold_chain_safety_use_case import (
     EvaluateColdChainSafetyUseCase,

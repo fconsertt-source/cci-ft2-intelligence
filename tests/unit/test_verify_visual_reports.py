@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock, patch
 from scripts import verify_visual_reports
-import os
 
 
 def test_verify_visual_reports_runs_and_calls_generate(tmp_path, monkeypatch):

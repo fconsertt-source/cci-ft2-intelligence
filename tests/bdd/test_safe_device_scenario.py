@@ -6,7 +6,6 @@ BDD: Safe device scenario
 ✔ يستخدم GenerateDeviceReportRequest
 """
 
-import pytest
 
 from src.application.use_cases.generate_device_report_uc import (
     GenerateDeviceReportRequest,

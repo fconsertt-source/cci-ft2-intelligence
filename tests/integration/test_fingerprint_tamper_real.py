@@ -3,7 +3,6 @@ from src.application.security.license_guard import LicenseGuard
 from src.domain.policies.trial_policy import TrialPolicy
 from src.infrastructure.security.fingerprint_provider import SystemFingerprintProvider
 from src.application.security.license_validator import LicenseValidator
-from src.infrastructure.security.encrypted_license_repository import EncryptedLicenseRepository
 
 def _create_guard():
     class MockRepo:

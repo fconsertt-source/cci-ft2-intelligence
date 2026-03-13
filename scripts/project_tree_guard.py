@@ -27,10 +27,9 @@ so they travel with every other DTO produced by the use‑case.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Iterable, List, Optional, Mapping, Any
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 
 # ----------------------------------------------------------------------
 #  Configuration – what to ignore while walking the tree

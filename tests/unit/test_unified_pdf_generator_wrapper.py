@@ -6,8 +6,6 @@
 import logging
 from dataclasses import replace
 from datetime import datetime, timezone
-from io import BytesIO
-from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
@@ -221,9 +219,6 @@ class TestGoldenBaselineCompatibility:
             # إعادة تهيئة generator لضمان استخدام الإعدادات الجديدة
             # Reset singleton for test
             import src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper as wrapper_module
-            from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import (
-                _wrapper_instance,
-            )
 
             wrapper_module._wrapper_instance = None
 

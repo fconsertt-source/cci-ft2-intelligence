@@ -1,7 +1,6 @@
 import hashlib
 import uuid
 from pathlib import Path
-from typing import Optional
 
 from src.application.ports.ledger_writer_port import LedgerWriterPort
 from src.application.ports.official_verifier_port import OfficialVerifierPort

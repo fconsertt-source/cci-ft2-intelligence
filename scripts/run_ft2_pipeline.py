@@ -12,14 +12,13 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from src.utils.yaml_loader import load_yaml
 from src.infrastructure.logging import get_logger
-from src.shared.di_container import create_evaluate_cold_chain_uc
 from src.infrastructure.adapters.ft2_reader_adapter import FT2ReaderAdapter
 from src.application.dtos.center_dto import CenterDTO
 from src.application.dtos.evaluate_cold_chain_safety_request import EvaluateColdChainSafetyRequest, TemperatureReading
 from src.application.use_cases.evaluate_cold_chain_safety_use_case import EvaluateColdChainSafetyUseCase
 from scripts.create_test_data import create_test_data
 from src.domain.services.rules_engine import calculate_center_stats
-from src.presentation.reporting.csv_reporter import generatecgenerate_centers_report, MessageProvider
+from src.presentation.reporting.csv_reporter import MessageProvider
 
 
 

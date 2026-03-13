@@ -1,11 +1,8 @@
 """Tests for the capture_golden_baseline script helpers."""
 
 import json
-import shutil
-import tempfile
-from pathlib import Path
 
-from scripts.capture_golden_baseline import BASELINE_DIR, main
+from scripts.capture_golden_baseline import main
 
 
 def test_capture_baseline_default(tmp_path, monkeypatch):

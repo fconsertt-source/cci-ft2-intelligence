@@ -15,11 +15,9 @@ from datetime import datetime, timedelta
 import pytest
 
 from src.domain.calculators.time_weighted_ccm_calculator import (
-    DEFAULT_BASE_TEMP,
     TimeWeightedCcmCalculator,
 )
 from src.domain.entities.temperature_reading import TemperatureReading
-from src.domain.value_objects.ccm_result import CCMResult
 
 
 # ---------------------------------------------------------------------------

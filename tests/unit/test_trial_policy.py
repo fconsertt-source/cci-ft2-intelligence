@@ -1,5 +1,4 @@
-import pytest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from src.domain.policies.trial_policy import TrialPolicy, TrialStatus
 
 def test_active_when_within_trial_period():

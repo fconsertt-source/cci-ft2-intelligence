@@ -3,7 +3,6 @@
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
-import pytest
 
 from src.domain.services.rules_engine import (
     ExpiryRule,
@@ -11,7 +10,6 @@ from src.domain.services.rules_engine import (
     HeatCriticalRule,
     TemperatureWarningRule,
     ThawRule,
-    apply_rules,
 )
 
 

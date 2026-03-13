@@ -1,7 +1,6 @@
 import logging
 import types
 
-import pytest
 
 from src.shared.di_container import build_evaluate_uc
 uc = build_evaluate_uc()

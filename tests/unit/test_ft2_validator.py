@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-import pytest
 
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import (
     FT2Reading as FT2Entry,

@@ -1,4 +1,3 @@
-import pytest
 from src.domain.enums.vvm_stage import VVMStage
 
 def test_vvm_stage_from_duration():

@@ -2,7 +2,6 @@
 """اختبارات تكامل لتوليد التقارير المرئية فعلياً"""
 
 import pytest
-from pathlib import Path
 
 # skip the whole module if heavy dependencies aren't available
 try:

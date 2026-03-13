@@ -5,7 +5,6 @@ interface.  The previous incarnation mixed a script with pytest and
 contained a syntax error.
 """
 
-from datetime import datetime, timezone
 
 import pytest
 from src.utils.time import utc_now_iso

@@ -1,6 +1,5 @@
 """Unit tests for UnifiedPDFGenerator font setup logic."""
 
-import builtins
 import os
 
 import pytest

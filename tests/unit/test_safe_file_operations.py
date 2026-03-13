@@ -1,6 +1,5 @@
 import os
 import pytest
-from pathlib import Path
 import hashlib
 from src.infrastructure.adapters.filesystem_adapter import SafeFileOperations
 

@@ -15,7 +15,6 @@ try:
     # لمستخدمي Windows: تغيير الترميز إلى UTF-8
     import sys
     if sys.platform == 'win32':
-        import codecs
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
         sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='ignore')
 except:

@@ -1,6 +1,5 @@
 # tests/unit/test_domain_calculators_entities.py
 """اختبارات تغطية لـ Q10ThermalCalculator و FT2Entry و HERCalculator"""
-import pytest
 
 from src.domain.calculators.her_calculator import HERCalculator
 from src.domain.calculators.q10_thermal_calculator import Q10ThermalCalculator

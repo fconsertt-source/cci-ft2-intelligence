@@ -22,7 +22,6 @@ from src.shared.di_container import (
     build_evaluate_uc,
     build_generate_device_report_uc,
     build_generate_report_uc,
-    build_import_ft2_uc,
     build_official_verifier,
 )
 

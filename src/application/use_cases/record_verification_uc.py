@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Protocol
 
 from src.application.ports.ledger_writer_port import LedgerWriterPort
 from src.domain.enums.ledger_event import LedgerEvent

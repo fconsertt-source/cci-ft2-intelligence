@@ -4,7 +4,6 @@
 
 import pytest
 import hashlib
-from pathlib import Path
 
 from src.infrastructure.adapters.filesystem_adapter import FilesystemAdapter
 

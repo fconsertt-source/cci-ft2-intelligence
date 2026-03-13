@@ -1,5 +1,4 @@
 # tests/unit/test_license_validator.py
-import pytest
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat

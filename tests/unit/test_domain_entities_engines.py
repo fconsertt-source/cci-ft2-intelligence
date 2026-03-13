@@ -2,7 +2,6 @@
 
 from datetime import datetime, timezone
 
-import pytest
 
 from src.domain.engines.heat_exposure_engine import HeatExposureEngine
 from src.domain.entities.device_report import DeviceReport

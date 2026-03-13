@@ -1,8 +1,3 @@
-import pytest
-from pathlib import Path
-from src.infrastructure.adapters.json_device_repository import JsonDeviceRepository
-from src.infrastructure.adapters.json_vaccine_spec_repository import JsonVaccineSpecRepository
-from src.domain.calculators.q10_thermal_calculator import Q10ThermalCalculator
 
 
 def test_device_with_temperature_excursion(excursion_use_case):

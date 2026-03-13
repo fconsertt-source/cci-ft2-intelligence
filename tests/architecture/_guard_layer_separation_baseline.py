@@ -1,5 +1,4 @@
 import ast
-import os
 
 
 def test_trial_policy_has_no_thermal_dependencies():

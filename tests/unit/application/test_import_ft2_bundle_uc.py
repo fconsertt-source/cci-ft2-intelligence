@@ -1,13 +1,10 @@
 # tests/unit/application/test_import_ft2_bundle_uc.py
 """Unit tests for ImportFT2BundleUseCase."""
 
-from pathlib import Path
 
-import pytest
 
 from src.application.use_cases.import_ft2_bundle_uc import (
     ImportFT2BundleRequest,
-    ImportFT2BundleResponse,
     ImportFT2BundleUseCase,
 )
 from src.domain.entities.device_identity import DeviceIdentity
