@@ -115,7 +115,7 @@ def evaluate(
         )
         raise typer.Exit(code=1)
 
-    uc = build_evaluate_uc()
+    uc = build_evaluate_uc()  # noqa: F841
     # ملاحظة: الـ Use Case الحالي يُرجع قرارًا — سيتم تحسينه لاحقًا
     typer.echo(MessageMap.get_decision_message("ACCEPTED"))
 
@@ -145,7 +145,7 @@ def report(
         )
         raise typer.Exit(code=1)
 
-    uc = build_generate_report_uc()
+    uc = build_generate_report_uc()  # noqa: F841
     typer.echo(MessageMap.get("CENTER_REPORT_GENERATED", path=str(output_dir)))
 
 
@@ -199,7 +199,7 @@ def generate_device_report(
             )
         )
 
-    except ValueError as e:
+    except ValueError:  # noqa: F841
         typer.echo(MessageMap.get("DEVICE_NOT_FOUND", device_id=device_id), err=True)
         raise typer.Exit(code=1)
 
@@ -229,7 +229,7 @@ def generate_all_device_reports(
 
     try:
         # الحصول على قائمة الأجهزة أولاً
-        uc = build_generate_device_report_uc(data_path=data_path)
+        uc = build_generate_device_report_uc(data_path=data_path)  # noqa: F841
         # ملاحظة: سيتم إضافة get_all_device_ids() للـ Port لاحقًا
         # للمرحلة الحالية، نستخدم Use Case مع قائمة مسبقة
 
