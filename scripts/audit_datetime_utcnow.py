@@ -66,7 +66,6 @@ def suggest_fix(line: str, timespec: Optional[str] = None) -> str:
     اقتراح الإصلاح المناسب للسطر.
     """
     # استخراج المسافة البادئة
-    indent = re.match(r'^\s*', line).group()
     
     # بناء الدالة المقترحة
     if timespec:
@@ -114,7 +113,6 @@ def format_report(results: List[Dict], stats: Dict) -> str:
             # عرض السطر مع الترقيم
             line_num = r['line']
             code = r['code']
-            context = r['context']
             compare = r['compare_type']
             suggested = r['suggested']
             
