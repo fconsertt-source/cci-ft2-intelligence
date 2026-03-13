@@ -14590,3 +14590,111 @@ AttributeError: 'str' object has no attribute 'getKeepWithNext'
 2026-03-13 02:30:19,287 - INFO - Done: /tmp/pytest-of-amer11974/pytest-4/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
 2026-03-13 02:30:19,288 - INFO - ⚠️ رسالة مفقودة: VISUAL_REPORT_ARABIC
 2026-03-13 02:30:19,289 - INFO - Done: /tmp/pytest-of-amer11974/pytest-4/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
+2026-03-13 18:22:02,006 - INFO - ✅ تم إنشاء تقرير المراكز: /tmp/pytest-of-amer11974/pytest-5/test_centers_report_snapshot0/centers_report.tsv
+2026-03-13 18:22:04,068 - INFO - 🧹 تنظيف الملفات التالفة في data/input_ft2
+2026-03-13 18:22:04,068 - INFO - 🗑️ تم حذف: bad1.txt (فارغ تماماً)
+2026-03-13 18:22:04,069 - INFO - ✅ تم تنظيف 1 ملف.
+2026-03-13 18:22:04,071 - WARNING - المجلد data/input_raw غير موجود.
+2026-03-13 18:22:04,224 - INFO - تم ربط 3 إدخال، تم تخطي 1
+2026-03-13 18:22:04,226 - INFO - تم ربط 3 إدخال، تم تخطي 1
+2026-03-13 18:22:04,227 - INFO - تم ربط 0 إدخال، تم تخطي 2
+2026-03-13 18:22:04,229 - INFO - تم ربط 0 إدخال، تم تخطي 0
+2026-03-13 18:22:04,231 - INFO - تم ربط 0 إدخال، تم تخطي 4
+2026-03-13 18:22:04,235 - INFO - تم تحليل 2 إدخال من /tmp/pytest-of-amer11974/pytest-5/test_parse_valid_csv0/data/test_readings.csv
+2026-03-13 18:22:04,242 - WARNING - تنسيق غير معروف في /tmp/pytest-of-amer11974/pytest-5/test_parse_invalid_file0/empty.csv
+2026-03-13 18:22:04,242 - INFO - تم تحليل 0 إدخال من /tmp/pytest-of-amer11974/pytest-5/test_parse_invalid_file0/empty.csv
+2026-03-13 18:22:04,245 - WARNING - تخطي صف 0 في /tmp/pytest-of-amer11974/pytest-5/test_parse_malformed_rows0/data_malformed/bad_readings.csv: could not convert string to float: 'invalid_temp'
+2026-03-13 18:22:04,246 - INFO - تم تحليل 1 إدخال من /tmp/pytest-of-amer11974/pytest-5/test_parse_malformed_rows0/data_malformed/bad_readings.csv
+2026-03-13 18:22:04,301 - INFO - 📄 إنشاء تقرير PDF احترافي
+2026-03-13 18:22:04,302 - INFO - ==================================================
+2026-03-13 18:22:04,303 - ERROR - ❌ ملف التقرير غير موجود: data/output/centers_report.tsv
+2026-03-13 18:22:04,303 - INFO - ⚠️  قم بتشغيل النظام أولاً:
+2026-03-13 18:22:04,303 - INFO -    python -m scripts.run_ft2_pipeline --legacy
+2026-03-13 18:22:04,310 - INFO - 📄 إنشاء تقرير PDF احترافي
+2026-03-13 18:22:04,310 - INFO - ==================================================
+2026-03-13 18:22:04,310 - INFO - 📊 قراءة البيانات من: data/output/centers_report.tsv
+2026-03-13 18:22:04,311 - INFO - 🔄 جاري إنشاء التقرير...
+2026-03-13 18:22:04,311 - INFO - 
+✅ تم إنشاء التقرير بنجاح!
+2026-03-13 18:22:04,312 - INFO - 📍 الموقع: /fake/report.pdf
+2026-03-13 18:22:04,469 - INFO - 📂 تم فتح التقرير تلقائياً
+2026-03-13 18:22:05,535 - INFO - | Test Scenario             | 5.0°C(1.0h) + 15.0°C(24.0h)                   | 1.0    days | UNKNOWN | NO_DATA                        |
+2026-03-13 18:22:05,891 - INFO - Mock data created at: data/output/visual_tests/mock_visual_data.tsv
+2026-03-13 18:22:05,892 - INFO - ⚠️ رسالة مفقودة: VISUAL_REPORT_OFFICIAL
+2026-03-13 18:22:05,893 - INFO - Done: /tmp/pytest-of-amer11974/pytest-5/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
+2026-03-13 18:22:05,893 - INFO - ⚠️ رسالة مفقودة: VISUAL_REPORT_TECHNICAL
+2026-03-13 18:22:05,894 - INFO - Done: /tmp/pytest-of-amer11974/pytest-5/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
+2026-03-13 18:22:05,894 - INFO - ⚠️ رسالة مفقودة: VISUAL_REPORT_ARABIC
+2026-03-13 18:22:05,894 - INFO - Done: /tmp/pytest-of-amer11974/pytest-5/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
+2026-03-13 18:31:33,924 - INFO - ✅ تم إنشاء تقرير المراكز: /tmp/pytest-of-amer11974/pytest-6/test_centers_report_snapshot0/centers_report.tsv
+2026-03-13 18:31:35,287 - INFO - 🧹 تنظيف الملفات التالفة في data/input_ft2
+2026-03-13 18:31:35,287 - INFO - 🗑️ تم حذف: bad1.txt (فارغ تماماً)
+2026-03-13 18:31:35,288 - INFO - ✅ تم تنظيف 1 ملف.
+2026-03-13 18:31:35,290 - WARNING - المجلد data/input_raw غير موجود.
+2026-03-13 18:31:35,436 - INFO - تم ربط 3 إدخال، تم تخطي 1
+2026-03-13 18:31:35,438 - INFO - تم ربط 3 إدخال، تم تخطي 1
+2026-03-13 18:31:35,440 - INFO - تم ربط 0 إدخال، تم تخطي 2
+2026-03-13 18:31:35,442 - INFO - تم ربط 0 إدخال، تم تخطي 0
+2026-03-13 18:31:35,445 - INFO - تم ربط 0 إدخال، تم تخطي 4
+2026-03-13 18:31:35,450 - INFO - تم تحليل 2 إدخال من /tmp/pytest-of-amer11974/pytest-6/test_parse_valid_csv0/data/test_readings.csv
+2026-03-13 18:31:35,453 - WARNING - تنسيق غير معروف في /tmp/pytest-of-amer11974/pytest-6/test_parse_invalid_file0/empty.csv
+2026-03-13 18:31:35,454 - INFO - تم تحليل 0 إدخال من /tmp/pytest-of-amer11974/pytest-6/test_parse_invalid_file0/empty.csv
+2026-03-13 18:31:35,457 - WARNING - تخطي صف 0 في /tmp/pytest-of-amer11974/pytest-6/test_parse_malformed_rows0/data_malformed/bad_readings.csv: could not convert string to float: 'invalid_temp'
+2026-03-13 18:31:35,457 - INFO - تم تحليل 1 إدخال من /tmp/pytest-of-amer11974/pytest-6/test_parse_malformed_rows0/data_malformed/bad_readings.csv
+2026-03-13 18:31:35,516 - INFO - 📄 إنشاء تقرير PDF احترافي
+2026-03-13 18:31:35,517 - INFO - ==================================================
+2026-03-13 18:31:35,518 - ERROR - ❌ ملف التقرير غير موجود: data/output/centers_report.tsv
+2026-03-13 18:31:35,518 - INFO - ⚠️  قم بتشغيل النظام أولاً:
+2026-03-13 18:31:35,518 - INFO -    python -m scripts.run_ft2_pipeline --legacy
+2026-03-13 18:31:35,524 - INFO - 📄 إنشاء تقرير PDF احترافي
+2026-03-13 18:31:35,524 - INFO - ==================================================
+2026-03-13 18:31:35,525 - INFO - 📊 قراءة البيانات من: data/output/centers_report.tsv
+2026-03-13 18:31:35,525 - INFO - 🔄 جاري إنشاء التقرير...
+2026-03-13 18:31:35,526 - INFO - 
+✅ تم إنشاء التقرير بنجاح!
+2026-03-13 18:31:35,526 - INFO - 📍 الموقع: /fake/report.pdf
+2026-03-13 18:31:35,560 - INFO - 📂 تم فتح التقرير تلقائياً
+2026-03-13 18:31:36,255 - INFO - | Test Scenario             | 5.0°C(1.0h) + 15.0°C(24.0h)                   | 1.0    days | UNKNOWN | NO_DATA                        |
+2026-03-13 18:31:36,600 - INFO - Mock data created at: data/output/visual_tests/mock_visual_data.tsv
+2026-03-13 18:31:36,600 - INFO - ⚠️ رسالة مفقودة: VISUAL_REPORT_OFFICIAL
+2026-03-13 18:31:36,602 - INFO - Done: /tmp/pytest-of-amer11974/pytest-6/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
+2026-03-13 18:31:36,603 - INFO - ⚠️ رسالة مفقودة: VISUAL_REPORT_TECHNICAL
+2026-03-13 18:31:36,603 - INFO - Done: /tmp/pytest-of-amer11974/pytest-6/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
+2026-03-13 18:31:36,604 - INFO - ⚠️ رسالة مفقودة: VISUAL_REPORT_ARABIC
+2026-03-13 18:31:36,604 - INFO - Done: /tmp/pytest-of-amer11974/pytest-6/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
+2026-03-13 18:41:51,726 - INFO - ✅ تم إنشاء تقرير المراكز: /tmp/pytest-of-amer11974/pytest-7/test_centers_report_snapshot0/centers_report.tsv
+2026-03-13 18:41:52,909 - INFO - 🧹 تنظيف الملفات التالفة في data/input_ft2
+2026-03-13 18:41:52,909 - INFO - 🗑️ تم حذف: bad1.txt (فارغ تماماً)
+2026-03-13 18:41:52,910 - INFO - ✅ تم تنظيف 1 ملف.
+2026-03-13 18:41:52,913 - WARNING - المجلد data/input_raw غير موجود.
+2026-03-13 18:41:53,062 - INFO - تم ربط 3 إدخال، تم تخطي 1
+2026-03-13 18:41:53,066 - INFO - تم ربط 3 إدخال، تم تخطي 1
+2026-03-13 18:41:53,068 - INFO - تم ربط 0 إدخال، تم تخطي 2
+2026-03-13 18:41:53,072 - INFO - تم ربط 0 إدخال، تم تخطي 0
+2026-03-13 18:41:53,074 - INFO - تم ربط 0 إدخال، تم تخطي 4
+2026-03-13 18:41:53,080 - INFO - تم تحليل 2 إدخال من /tmp/pytest-of-amer11974/pytest-7/test_parse_valid_csv0/data/test_readings.csv
+2026-03-13 18:41:53,083 - WARNING - تنسيق غير معروف في /tmp/pytest-of-amer11974/pytest-7/test_parse_invalid_file0/empty.csv
+2026-03-13 18:41:53,084 - INFO - تم تحليل 0 إدخال من /tmp/pytest-of-amer11974/pytest-7/test_parse_invalid_file0/empty.csv
+2026-03-13 18:41:53,088 - WARNING - تخطي صف 0 في /tmp/pytest-of-amer11974/pytest-7/test_parse_malformed_rows0/data_malformed/bad_readings.csv: could not convert string to float: 'invalid_temp'
+2026-03-13 18:41:53,089 - INFO - تم تحليل 1 إدخال من /tmp/pytest-of-amer11974/pytest-7/test_parse_malformed_rows0/data_malformed/bad_readings.csv
+2026-03-13 18:41:53,144 - INFO - 📄 إنشاء تقرير PDF احترافي
+2026-03-13 18:41:53,145 - INFO - ==================================================
+2026-03-13 18:41:53,145 - ERROR - ❌ ملف التقرير غير موجود: data/output/centers_report.tsv
+2026-03-13 18:41:53,146 - INFO - ⚠️  قم بتشغيل النظام أولاً:
+2026-03-13 18:41:53,146 - INFO -    python -m scripts.run_ft2_pipeline --legacy
+2026-03-13 18:41:53,150 - INFO - 📄 إنشاء تقرير PDF احترافي
+2026-03-13 18:41:53,151 - INFO - ==================================================
+2026-03-13 18:41:53,151 - INFO - 📊 قراءة البيانات من: data/output/centers_report.tsv
+2026-03-13 18:41:53,151 - INFO - 🔄 جاري إنشاء التقرير...
+2026-03-13 18:41:53,152 - INFO - 
+✅ تم إنشاء التقرير بنجاح!
+2026-03-13 18:41:53,152 - INFO - 📍 الموقع: /fake/report.pdf
+2026-03-13 18:41:53,186 - INFO - 📂 تم فتح التقرير تلقائياً
+2026-03-13 18:41:53,822 - INFO - | Test Scenario             | 5.0°C(1.0h) + 15.0°C(24.0h)                   | 1.0    days | UNKNOWN | NO_DATA                        |
+2026-03-13 18:41:54,126 - INFO - Mock data created at: data/output/visual_tests/mock_visual_data.tsv
+2026-03-13 18:41:54,126 - INFO - ⚠️ رسالة مفقودة: VISUAL_REPORT_OFFICIAL
+2026-03-13 18:41:54,127 - INFO - Done: /tmp/pytest-of-amer11974/pytest-7/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
+2026-03-13 18:41:54,127 - INFO - ⚠️ رسالة مفقودة: VISUAL_REPORT_TECHNICAL
+2026-03-13 18:41:54,128 - INFO - Done: /tmp/pytest-of-amer11974/pytest-7/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
+2026-03-13 18:41:54,128 - INFO - ⚠️ رسالة مفقودة: VISUAL_REPORT_ARABIC
+2026-03-13 18:41:54,128 - INFO - Done: /tmp/pytest-of-amer11974/pytest-7/test_verify_visual_reports_run0/data/output/visual_tests/visual_test_official.pdf
