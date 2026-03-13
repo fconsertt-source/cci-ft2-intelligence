@@ -114,7 +114,7 @@ class ArabicPDFGenerator:
             from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
             from reportlab.lib.units import cm
             from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
-        except ImportError as e:
+        except ImportError :
             return self._minimal_pdf(dto)
         buffer = BytesIO()
         doc = SimpleDocTemplate(
@@ -137,7 +137,7 @@ class ArabicPDFGenerator:
         )
         device_id = getattr(dto, "device_id", "N/A")
         status_raw = getattr(dto, "final_status", "safe")
-        logical_status = {"safe": "آمن", "warning": "تحذير", "rejected": "مرفوض"}.get(
+        logical_status = {"safe": "آمن", "warning": "تحذير", "rejected": "مرفوض"}.get(  # noqa: F841
             status_raw.lower(), status_raw
         )
         story = [
@@ -155,7 +155,7 @@ class ArabicPDFGenerator:
     def _minimal_pdf(self, dto) -> bytes:
         device_id = getattr(dto, "device_id", "N/A")
         status_raw = getattr(dto, "final_status", "safe")
-        logical_status = {"safe": "آمن", "warning": "تحذير", "rejected": "مرفوض"}.get(
+        logical_status = {"safe": "آمن", "warning": "تحذير", "rejected": "مرفوض"}.get(  # noqa: F841
             status_raw.lower(), status_raw
         )
         return (
@@ -221,7 +221,7 @@ class UnifiedPDFGeneratorWrapper:
         if engine:
             try:
                 return engine.generate(dto, report_type=force_report_type or "official")
-            except (ImportError, ModuleNotFoundError) as exc:
+            except (ImportError, ModuleNotFoundError) :
                 return self._generate_large_placeholder(dto)
             except Exception as exc:
                 logger.critical("New PDF engine failed", extra={"error": str(exc)})
