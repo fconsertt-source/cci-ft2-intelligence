@@ -1,24 +1,48 @@
 # src/domain/services/her_calculator_service.py
+from __future__ import annotations
+
+from typing import List, Protocol, runtime_checkable
+
+from src.domain.entities.temperature_reading import TemperatureReading
+from src.domain.value_objects.ccm_result import CCMResult
+from src.domain.value_objects.her_result import HERResult
+
+
+@runtime_checkable
 class HerCalculatorService(Protocol):
-    """Separate strategy for HER calculation — maintains dual integration."""
+    """
+    Strategy interface for HER calculation.
+    مستقل تماماً عن CCM — يُنفَّذ بشكل منفصل.
+    """
+
     def calculate(self, readings: List[TemperatureReading]) -> HERResult:
+        """
+        حساب Heat Exposure Ratio من قراءات درجة الحرارة.
+
+        Args:
+            readings: قراءات درجة الحرارة المُجمَّعة من جهاز FT2
+
+        Returns:
+            HERResult: نتيجة نقية — بدون قرار ACCEPT/REJECT
+        """
         ...
 
+
+@runtime_checkable
 class CcmCalculatorService(Protocol):
-    """Separate strategy for CCM calculation — maintains dual integration."""
+    """
+    Strategy interface for CCM calculation.
+    مستقل تماماً عن HER — يُنفَّذ بشكل منفصل.
+    """
+
     def calculate(self, readings: List[TemperatureReading]) -> CCMResult:
+        """
+        حساب Cold Chain Monitor من قراءات درجة الحرارة.
+
+        Args:
+            readings: قراءات درجة الحرارة المُجمَّعة من جهاز FT2
+
+        Returns:
+            CCMResult: نتيجة نقية — بدون قرار ACCEPT/REJECT
+        """
         ...
-
-# src/domain/calculators/q10_her_calculator.py
-class Q10HerCalculator(HerCalculatorService):
-    """Advanced Q10 model — still independent from CCM."""
-    def calculate(self, readings: List[TemperatureReading]) -> HERResult:
-        # ← HER فقط — لا تؤثر على CCM
-        pass
-
-# src/domain/calculators/time_weighted_ccm_calculator.py
-class TimeWeightedCcmCalculator(CcmCalculatorService):
-    """Advanced time-weighted model — still independent from HER."""
-    def calculate(self, readings: List[TemperatureReading]) -> CCMResult:
-        # ← CCM فقط — لا تؤثر على HER
-        pass
