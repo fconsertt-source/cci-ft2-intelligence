@@ -82,3 +82,4 @@ build/
 *.pyc
 .pytest_cache/
 .mypy_cache/
+pipeline.log
