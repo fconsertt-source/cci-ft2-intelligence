@@ -5,4 +5,8 @@ This package is intentionally empty for now and will be populated as modules
 are migrated from existing locations (e.g., `ft2_reader`, `ingestion`).
 """
 
-__all__ = []
+from .logging import get_logger
+
+__all__ = [
+    "get_logger",
+]

@@ -39,9 +39,12 @@ models:
 defaultModel: Llama‑3.1‑8B Instant (Groq)   # أو Autodetect (Ollama) إذا تفضّل المحلي
 debug: false
 telemetry: true
+# path configuration for PDF generator fonts
+paths:
+  fonts_dir: assets/fonts
 # ... existing configuration ...
 
-models:
+available_models:
   # النماذج المجانية المتاحة للاستفادة منها في مرحلة التطور الذاتي
   - name: "meta-llama/llama-4-maverick-17b-128e-instruct"
     description: "LLaMA 4 Maverick 17B (إرشادي) – مفتوح المصدر"

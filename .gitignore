@@ -70,3 +70,15 @@ Thumbs.db
 desktop.ini
 -H
 -v
+
+# Allow baseline files but warn on change
+!tests/golden/baselines/*.pdf
+!tests/golden/baselines/*.json
+
+# Build artifacts
+dist/
+build/
+*.log
+*.pyc
+.pytest_cache/
+.mypy_cache/

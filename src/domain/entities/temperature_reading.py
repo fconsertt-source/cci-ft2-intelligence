@@ -1,3 +1,4 @@
+# src.domain.entities.temperature_reading.py
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -7,6 +8,7 @@ class TemperatureReading:
     """
     قراءة درجة حرارة واحدة من جهاز FT2
     """
+
     vaccine_id: str
     value: float
     recorded_at: datetime

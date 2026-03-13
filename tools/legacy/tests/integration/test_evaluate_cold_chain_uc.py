@@ -1,7 +1,12 @@
-import pytest
 from unittest.mock import MagicMock
-from src.application.use_cases.evaluate_cold_chain_safety_uc import EvaluateColdChainSafetyUC
-from src.application.dtos.analysis_result_dto import AnalysisResultDTO, VaccineStatus
+
+import pytest
+
+from src.application.use_cases.evaluate_cold_chain_safety_uc import (
+    EvaluateColdChainSafetyUC,
+)
+from src.domain.dtos.analysis_result_dto import AnalysisResultDTO, VaccineStatus
+
 
 class TestEvaluateColdChainSafetyUC:
 
@@ -10,9 +15,14 @@ class TestEvaluateColdChainSafetyUC:
         # Mock the reader (port) to return some dummy data
         mock_reader = MagicMock()
         mock_reader.get_vaccines.return_value = (
-            {"id": "VAC001", "q10_value": 1.8, "ideal_temp": 5.0, "shelf_life_days": 30.0},
+            {
+                "id": "VAC001",
+                "q10_value": 1.8,
+                "ideal_temp": 5.0,
+                "shelf_life_days": 30.0,
+            },
         )
-        mock_reader.read_all.return_value = () # No readings for simplicity
+        mock_reader.read_all.return_value = ()  # No readings for simplicity
 
         # Instantiate the legacy Use Case with the mocked dependency
         uc = EvaluateColdChainSafetyUC(reader=mock_reader)

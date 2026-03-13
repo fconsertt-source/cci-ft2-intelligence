@@ -1,17 +1,20 @@
-from pathlib import Path
-import uuid
 import hashlib
+import uuid
+from pathlib import Path
 from typing import Optional
 
-from src.application.ports.official_verifier_port import OfficialVerifierPort
 from src.application.ports.ledger_writer_port import LedgerWriterPort
-from src.domain.evidence.verification_result import VerificationResult, VerificationStatus
-from src.domain.ledger.events import LedgerEvent
+from src.application.ports.official_verifier_port import OfficialVerifierPort
+from src.domain.enums.ledger_event import LedgerEvent
+from src.domain.evidence.verification_result import (
+    VerificationResult,
+    VerificationStatus,
+)
 
 
 class VerifyAndRecordUseCase:
     """
-    Use Case: Orchestrates the official verification of a file and records the 
+    Use Case: Orchestrates the official verification of a file and records the
     outcome in the forensic ledger.
     """
 
@@ -28,8 +31,12 @@ class VerifyAndRecordUseCase:
 
         # 3. Determine Event Type
         # We consider SUCCESS as verified. Any other status is a failure of authenticity/integrity.
-        is_verified = (result.status == VerificationStatus.SUCCESS)
-        event_type = LedgerEvent.AUTHENTICITY_VERIFIED if is_verified else LedgerEvent.AUTHENTICITY_FAILED
+        is_verified = result.status == VerificationStatus.SUCCESS
+        event_type = (
+            LedgerEvent.AUTHENTICITY_VERIFIED
+            if is_verified
+            else LedgerEvent.AUTHENTICITY_FAILED
+        )
 
         # 4. Record in Ledger
         self.ledger.append(
@@ -37,7 +44,7 @@ class VerifyAndRecordUseCase:
             file_hash=file_hash,
             event_id=str(uuid.uuid4()),
             authenticity_status=result.status.value,
-            source_path=str(file_path)
+            source_path=str(file_path),
         )
 
         return result
@@ -46,7 +53,7 @@ class VerifyAndRecordUseCase:
         """Calculates SHA-256 hash of the file content."""
         if not file_path.exists():
             return "FILE_NOT_FOUND"
-            
+
         sha256 = hashlib.sha256()
         with open(file_path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):

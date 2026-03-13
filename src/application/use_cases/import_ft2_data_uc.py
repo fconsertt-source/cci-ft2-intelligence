@@ -1,22 +1,26 @@
 from __future__ import annotations
+
 from pathlib import Path
 from typing import List, Optional
+
 from src.application.ports.ft2_reader_port import Ft2ReaderPort
 from src.application.ports.ft2_writer_port import Ft2WriterPort
 from src.application.ports.logger_port import LoggerPort
-from src.application.dtos.ft2_entry_dto import FT2EntryDTO
-from src.application.services.device_center_mapper import DeviceCenterMapper  # ← الإضافة الوحيدة
+from src.application.services.device_center_mapper import (  # ← الإضافة الوحيدة
+    DeviceCenterMapper,
+)
+from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
 
 
 class ImportFt2DataUseCase:
     """Pure Use Case for importing FT2 raw data into intermediate JSON format.
-    
+
     Responsibilities:
       - Orchestrate reading via Ft2ReaderPort
       - Orchestrate writing via Ft2WriterPort
       - Log progress (optional)
       - Enrich with administrative context (optional, via DeviceCenterMapper)
-    
+
     Boundaries:
       - NO dependency on presentation layer
       - NO business logic (decision rules belong in evaluate_cold_chain)
@@ -38,7 +42,9 @@ class ImportFt2DataUseCase:
 
     def execute(self, input_dir: Path, output_path: Path) -> None:
         if self._logger:
-            self._logger.info(f"Importing FT2 data from '{input_dir}' to '{output_path}'")
+            self._logger.info(
+                f"Importing FT2 data from '{input_dir}' to '{output_path}'"
+            )
 
         try:
             # 1. Read all data from source directory (raw physical reality)
@@ -52,7 +58,9 @@ class ImportFt2DataUseCase:
                 ft2_data = enriched_data
                 if self._logger:
                     mapped = sum(1 for e in ft2_data if e.center_id != "UNKNOWN")
-                    self._logger.info(f"Enriched {mapped}/{len(ft2_data)} entries with center context.")
+                    self._logger.info(
+                        f"Enriched {mapped}/{len(ft2_data)} entries with center context."
+                    )
 
             # 3. Write the (optionally enriched) data to destination
             self._writer.write(ft2_data, output_path)
@@ -64,9 +72,11 @@ class ImportFt2DataUseCase:
                 self._logger.error(f"An error occurred during data import: {e}")
             raise
 
-    def _enrich_with_center_context(self, entries: List[FT2EntryDTO]) -> List[FT2EntryDTO]:
+    def _enrich_with_center_context(
+        self, entries: List[FT2EntryDTO]
+    ) -> List[FT2EntryDTO]:
         """Creates enriched copies WITHOUT modifying raw entries.
-        
+
         Why copy instead of mutate?
           ✅ Preserves raw data path for forensic analysis
           ✅ Allows parallel Device-only and Center-enriched reports
@@ -74,8 +84,16 @@ class ImportFt2DataUseCase:
         """
         enriched = []
         for entry in entries:
-            context = self._mapper.get_center_context(entry.device_id) if self._mapper else None
-            if context and context.get("center_id") and context["center_id"] != "UNKNOWN":
+            context = (
+                self._mapper.get_center_context(entry.device_id)
+                if self._mapper
+                else None
+            )
+            if (
+                context
+                and context.get("center_id")
+                and context["center_id"] != "UNKNOWN"
+            ):
                 # Create enriched copy — raw entry remains untouched
                 enriched_entry = FT2EntryDTO(
                     id=entry.id,
@@ -86,7 +104,7 @@ class ImportFt2DataUseCase:
                     batch=entry.batch,
                     duration_minutes=entry.duration_minutes,
                     batch_id=entry.batch_id,
-                    center_id=context["center_id"]  # ← Only enrichment
+                    center_id=context["center_id"],  # ← Only enrichment
                 )
                 enriched.append(enriched_entry)
             else:

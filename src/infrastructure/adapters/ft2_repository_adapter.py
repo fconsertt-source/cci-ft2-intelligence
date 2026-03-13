@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Iterable, List
 
 from src.application.ports.i_repository import IDataRepository
-from src.application.dtos.center_dto import CenterDTO
-from src.application.dtos.vaccine_dto import VaccineDTO
+from src.domain.dtos.center_dto import CenterDTO
+from src.domain.dtos.vaccine_dto import VaccineDTO
 from src.infrastructure.utils.vaccine_library_loader import VaccineLibraryLoader
 
 
@@ -31,8 +31,12 @@ class Ft2RepositoryAdapter(IDataRepository):
                     id=vaccine_id,
                     name=data.get("name", vaccine_id),
                     category=data.get("category", "general"),
-                    full_loss_threshold_low=data.get("temp_requirements", {}).get("min_safe", 0.0),
-                    full_loss_threshold_high=data.get("temp_requirements", {}).get("max_safe", 8.0),
+                    full_loss_threshold_low=data.get("temp_requirements", {}).get(
+                        "min_safe", 0.0
+                    ),
+                    full_loss_threshold_high=data.get("temp_requirements", {}).get(
+                        "max_safe", 8.0
+                    ),
                     shelf_life_days=int(data.get("shelf_life_days", 30)),
                     # Optional scientific fields left to defaults if DTO supports them
                 )

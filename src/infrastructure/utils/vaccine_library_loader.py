@@ -1,11 +1,16 @@
-import yaml
+# src/infrastructure/utils/vaccine_library_loader.py
+
 import os
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
+import yaml
+
 
 class VaccineLibraryLoader:
     """
     Loads vaccine definitions from the vaccine_library.yaml file.
     """
+
     _instance = None
     _library: Dict[str, Any] = {}
 
@@ -19,14 +24,14 @@ class VaccineLibraryLoader:
     def _load_library(self):
         config_path = "config/vaccine_library.yaml"
         if os.path.exists(config_path):
-            with open(config_path, 'r', encoding='utf-8') as f:
+            with open(config_path, "r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
-                self._library = data.get('vaccines', {})
+                self._library = data.get("vaccines", {})
 
     def get_vaccine_data(self, vaccine_id: str) -> Optional[Dict[str, Any]]:
         # Check by id if available
         for key, data in self._library.items():
-            if data.get('id') == vaccine_id or key == vaccine_id:
+            if data.get("id") == vaccine_id or key == vaccine_id:
                 return data
         return None
 

@@ -1,14 +1,29 @@
-# .github/CODEOWNERS
-# Architecture guardians - require review for critical paths
+name: Architecture Guards
 
-# Domain layer (immutable)
-/src/domain/ @architecture-team
+on:
+  push:
+    branches: ["main", "master", "feature/*"]
+  pull_request:
+    branches: ["main", "master"]
 
-# Application ports (contract changes)
-/src/application/ports/ @architecture-team
+jobs:
+  architecture-check:
+    name: Architecture Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-# ADRs (architectural decisions)
-/docs/adr/ @architecture-team
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
 
-# Guards (enforcement mechanism)
-/scripts/check_*.py @architecture-team
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run architecture contract tests
+        run: |
+          pytest tests/contracts/ -v

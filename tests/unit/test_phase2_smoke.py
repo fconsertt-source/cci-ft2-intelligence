@@ -1,12 +1,15 @@
-import pytest
 from datetime import datetime, timedelta
 
-from src.application.use_cases.evaluate_cold_chain_safety_use_case import EvaluateColdChainSafetyUseCase
-from src.application.dtos.evaluate_cold_chain_safety_request import (
+import pytest
+
+from src.application.use_cases.evaluate_cold_chain_safety_use_case import (
+    EvaluateColdChainSafetyUseCase,
+)
+from src.domain.dtos.analysis_result_dto import VaccineStatus
+from src.domain.dtos.evaluate_cold_chain_safety_request import (
     EvaluateColdChainSafetyRequest,
     TemperatureReading,
 )
-from src.application.dtos.analysis_result_dto import VaccineStatus
 
 
 def make_dummy_readings(device_id: str, count: int = 3):
@@ -16,7 +19,7 @@ def make_dummy_readings(device_id: str, count: int = 3):
         TemperatureReading(
             device_id=device_id,
             value=5.0 + i,  # درجة حرارة بسيطة متزايدة
-            timestamp=now + timedelta(hours=i)
+            timestamp=now + timedelta(hours=i),
         )
         for i in range(count)
     )
@@ -47,7 +50,9 @@ def test_uc_creation_and_execute_returns_response():
 def test_uc_handles_empty_request():
     """التحقق من التعامل مع طلب فارغ"""
     uc = EvaluateColdChainSafetyUseCase()
-    request = EvaluateColdChainSafetyRequest(center_id="C02", center_name="Empty Center", readings=())
+    request = EvaluateColdChainSafetyRequest(
+        center_id="C02", center_name="Empty Center", readings=()
+    )
     response = uc.execute(request)
 
     # يجب أن تكون النتيجة حالة غير معروفة ولكن بدون خطأ

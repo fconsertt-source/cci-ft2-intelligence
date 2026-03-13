@@ -1,11 +1,13 @@
-# ft2_linker.py (مُحسّن)
-from typing import List, Dict, TYPE_CHECKING
+# src/infrastructure/adapters/ft2_reader/services/ft2_linker.py
+from typing import TYPE_CHECKING, Dict, List
+
 from src.infrastructure.logging import get_logger
 
 if TYPE_CHECKING:
     from src.domain.entities.vaccination_center import VaccinationCenter
 
 logger = get_logger(__name__)
+
 
 class FT2Linker:
     @staticmethod
@@ -22,16 +24,16 @@ class FT2Linker:
         logger.debug(f"تمت معالجة {count} إدخال عبر خدمة الربط")
 
     @staticmethod
-    def link_generator(entries_generator, centers: List['VaccinationCenter']):
+    def link_generator(entries_generator, centers: List["VaccinationCenter"]):
         """ربط الإدخالات كـ Generator لتوفير الذاكرة"""
         device_map = {}
         for center in centers:
             for device_id in center.device_ids:
                 device_map[device_id] = center
-        
+
         linked_count = 0
         skipped_count = 0
-        
+
         for entry in entries_generator:
             center = device_map.get(entry.device_id)
             if center:
@@ -41,5 +43,5 @@ class FT2Linker:
             else:
                 skipped_count += 1
                 yield entry, None
-        
+
         logger.info(f"تم ربط {linked_count} إدخال، تم تخطي {skipped_count}")

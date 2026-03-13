@@ -1,30 +1,45 @@
-# Pre-commit hooks — Lightweight local guards
-# Install once: pre-commit install
-# Runs automatically before every git commit
+# .pre-commit-config.yaml
+# yaml-language-server: $schema=https://json.schemastore.org/pre-commit-config.json
+# Preventive architectural guardrails — تمنع الكود الملوث من الدخول
 
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+
+  - repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+      - id: black
+        language_version: python3.12
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort (python)
+        args: ["--profile", "black"]
+
   - repo: local
     hooks:
-      - id: architectural-guard-entity-leakage
-        name: "Guard: No Entity Leakage"
-        entry: python scripts/check_no_core_entity_imports.py
+      # ✅ حارس معماري: كشف التكرارات قبل commit
+      - id: detect-duplicates
+        name: Detect Duplicate Entities
+        entry: python scripts/detect_duplicate_entities.py
         language: system
         pass_filenames: false
         always_run: true
-        stages: [pre-commit]
-      
-      - id: architectural-guard-di-container
-        name: "Guard: DI Container Enforcement"
-        entry: python scripts/check_di_container_usage.py
+        stages: [commit]
+
+      # ✅ حارس معماري: اختبارات العقود
+      - id: architecture-contracts
+        name: Architecture Contracts
+        entry: pytest tests/contracts/test_architecture_contracts.py -v
         language: system
         pass_filenames: false
         always_run: true
-        stages: [pre-commit]
-      
-      - id: architectural-guard-src-root
-        name: "Guard: src/ Root Cleanliness"
-        entry: python scripts/check_src_root_clean.py
-        language: system
-        pass_filenames: false
-        always_run: true
-        stages: [pre-commit]
+        stages: [commit]

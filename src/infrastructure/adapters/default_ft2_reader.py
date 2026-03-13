@@ -2,14 +2,20 @@ import os
 import uuid
 from pathlib import Path
 from typing import List
-from src.application.dtos.ft2_entry_dto import FT2EntryDTO
+
 from src.application.ports.ft2_reader_port import Ft2ReaderPort
-from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser, FT2Entry
+from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import (
+    FT2Reading as FT2Entry,
+)
+
 
 class DefaultFt2Reader:
     """
     Adapter that implements the Ft2ReaderPort to read data from a directory of FT2 files.
     """
+
     def read(self, source: Path) -> List[FT2EntryDTO]:
         """
         Reads all .txt files in a source directory, parses them, and returns a list of FT2EntryDTOs.
@@ -37,7 +43,7 @@ class DefaultFt2Reader:
                 batch=entry.batch,
                 duration_minutes=entry.duration_minutes,
             )
-for entry in all_entries
+            for entry in all_entries
         ]
 
         return dto_list
