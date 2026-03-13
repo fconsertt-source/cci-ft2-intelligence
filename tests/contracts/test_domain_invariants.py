@@ -2,7 +2,6 @@
 اختبارات ثوابت المجال — تضمن عدم كسر القواعد الأساسية
 """
 
-from datetime import datetime
 
 from src.domain.entities.vaccination_center import FreezeTolerance, VaccinationCenter
 

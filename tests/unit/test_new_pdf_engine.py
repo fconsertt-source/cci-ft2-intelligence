@@ -1,7 +1,6 @@
 """Unit tests for the new PDFGenerator stub (Phase 1).
 """
 
-from datetime import datetime
 
 import pytest
 
@@ -11,7 +10,7 @@ from src.infrastructure.adapters.reporting.new_pdf_engine import PDFGenerator
 
 # determine if reportlab is installed so tests can be skipped gracefully
 try:
-    import reportlab  # type: ignore
+    import reportlab  # type: ignore  # noqa: F401
 
     HAS_REPORTLAB = True
 except ImportError:

@@ -1,5 +1,3 @@
-import pytest
-from pathlib import Path
 from src.infrastructure.adapters.json_device_repository import JsonDeviceRepository
 
 

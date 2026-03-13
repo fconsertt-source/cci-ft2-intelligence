@@ -24,7 +24,7 @@ def test_table_builder_no_reportlab(monkeypatch):
 
 def test_table_builder_with_reportlab(monkeypatch):
     try:
-        from reportlab.platypus import Table
+        from reportlab.platypus import Table  # noqa: F401
     except ImportError:
         import pytest
 

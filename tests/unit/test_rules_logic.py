@@ -3,7 +3,7 @@ import sys
 import os
 from datetime import datetime, timedelta
 from dataclasses import dataclass
-from typing import List, Dict, Any
+from typing import List
 
 # إضافة مسار src للعثور على الموديولات
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))

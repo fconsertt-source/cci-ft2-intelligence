@@ -1,5 +1,5 @@
 # src/infrastructure/adapters/ft2_reader/services/ft2_linker.py
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, List
 
 from src.infrastructure.logging import get_logger
 

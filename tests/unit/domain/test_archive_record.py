@@ -2,7 +2,6 @@
 اختبارات وحدة لكيان ArchiveRecord
 """
 
-import pytest
 from datetime import datetime, timezone, timedelta
 
 from src.domain.entities.archive_record import ArchiveRecord, ArchiveStatus

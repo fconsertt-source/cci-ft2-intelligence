@@ -2,7 +2,6 @@
 Contract tests for time-related constants used in the service layer.
 """
 
-import pytest
 
 
 def test_time_unit_constant():

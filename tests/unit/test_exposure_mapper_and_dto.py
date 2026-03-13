@@ -159,7 +159,6 @@ class TestApplicationDeviceReportDTO:
 
         from src.application.dtos.device_report_dto import (
             DeviceReportDTO,
-            ThermalExcursionDTO,
         )
 
         dto = DeviceReportDTO(
@@ -358,7 +357,6 @@ class TestAbstractPortsNotImplemented:
         import pytest
 
         from src.application.ports.i_reporter import IReporter
-        from src.domain.dtos.analysis_result_dto import AnalysisResultDTO
 
         class ConcreteReporter(IReporter):
             def generate(self, result):

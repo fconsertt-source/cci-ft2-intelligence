@@ -5,7 +5,6 @@ Legacy simulation tooling for VVM scenarios.
 This file has been moved to `tools/legacy` and is excluded from the import-guard.
 See docs/adr/0004-phase3-plan.md for migration plan.
 """
-import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path

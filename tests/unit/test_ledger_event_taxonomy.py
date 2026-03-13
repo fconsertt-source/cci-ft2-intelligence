@@ -8,13 +8,10 @@
 """
 
 import json
-from pathlib import Path
 
 import pytest
 
 from src.domain.enums.ledger_event import (
-    EVENT_CATEGORY,
-    EVENT_PRIORITY,
     LedgerEvent,
     get_event_category,
     get_event_priority,

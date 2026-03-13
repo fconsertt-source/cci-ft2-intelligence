@@ -16,7 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.domain.enums.ledger_event import LedgerEvent
-from src.shared.di_container import configure_ledger, container
+from src.shared.di_container import configure_ledger
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"

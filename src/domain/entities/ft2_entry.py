@@ -1,8 +1,7 @@
 # src/domain/entities/ft2_entry.py
 
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 
 @dataclass

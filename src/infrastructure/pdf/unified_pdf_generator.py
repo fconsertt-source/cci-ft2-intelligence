@@ -5,7 +5,6 @@ Handles multiple report types (Official, Technical, Arabic) with a premium desig
 Production-ready version with Clean Architecture compliance and fail-fast validation.
 """
 import os
-import uuid
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union

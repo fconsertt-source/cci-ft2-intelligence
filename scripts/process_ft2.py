@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.application.ports.ledger_writer_port import LedgerWriterPort
 from src.domain.enums.ledger_event import LedgerEvent
-from src.shared.di_container import configure_ledger, container
+from src.shared.di_container import configure_ledger
 
 # تهيئة التسجيل
 logging.basicConfig(

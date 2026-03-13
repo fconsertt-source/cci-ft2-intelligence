@@ -1,11 +1,9 @@
 from unittest.mock import MagicMock
 
-import pytest
 
 from src.application.use_cases.evaluate_cold_chain_safety_uc import (
     EvaluateColdChainSafetyUC,
 )
-from src.domain.dtos.analysis_result_dto import AnalysisResultDTO, VaccineStatus
 
 
 class TestEvaluateColdChainSafetyUC:

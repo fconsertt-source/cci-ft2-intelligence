@@ -5,7 +5,6 @@ Golden master tests for PDF output, with normalization.
 """
 import hashlib
 import json
-import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path

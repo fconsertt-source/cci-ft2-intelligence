@@ -1,6 +1,6 @@
 """Chart/graph builder for reports (initially matplotlib-backed)."""
 
-from typing import Any, List
+from typing import List
 
 
 class ChartBuilder:

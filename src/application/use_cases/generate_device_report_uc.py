@@ -5,9 +5,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from src.application.ports.device_repository_port import DeviceRepositoryPort
 from src.application.ports.ledger_writer_port import LedgerWriterPort

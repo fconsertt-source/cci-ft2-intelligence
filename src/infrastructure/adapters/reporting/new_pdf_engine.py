@@ -14,7 +14,6 @@ The implementation is currently a stub; the legacy engine remains available
 until migration completes.
 """
 
-import sys
 from pathlib import Path
 from typing import Any, Optional
 
@@ -118,7 +117,6 @@ class PDFGenerator:
         """
         # attempt to build a real PDF using reportlab and the new component
         from reportlab.lib.pagesizes import A4
-        from reportlab.pdfgen import canvas
         from reportlab.platypus import SimpleDocTemplate
 
         from src.presentation.reporting.components.arabic_processor import shape

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Optional, Protocol
 
 from src.domain.enums.ledger_event import LedgerEvent

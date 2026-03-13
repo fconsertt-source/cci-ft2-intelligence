@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from src.domain.entities.temperature_reading import TemperatureReading
 from src.domain.value_objects.her_result import HERResult

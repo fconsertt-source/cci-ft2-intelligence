@@ -10,7 +10,6 @@ DefaultValidator
 from __future__ import annotations
 from typing import Any
 
-from src.application.exceptions import ValidationError
 from src.application.ports.validation_port import ValidationPort
 
 

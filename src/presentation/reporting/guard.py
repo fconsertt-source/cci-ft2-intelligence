@@ -15,7 +15,6 @@ import csv
 import datetime
 import json
 import uuid
-import shutil
 from pathlib import Path
 from contextlib import contextmanager
 from typing import Any, Mapping, Protocol, List, Set

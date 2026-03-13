@@ -1,6 +1,6 @@
 # src/application/use_cases/evaluate_cold_chain_safety_use_case.py
 from itertools import tee
-from typing import List, Tuple
+from typing import List
 
 from src.domain.dtos.evaluate_cold_chain_safety_request import (
     EvaluateColdChainSafetyRequest,

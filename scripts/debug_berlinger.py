@@ -3,7 +3,6 @@
 """تشخيص تشغيل Berlinger Verifier في البيئة الحالية"""
 
 import subprocess
-import sys
 from pathlib import Path
 
 def diagnose(jar_path: Path, sample_file: Path):

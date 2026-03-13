@@ -1,13 +1,11 @@
 # tests/conftest.py
 import json
-from datetime import datetime
 
 import pytest
 
 from src.application.use_cases.generate_device_report_uc import (
     GenerateDeviceReportUseCase,
 )
-from src.domain.calculators.q10_thermal_calculator import Q10ThermalCalculator
 from src.domain.services.regulatory_decision_service import RegulatoryDecisionService
 from src.domain.services.thermal_degradation_estimator import (
     ThermalDegradationEstimator,

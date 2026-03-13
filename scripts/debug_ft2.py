@@ -7,7 +7,6 @@ It now uses `src.infrastructure.logging.get_logger` and `FT2Parser` when parsing
 
 import os
 import sys
-import csv
 from pathlib import Path
 
 # Add project root to path for src imports

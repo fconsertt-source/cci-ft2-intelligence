@@ -7,7 +7,6 @@ from src.domain.entities.ft2_entry import (  # افتراض وجود هذا ال
     FT2Entry,
 )
 
-from .archive_record import ArchiveRecord, ArchiveStatus
 
 
 class FreezeTolerance(Enum):

@@ -4,7 +4,6 @@
 
 import inspect
 
-import pytest
 
 
 class TestPDFWrapperContract:

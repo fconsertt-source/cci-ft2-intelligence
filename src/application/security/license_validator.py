@@ -1,7 +1,6 @@
 # src/application/security/license_validator.py
 from __future__ import annotations
 from typing import Protocol
-import hashlib
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
