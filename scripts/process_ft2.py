@@ -119,7 +119,7 @@ def process_single_file(
             ft2_serial=device_id,
             source_path=str(file_path),
         )
-        logger.debug(f"  Logged: FILE_INGESTED")
+        logger.debug("  Logged: FILE_INGESTED")
 
         # 4. استخراج البيانات
         data = extract_ft2_data(file_path)
@@ -159,7 +159,7 @@ def process_single_file(
             source_path=str(file_path),
             destination_path=str(archive_path),
         )
-        logger.debug(f"  Logged: FILE_ARCHIVED")
+        logger.debug("  Logged: FILE_ARCHIVED")
 
         logger.info(f"  ✅ Success: {file_path.name}")
         return True
@@ -230,7 +230,7 @@ def main():
 
     # الملخص
     logger.info(f"\n{'='*60}")
-    logger.info(f"📊 Processing Summary")
+    logger.info("📊 Processing Summary")
     logger.info(f"{'='*60}")
     logger.info(f"✅ Processed: {processed_count}")
     logger.info(f"❌ Failed: {failed_count}")

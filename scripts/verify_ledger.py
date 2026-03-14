@@ -17,11 +17,11 @@ def main():
         
         if is_valid:
             state = ledger.get_chain_state()
-            print(f"✅ LEDGER INTEGRITY VERIFIED")
+            print("✅ LEDGER INTEGRITY VERIFIED")
             print(f"   Entries: {state.entry_count}")
             print(f"   Last Hash: {state.last_entry_hash}")
         else:
-            print(f"❌ LEDGER TAMPERING DETECTED")
+            print("❌ LEDGER TAMPERING DETECTED")
             print(f"   Error: {error}")
             sys.exit(1)
             

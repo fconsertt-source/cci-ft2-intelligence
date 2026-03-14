@@ -76,8 +76,8 @@ def test_pdf_generation_performance():
     assert peak_mb < MAX_PEAK_MEMORY_MB, f"Peak memory too high: {peak_mb:.2f}MB"
 
     # 📊 Log للأداء للتتبع الأسبوعي
-    print(f"\n=== PDF Performance ===")
+    print("\n=== PDF Performance ===")
     print(f"Time: {elapsed:.2f}s (threshold: {FINAL_THRESHOLD}s)")
     print(f"Size: {size_mb:.2f}MB (limit: {MAX_REASONABLE_SIZE_MB}MB)")
     print(f"Peak Memory: {peak_mb:.2f}MB (limit: {MAX_PEAK_MEMORY_MB}MB)")
-    print(f"========================\n")
+    print("========================\n")

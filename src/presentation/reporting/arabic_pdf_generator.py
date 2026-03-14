@@ -313,7 +313,7 @@ def create_arabic_pdf():
         doc.build(story)
         
         safe_print(f"SUCCESS: Report created successfully: {output_file}")
-        safe_print(f"INFO: Report statistics:")
+        safe_print("INFO: Report statistics:")
         safe_print(f"  - Total centers: {total}")
         safe_print(f"  - Accepted: {accepted}")
         safe_print(f"  - Warning: {warning}")

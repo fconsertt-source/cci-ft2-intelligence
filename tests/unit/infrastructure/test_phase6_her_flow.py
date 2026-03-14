@@ -51,7 +51,7 @@ def make_entries(
             temperature=t,
             timestamp=start + timedelta(minutes=i * interval_minutes),
             duration_minutes=interval_minutes,
-            device_id=f"FT2-001",
+            device_id="FT2-001",
         )
         for i, t in enumerate(temps)
     ]

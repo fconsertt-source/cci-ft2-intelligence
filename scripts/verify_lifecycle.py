@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 def main():
     logger.info("🔍 Verifying Archive Integrity...")
-    logger.info(f"📁 Archive Root: data/archive/")
+    logger.info("📁 Archive Root: data/archive/")
     logger.info("="*60)
     
     archive_root = Path('data/archive')

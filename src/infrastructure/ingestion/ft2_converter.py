@@ -73,10 +73,10 @@ def convert_csv_to_ft2(csv_path: str, output_path: str):
                 ft2_content.append(f"  Min T: {temp:.1f}")
                 ft2_content.append(f"  Max T: {temp:.1f}")
                 ft2_content.append(f"  Avrg T: {temp:.1f}")
-                ft2_content.append(f"  Alarm:")
-                ft2_content.append(f"   0:")
+                ft2_content.append("  Alarm:")
+                ft2_content.append("   0:")
                 ft2_content.append(f"    t Acc: {0 if temp > -0.5 else 60}")
-                ft2_content.append(f"   1:")
+                ft2_content.append("   1:")
                 ft2_content.append(f"    t Acc: {60 if temp > 8.0 else 0}")
                 
             except (KeyError, ValueError) as e:

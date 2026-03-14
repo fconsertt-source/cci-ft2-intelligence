@@ -283,7 +283,7 @@ def main() -> int:
     print()
     print(f"Status: {result.status()}")
     print(f"Exit Code: {result.exit_code()}")
-    print(f"Report: dist/build_readiness_report.json")
+    print("Report: dist/build_readiness_report.json")
     print("══════════════════════════════")
 
     return result.exit_code()

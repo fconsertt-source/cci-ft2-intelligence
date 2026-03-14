@@ -25,7 +25,7 @@ def main():
         result = use_case.execute(args.file_path)
         
         if result.status == VerificationStatus.SUCCESS:
-            print(f"✅ SUCCESS: File is authentic.")
+            print("✅ SUCCESS: File is authentic.")
             print(f"   Diagnostics: {result.diagnostics}")
         else:
             print(f"❌ FAILED: {result.status.name}")

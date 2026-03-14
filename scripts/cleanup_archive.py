@@ -26,8 +26,8 @@ def main():
     dry_run = "--dry-run" in sys.argv
 
     logger.info("🗑️  Archive Cleanup Utility")
-    logger.info(f"📁 Archive Root: data/archive/")
-    logger.info(f"⏰ Retention: 90 days")
+    logger.info("📁 Archive Root: data/archive/")
+    logger.info("⏰ Retention: 90 days")
     logger.info(
         f"🔍 Mode: {'DRY RUN (no deletion)' if dry_run else 'LIVE (will delete)'}"
     )
@@ -64,7 +64,7 @@ def main():
                             file_path.unlink()
 
     logger.info("=" * 60)
-    logger.info(f"📊 Cleanup Results:")
+    logger.info("📊 Cleanup Results:")
     logger.info(f"   Expired files found: {expired_count}")
     if dry_run:
         logger.info("   (DRY RUN - no files deleted)")

@@ -125,7 +125,7 @@ def format_report(results: List[Dict], stats: Dict) -> str:
         # معلومات إضافية عن الملف
         has_import = r.get('has_datetime_import', False)
         if not has_import:
-            lines.append(f"       ℹ️  الملف لا يستورد datetime - سيحتاج إلى استيراد")
+            lines.append("       ℹ️  الملف لا يستورد datetime - سيحتاج إلى استيراد")
         lines.append("")
     
     # الملخص الإحصائي

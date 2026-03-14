@@ -7,10 +7,10 @@ import sys
 from pathlib import Path
 
 def diagnose(jar_path: Path, sample_file: Path):
-    print(f"🔍 Java version:")
+    print("🔍 Java version:")
     subprocess.run(["java", "-version"], stderr=subprocess.STDOUT)
     
-    print(f"\n🔍 Testing headless mode:")
+    print("\n🔍 Testing headless mode:")
     cmd = [
         "java",
         "-Djava.awt.headless=true",
