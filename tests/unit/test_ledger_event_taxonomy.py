@@ -170,10 +170,10 @@ class TestLedgerWriterWithTaxonomy:
 
     def test_append_with_taxonomy(self, ledger_path):
         """اختبار إضافة إدخال مع taxonomy كامل"""
-        writer = LedgerWriterAdapter(ledger_path)
+        writer = LedgerWriterAdapter(ledger_path) 
 
         # only include supported fields; extras removed
-        event_hash = writer.append(
+        event_hash = writer.append( # noqa: F841
             event_type=LedgerEvent.PDF_GENERATED,
             file_hash="dummy-hash-000",
             ft2_serial="130600112764",

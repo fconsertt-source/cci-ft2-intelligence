@@ -115,7 +115,6 @@ def create_arabic_pdf():
             leftMargin=2*cm,
             topMargin=2*cm,
             bottomMargin=2*cm,
-            title="Cold Chain Monitoring Report"
         )
         
         story = []
@@ -140,15 +139,6 @@ def create_arabic_pdf():
             alignment=TA_CENTER,
             spaceAfter=20,
             textColor=colors.HexColor('#3498DB')
-        )
-        
-        arabic_normal_style = ParagraphStyle(
-            'ArabicNormal',
-            parent=styles['Normal'],
-            fontName=arabic_font,
-            fontSize=11,
-            alignment=TA_RIGHT,
-            spaceAfter=10
         )
         
         arabic_center_style = ParagraphStyle(
