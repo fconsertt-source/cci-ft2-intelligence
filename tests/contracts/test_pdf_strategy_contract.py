@@ -1,12 +1,11 @@
 # tests/contracts/test_pdf_strategy_contract.py
 #!/usr/bin/env python3
 """Contract tests ensuring all PDF strategy implementations conform to API."""
-from datetime import datetime
 
 import pytest
 
 # ✅ استيراد من المسار الصحيح
-from src.domain.dtos.device_report_dto import DeviceReportDTO, ReportStatus
+from src.domain.dtos.device_report_dto import DeviceReportDTO
 
 
 def create_minimal_dto() -> DeviceReportDTO:

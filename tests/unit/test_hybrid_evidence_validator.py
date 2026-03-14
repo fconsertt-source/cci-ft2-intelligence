@@ -3,7 +3,6 @@
 
 import pytest
 from pathlib import Path
-from unittest.mock import Mock
 
 from src.domain.evidence.verification_result import VerificationResult, VerificationStatus
 from src.infrastructure.security.hybrid_evidence_validator import HybridEvidenceValidator

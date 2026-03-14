@@ -1,10 +1,9 @@
 # src/infrastructure/adapters/ft2_reader/parser/ft2_parser.py
 
 import csv
-import os
 import warnings
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import List
 
 from src.infrastructure.logging import get_logger
 

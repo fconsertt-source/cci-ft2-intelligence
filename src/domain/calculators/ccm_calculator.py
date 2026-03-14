@@ -4,7 +4,6 @@
 # ============================================================================
 from typing import Any, Dict, List
 
-from typing import Any, Dict, List
 
 from src.domain.entities.temperature_reading import TemperatureReading
 

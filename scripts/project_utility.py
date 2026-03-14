@@ -45,7 +45,8 @@ def create_manifest():
     for root, dirs, files in os.walk(PROJECT_ROOT):
         dirs[:] = [d for d in dirs if not any(fnmatch.fnmatch(d, p) for p in IGNORE_PATTERNS)]
         for f in files:
-            if any(fnmatch.fnmatch(f, p) for p in IGNORE_PATTERNS): continue
+            if any(fnmatch.fnmatch(f, p) for p in IGNORE_PATTERNS):
+                continue
             file_path = Path(root) / f
             rel_path = file_path.relative_to(PROJECT_ROOT)
             manifest.append({

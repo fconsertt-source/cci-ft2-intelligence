@@ -6,7 +6,6 @@ from typing import Dict, Optional
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives import constant_time
 
 class EncryptedLicenseRepository:
     def __init__(self, license_path: str, fingerprint: str):

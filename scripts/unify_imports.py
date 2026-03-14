@@ -8,7 +8,6 @@ Usage:
     python scripts/unify_imports.py --apply    # تطبيق
 """
 import argparse
-import sys
 from pathlib import Path
 
 try:

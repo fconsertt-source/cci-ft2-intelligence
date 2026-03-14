@@ -1,9 +1,7 @@
 # tests/unit/shared/test_path_utils.py
 """Tests for shared.path_utils utilities."""
 
-from pathlib import Path
 
-import pytest
 
 from src.shared import path_utils
 

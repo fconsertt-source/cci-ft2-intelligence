@@ -1,7 +1,6 @@
 import hashlib
 import uuid
-from pathlib import Path
-from unittest.mock import ANY, Mock
+from unittest.mock import Mock
 
 import pytest
 

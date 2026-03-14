@@ -1,9 +1,8 @@
 # tests/unit/test_vaccination_center_coverage.py
 """اختبارات تغطية لـ VaccinationCenter"""
-import pytest
 
 from src.domain.entities.ft2_entry import FT2Entry
-from src.domain.entities.vaccination_center import FreezeTolerance, VaccinationCenter
+from src.domain.entities.vaccination_center import VaccinationCenter
 
 
 def make_center(**kwargs):

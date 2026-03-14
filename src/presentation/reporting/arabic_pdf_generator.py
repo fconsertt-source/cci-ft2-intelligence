@@ -15,7 +15,6 @@ try:
     # لمستخدمي Windows: تغيير الترميز إلى UTF-8
     import sys
     if sys.platform == 'win32':
-        import codecs
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
         sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='ignore')
 except Exception:
@@ -32,7 +31,7 @@ try:
 except ImportError:
     REPORTLAB_AVAILABLE = False
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+from reportlab.lib.enums import TA_CENTER
 
 def safe_print(message):
     """طباعة آمنة تتجنب مشاكل الترميز"""

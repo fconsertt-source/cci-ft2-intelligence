@@ -9,7 +9,7 @@ import os
 import sys
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 

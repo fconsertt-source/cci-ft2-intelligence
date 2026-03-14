@@ -138,7 +138,6 @@ class TestPDFGoldenMaster:
         except ImportError:
             pytest.skip("pdfminer not available")
 
-        import os
         import re
 
         # تثبيت البيئة

@@ -1,6 +1,5 @@
 from typing import List
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
-from src.infrastructure.adapters.ft2_reader.validator.ft2_validator import FT2Validator
 
 
 class FT2ReaderAdapter:

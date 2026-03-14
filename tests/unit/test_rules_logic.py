@@ -3,7 +3,7 @@ import sys
 import os
 from datetime import datetime, timedelta
 from dataclasses import dataclass
-from typing import List, Dict, Any
+from typing import List
 
 # استيراد المحرك الحقيقي للقواعد
 from src.domain.services.rules_engine import apply_rules, calculate_center_stats

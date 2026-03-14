@@ -12,19 +12,14 @@
 """
 from __future__ import annotations
 
-import math
 from datetime import datetime, timedelta
 
 import pytest
 
 from src.domain.calculators.q10_her_calculator import (
-    DEFAULT_Q10,
-    DEFAULT_REFERENCE_TEMP,
-    DEFAULT_SHELF_LIFE_HOURS,
     Q10HerCalculator,
 )
 from src.domain.entities.temperature_reading import TemperatureReading
-from src.domain.value_objects.her_result import HERResult
 
 
 # ---------------------------------------------------------------------------

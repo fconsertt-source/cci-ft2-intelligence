@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.domain.evidence.verification_result import VerificationStatus, VerificationResult
+from src.domain.evidence.verification_result import VerificationStatus
 from src.infrastructure.security.text_signature_verifier import TextSignatureVerifier
 
 

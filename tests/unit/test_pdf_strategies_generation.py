@@ -1,6 +1,5 @@
 """Ensure PDF strategies successfully produce byte output."""
 
-from datetime import datetime
 from src.utils.time import utc_now_iso
 
 from src.domain.dtos.device_report_dto import DeviceReportDTO

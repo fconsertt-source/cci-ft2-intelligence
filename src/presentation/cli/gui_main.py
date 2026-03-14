@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # استيراد LanguageManager بأمان
 try:
-    from src.shared.language_manager import LanguageManager, lang
+    from src.shared.language_manager import lang
 
     LANG_AVAILABLE = True
 except ImportError as e:
@@ -27,16 +27,6 @@ except ImportError as e:
     lang = None
     logger.error(f"فشل استيراد LanguageManager: {e}")
 
-# استيراد Use Case
-try:
-    from src.application.use_cases.generate_device_report_uc import (
-        GenerateDeviceReportUseCase,
-    )
-
-    UC_AVAILABLE = True
-except ImportError:
-    UC_AVAILABLE = False
-    logger.warning("GenerateDeviceReportUseCase غير متوفر")
 
 # استيراد Repository
 try:

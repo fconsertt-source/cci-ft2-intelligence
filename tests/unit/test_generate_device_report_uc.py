@@ -9,7 +9,7 @@
 
 from datetime import datetime, timezone
 from pathlib import Path
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 import pytest
 
@@ -19,7 +19,6 @@ from src.application.use_cases.generate_device_report_uc import (
 from src.application.use_cases.requests import GenerateDeviceReportRequest
 from src.domain.entities.thermal_record import ThermalRecord
 from src.domain.enums.ledger_event import LedgerEvent
-from src.domain.enums.regulatory_status import RegulatoryStatus
 
 
 @pytest.fixture

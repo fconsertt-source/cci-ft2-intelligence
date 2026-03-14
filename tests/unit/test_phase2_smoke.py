@@ -1,11 +1,9 @@
 from datetime import datetime, timedelta
 
-import pytest
 
 from src.application.use_cases.evaluate_cold_chain_safety_use_case import (
     EvaluateColdChainSafetyUseCase,
 )
-from src.domain.dtos.analysis_result_dto import VaccineStatus
 from src.domain.dtos.evaluate_cold_chain_safety_request import (
     EvaluateColdChainSafetyRequest,
     TemperatureReading,

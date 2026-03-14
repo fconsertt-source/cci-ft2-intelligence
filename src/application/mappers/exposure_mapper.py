@@ -1,5 +1,4 @@
 from typing import List, Any
-from datetime import datetime
 from src.domain.models.temperature_exposure import TemperatureExposure
 
 class ExposureMapper:

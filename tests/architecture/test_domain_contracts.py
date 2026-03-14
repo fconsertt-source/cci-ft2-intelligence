@@ -1,4 +1,3 @@
-import pytest
 
 def test_temperature_exposure_is_pure_concept():
     """التحقق من أن النموذج المفاهيمي لا يحتوي على تفاصيل تنفيذ"""

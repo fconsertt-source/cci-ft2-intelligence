@@ -717,7 +717,8 @@ class UnifiedPDFGenerator:
                 if hasattr(elem, "filename") and "temp_dist_" in str(elem.filename):
                     # لا نغير الملف الفعلي، فقط نضمن ثبات المرجع
                     pass
-
+        chart_path = os.path.join(self.output_dir, f"temp_dist_{uuid.uuid4().hex}.png")
+        
         elements.append(Image(chart_path, width=16 * cm, height=8 * cm))
 
         # Add system insight

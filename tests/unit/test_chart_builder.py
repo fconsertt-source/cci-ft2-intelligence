@@ -13,7 +13,6 @@ def test_chart_builder_with_data(monkeypatch):
     # verify flowables when reportlab + matplotlib present
     try:
         import matplotlib.pyplot  # noqa: F401
-        from reportlab.platypus import Image
     except ImportError:
         import pytest
 

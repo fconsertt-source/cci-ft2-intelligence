@@ -3,7 +3,6 @@ import uuid
 from pathlib import Path
 from typing import List
 
-from src.application.ports.ft2_reader_port import Ft2ReaderPort
 from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import (

@@ -3,7 +3,6 @@
 """
 
 import pytest
-from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
 from src.infrastructure.adapters.jsonl_index_adapter import JSONLIndexAdapter

@@ -1,7 +1,6 @@
 import subprocess
 import logging
 from pathlib import Path
-from typing import Optional
 
 from src.infrastructure.utils.path_resolver import (
     get_runtime_dir,

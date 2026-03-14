@@ -1,6 +1,5 @@
 # src/infrastructure/security/license_activator.py
 from __future__ import annotations
-import os
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Optional

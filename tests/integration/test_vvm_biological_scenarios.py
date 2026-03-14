@@ -10,7 +10,6 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 from src.domain.entities.vaccination_center import VaccinationCenter
 from src.domain.services.rules_engine import apply_rules
 from src.domain.enums.vvm_stage import VVMStage
-from src.domain.calculators.vvm_q10_model import VVMQ10Model
 
 @dataclass
 class MockEntry:

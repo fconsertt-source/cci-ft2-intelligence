@@ -39,12 +39,11 @@ except ImportError:  # pragma: no cover
 from src.application.ports.ledger_writer_port import LedgerWriterPort
 from src.domain.enums.ledger_event import LedgerEvent
 from src.domain.ledger.exceptions import (
-    LedgerIntegrityError,
     LedgerStateCorruptedError,
     LedgerWriteError,
 )
 from src.domain.ledger.models import LedgerChainState, LedgerEntry
-from src.infrastructure.utils.atomic_writer import atomic_append, atomic_write
+from src.infrastructure.utils.atomic_writer import atomic_append
 from src.infrastructure.utils.hash_chain import (
     get_last_hash_from_ledger,
     load_chain_state,
@@ -307,7 +306,7 @@ class HashChainedLedgerWriter(LedgerWriterPort):
         if not self.ledger_path.exists():
             return None
         with open(self.ledger_path, "r", encoding="utf-8") as f:
-            lines = [l.strip() for l in f if l.strip()]
+            lines = [line.strip() for line in f if line.strip()]
         if not lines:
             return None
         try:

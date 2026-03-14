@@ -8,13 +8,10 @@
 """
 
 import json
-from pathlib import Path
 
 import pytest
 
 from src.domain.enums.ledger_event import (
-    EVENT_CATEGORY,
-    EVENT_PRIORITY,
     LedgerEvent,
     get_event_category,
     get_event_priority,
@@ -184,7 +181,7 @@ class TestLedgerWriterWithTaxonomy:
         assert ledger_path.exists()
         # count manually since writer doesn't expose method
         with open(ledger_path, "r", encoding="utf-8") as f:
-            assert sum(1 for l in f if l.strip()) == 1
+            assert sum(1 for line in f if line.strip()) == 1
 
         # التحقق من المحتوى داخل السطر الأول
         with open(ledger_path, "r", encoding="utf-8") as f:
@@ -214,7 +211,7 @@ class TestLedgerWriterWithTaxonomy:
         # التحقق من السلسلة (manually via LedgerEntry.verify_chain)
         # count lines in ledger for entry count
         with open(ledger_path, "r", encoding="utf-8") as f:
-            lines = [l for l in f if l.strip()]
+            lines = [line for line in f if line.strip()]
         assert len(lines) == 3
         previous = None
         from src.domain.ledger.models import LedgerEntry
@@ -251,7 +248,7 @@ class TestLedgerWriterWithTaxonomy:
             writer.append(event_type=event_type, **kwargs)
 
         with open(ledger_path, "r", encoding="utf-8") as f:
-            assert sum(1 for l in f if l.strip()) == 5
+            assert sum(1 for line in f if line.strip()) == 5
 
         # التحقق من الفئات باستخدام الـ enum مباشرة
         categories = []

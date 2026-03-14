@@ -2,7 +2,6 @@ import subprocess
 import logging
 import os
 from pathlib import Path
-from datetime import datetime, timezone
 
 from src.application.ports.official_verifier_port import OfficialVerifierPort
 from src.domain.evidence.verification_result import VerificationResult, VerificationStatus
