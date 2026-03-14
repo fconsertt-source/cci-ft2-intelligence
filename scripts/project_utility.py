@@ -6,12 +6,13 @@ import hashlib
 import fnmatch
 from pathlib import Path
 
+from src.infrastructure.logging import get_logger
+
 # الإعدادات
 PROJECT_ROOT = Path(__file__).parent.parent
 # allow importing `src` during script runs
 sys.path.append(str(PROJECT_ROOT))
 
-from src.infrastructure.logging import get_logger
 logger = get_logger(__name__)
 IGNORE_PATTERNS = [
     '.git', '__pycache__', '.venv', 'venv', '*.pyc', '.pytest_cache',

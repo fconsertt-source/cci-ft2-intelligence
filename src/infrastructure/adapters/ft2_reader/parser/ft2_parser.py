@@ -2,6 +2,7 @@
 
 import csv
 import os
+import warnings
 from datetime import datetime
 from typing import Any, Dict, List
 
@@ -97,8 +98,6 @@ class FT2Parser:
 # ---------------------------------------------------------------------------
 
 # preserve old name for external callers; emit warning at import time
-import warnings
-
 
 class FT2Entry(FT2Reading):  # type: ignore
     """Deprecated alias kept for backward compatibility.

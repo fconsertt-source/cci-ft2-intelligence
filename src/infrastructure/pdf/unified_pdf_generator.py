@@ -10,6 +10,17 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
+from src.infrastructure.adapters.reporting.components.alert_circle import AlertCircle
+
+# ----------------------------------------------------------------------
+# Import our own components (now from infrastructure)
+# ----------------------------------------------------------------------
+from src.infrastructure.adapters.reporting.components.stability_bar import StabilityBar
+from src.infrastructure.adapters.reporting.components.vvm_icon import VVMIcon
+from src.infrastructure.utils.config_loader import ConfigLoader
+from src.shared.language_manager import lang
+
+
 # ----------------------------------------------------------------------
 # Dependency validation – fail-fast if required libraries are missing
 # ----------------------------------------------------------------------
@@ -83,18 +94,6 @@ except ImportError:
 
     def get_display(s):
         return s
-
-
-from src.infrastructure.adapters.reporting.components.alert_circle import AlertCircle
-
-# ----------------------------------------------------------------------
-# Import our own components (now from infrastructure)
-# ----------------------------------------------------------------------
-from src.infrastructure.adapters.reporting.components.stability_bar import StabilityBar
-from src.infrastructure.adapters.reporting.components.vvm_icon import VVMIcon
-from src.infrastructure.utils.config_loader import ConfigLoader
-from src.shared.language_manager import lang
-
 
 # ----------------------------------------------------------------------
 # Enum for report types – safer than string constants

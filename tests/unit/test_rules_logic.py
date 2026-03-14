@@ -5,6 +5,10 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 from typing import List, Dict, Any
 
+# استيراد المحرك الحقيقي للقواعد
+from src.domain.services.rules_engine import apply_rules, calculate_center_stats
+from src.domain.enums.vvm_stage import VVMStage
+
 # إضافة مسار src للعثور على الموديولات
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
@@ -14,9 +18,6 @@ if SRC_DIR not in sys.path:
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-# استيراد المحرك الحقيقي للقواعد
-from src.domain.services.rules_engine import apply_rules, calculate_center_stats
-from src.domain.enums.vvm_stage import VVMStage
 
 @dataclass
 class MockEntry:
