@@ -48,7 +48,7 @@ class TestEntityUniqueness:
             with open(py_file, "r", encoding="utf-8") as f:
                 try:
                     tree = ast.parse(f.read())
-                except:
+                except SyntaxError:
                     continue
 
                 for node in ast.walk(tree):
@@ -102,7 +102,7 @@ class TestLayerBoundaries:
             with open(py_file, "r", encoding="utf-8") as f:
                 try:
                     tree = ast.parse(f.read())
-                except:
+                except SyntaxError:
                     continue
 
                 for node in ast.walk(tree):

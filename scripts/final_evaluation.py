@@ -17,7 +17,7 @@ def evaluate() -> dict:
         try:
             with open(log_file, 'r') as f:
                 error_count += sum(1 for line in f if 'error' in line.lower() or 'failed' in line.lower())
-        except:
+        except Exception:
             pass
     
     stability_score = max(0, 100 - (error_count * 2))

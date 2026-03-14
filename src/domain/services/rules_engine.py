@@ -194,7 +194,7 @@ class ThawRule(DecisionRule):
             if isinstance(thaw_start, str):
                 try:
                     thaw_start = datetime.strptime(thaw_start, "%Y-%m-%d")
-                except:
+                except ValueError:
                     return None
 
             days_since_thaw = (datetime.now() - thaw_start).days

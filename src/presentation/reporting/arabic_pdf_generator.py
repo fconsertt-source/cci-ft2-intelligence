@@ -18,7 +18,7 @@ try:
         import codecs
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='ignore')
         sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='ignore')
-except:
+except Exception:
     pass
 
 from reportlab.lib.pagesizes import A4
@@ -38,11 +38,11 @@ def safe_print(message):
     """طباعة آمنة تتجنب مشاكل الترميز"""
     try:
         print(message)
-    except:
+    except Exception:
         # إذا فشلت الطباعة، حاول بطريقة أخرى
         try:
             print(message.encode('utf-8', errors='ignore').decode('ascii', errors='ignore'))
-        except:
+        except Exception:
             print("[Printed message with encoding issues]")
 
 def setup_arabic_fonts():
