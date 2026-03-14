@@ -208,7 +208,7 @@ class PDFGenerator:
                 raise ValueError("generated PDF contained no pages")
 
             return pdf_bytes
-        except Exception as e:
+        except Exception as _:
             # if building fails or produced empty document, log and re-raise.
             # This ensures that tests fail loudly instead of passing with a
             # minimal (and incorrect) PDF.

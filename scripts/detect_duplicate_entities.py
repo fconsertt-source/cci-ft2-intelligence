@@ -162,7 +162,7 @@ class DuplicateDetector:
                                 )
                             )
             return imports
-        except Exception as e:
+        except Exception as _:
             return []
 
     def run_full_scan(self):

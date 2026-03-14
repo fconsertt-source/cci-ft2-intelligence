@@ -130,7 +130,7 @@ def run_command(
             print(f"  Stderr: {e.stderr[:500]}...")
         return False, e.stdout, e.stderr
 
-    except subprocess.TimeoutExpired as e:
+    except subprocess.TimeoutExpired as _:
         print(f"❌ {description} TIMEOUT ({timeout}s)")
         return False, None, "Timeout expired"
 

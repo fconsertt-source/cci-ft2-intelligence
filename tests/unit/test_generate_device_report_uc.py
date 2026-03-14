@@ -109,7 +109,7 @@ class TestGenerateDeviceReportUseCase:
         uc.execute(req)
 
         # LicenseGuard يجب أن يُستدعى أولاً
-        calls_order = [
+        calls_order = [  # noqa: F841
             call[0][0] if call[0] else None
             for call in mock_dependencies["license_guard"].ensure_active.call_args_list
         ]
@@ -159,7 +159,7 @@ class TestGenerateDeviceReportUseCase:
                 LedgerEvent.OPERATOR_SESSION_STARTED.value,
                 "operator_session_started",
             ]:
-                found_session = True
+                found_session = True  # noqa: F841
                 break
 
         # ملاحظة: قد لا يكون مُنفذاً بعد في الكود الحالي
@@ -180,7 +180,7 @@ class TestGenerateDeviceReportUseCase:
             kwargs = call[1] if len(call) > 1 else {}
             event_type = kwargs.get("event_type")
             if event_type in [LedgerEvent.REPORT_GENERATED.value, "report_generated"]:
-                found_report = True
+                found_report = True  # noqa: F841
                 break
 
         # ملاحظة: قد لا يكون مُنفذاً بعد في الكود الحالي

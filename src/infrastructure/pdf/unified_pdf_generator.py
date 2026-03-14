@@ -418,7 +418,6 @@ class UnifiedPDFGenerator:
         warning = sum(1 for r in records if r.get("alert_level") == "YELLOW")
         rejected = sum(1 for r in records if r.get("alert_level") == "RED")
 
-        is_ar = report_type == ReportType.ARABIC
         labels = {
             "title": lang.get("report.executive_summary"),
             "msg": lang.get(
