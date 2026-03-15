@@ -1,8 +1,10 @@
+# src/domain/dtos/evaluate_cold_chain_safety_request.py
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from typing import Any, Dict, Optional, Tuple
 
 from src.domain.dtos.base_dto import BaseDTO
+from src.domain.value_objects.vaccine_specification import VaccineSpecification
 
 
 @dataclass(frozen=True)
@@ -18,7 +20,7 @@ class EvaluateColdChainSafetyRequest(BaseDTO):
     center_name: Optional[str] = None
     readings: Tuple[TemperatureReading, ...] = field(default_factory=tuple)
     vaccines: Tuple[Any, ...] = field(default_factory=tuple)
-    # Configuration passed from profile
+    vaccine_spec: Optional[VaccineSpecification] = None
     temperature_ranges: dict = field(default_factory=dict)
     decision_thresholds: dict = field(default_factory=dict)
     timestamp: Optional[datetime] = None
@@ -37,8 +39,6 @@ class EvaluateColdChainSafetyResponse:
     thaw_remaining_hours: Optional[float]
     category_display: Optional[str]
     decision_reasons: Tuple[str, ...]
-
-    # Optional: Return stats if needed for reporting
     has_freeze: bool = False
     has_ccm_violation: bool = False
 

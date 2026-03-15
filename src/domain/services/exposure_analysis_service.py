@@ -46,6 +46,23 @@ class ExposureAnalysisService:
     يحتوي على جميع المؤشرات المطلوبة لـ RulesEngine.
     """
 
+    def __init__(
+        self,
+        reference_temp: float = 5.0,
+        q10_value: float = 2.0,
+        shelf_life_hours: float = 0.0,
+    ) -> None:
+        """
+        Args:
+            reference_temp:   درجة الحرارة المرجعية (legacy)
+            q10_value:        معامل Q10 (legacy)
+            shelf_life_hours: العمر الافتراضي بالساعات (legacy)
+            الأولوية دائماً لـ spec عند تمريرها في analyze()
+        """
+        self._reference_temp = reference_temp
+        self._q10_value = q10_value
+        self._shelf_life_hours = shelf_life_hours
+
     def analyze(
         self,
         readings: List["TemperatureReading"],
@@ -77,8 +94,18 @@ class ExposureAnalysisService:
         if spec is None:
             from src.domain.value_objects.vaccine_specification import (
                 VACCINE_CATALOGUE,
+                VaccineSpecification,
             )
-            spec = VACCINE_CATALOGUE["GENERAL"]
+            # إذا مُرِّرت قيم في constructor → استخدمها
+            if self._shelf_life_hours > 0:
+                spec = VaccineSpecification(
+                    vaccine_type="CUSTOM",
+                    q10_factor=self._q10_value,
+                    shelf_life_days=self._shelf_life_hours / 24.0,
+                    reference_temp_c=self._reference_temp,
+                )
+            else:
+                spec = VACCINE_CATALOGUE["GENERAL"]
 
         # ── 1. Circuit Breakers (أولوية مطلقة) ──────────────────
         circuit_breaker = self._check_circuit_breakers(readings, spec)
@@ -116,6 +143,9 @@ class ExposureAnalysisService:
             "total_hours_above_10": round(hours_above_10, 2),
             "total_hours_above_34": round(hours_above_34, 4),
             "circuit_breaker": circuit_breaker,
+            # ── legacy: كان موجوداً في الإصدار القديم ──────────
+            "data_quality_flags": {"sampling_gap": False},
+            "has_ccm_violation": hours_above_10 > 0,
         }
 
     # ──────────────────────────────────────────────────────────
@@ -177,26 +207,58 @@ class ExposureAnalysisService:
 
         cumulative_degradation_hours: float = 0.0
 
-        for reading in readings:
-            # دعم duration_minutes و duration_hours معاً
-            duration_hours = self._get_duration_hours(reading)
+        # تحقق هل القراءات تحتوي duration أم لا
+        has_duration = any(
+            getattr(r, "duration_minutes", None) is not None
+            or getattr(r, "duration_hours", None) is not None
+            for r in readings
+        )
 
-            # عامل التسريع Q10
-            exponent = (reading.value - spec.reference_temp_c) / 10.0
-            factor = spec.q10_factor ** exponent
-
-            cumulative_degradation_hours += duration_hours * factor
+        if has_duration:
+            # المسار العادي: كل قراءة تحمل مدتها
+            for reading in readings:
+                duration_hours = self._get_duration_hours(reading)
+                if duration_hours <= 0:
+                    continue
+                exponent = (reading.value - spec.reference_temp_c) / 10.0
+                factor = spec.q10_factor ** exponent
+                cumulative_degradation_hours += duration_hours * factor
+        else:
+            # مسار pairwise (مثل Q10HerCalculator):
+            # المدة = الفرق بين recorded_at
+            # درجة الحرارة = متوسط القراءتين المتتاليتين
+            import math
+            sorted_readings = sorted(
+                readings, key=lambda r: getattr(r, "recorded_at", 0)
+            )
+            for i in range(len(sorted_readings) - 1):
+                prev = sorted_readings[i]
+                curr = sorted_readings[i + 1]
+                prev_at = getattr(prev, "recorded_at", None)
+                curr_at = getattr(curr, "recorded_at", None)
+                if prev_at is None or curr_at is None:
+                    continue
+                delta_hours = (curr_at - prev_at).total_seconds() / 3600.0
+                if delta_hours <= 0:
+                    continue
+                avg_temp = (prev.value + curr.value) / 2.0
+                exponent = (avg_temp - spec.reference_temp_c) / 10.0
+                try:
+                    factor = math.pow(spec.q10_factor, exponent)
+                except (ValueError, OverflowError):
+                    continue
+                cumulative_degradation_hours += factor * delta_hours
 
         her_ratio = cumulative_degradation_hours / spec.shelf_life_hours
 
         logger.debug(
-            "Q10 HER: cumulative_deg=%.4f hrs / shelf=%.1f hrs = ratio=%.4f",
+            "Q10 HER: cumulative_deg=%.4f hrs / shelf=%.1f hrs = ratio=%.6f",
             cumulative_degradation_hours,
             spec.shelf_life_hours,
             her_ratio,
         )
 
-        return round(her_ratio, 6)
+        return her_ratio
 
     # ──────────────────────────────────────────────────────────
     # CCM Index — WHO/PQS/E06/IN02.1 § 4.2.3
@@ -236,26 +298,31 @@ class ExposureAnalysisService:
     # ──────────────────────────────────────────────────────────
 
     @staticmethod
-    def _get_duration_hours(reading) -> float:
+    def _get_duration_hours(reading, next_reading=None) -> float:
         """
-        استخراج مدة القراءة بالساعات من أي نوع قراءة.
+        استخراج مدة القراءة بالساعات.
 
-        يدعم:
-          - duration_minutes (TemperatureEntry / FT2Reading / MagicMock في الاختبارات)
-          - duration_hours   (TemperatureReading domain entity)
-          - افتراضي 24 ساعة عند غياب كليهما (قراءة يومية)
+        الأولوية:
+          1. duration_minutes (TemperatureEntry / FT2Reading)
+          2. duration_hours   (TemperatureReading مع duration_hours)
+          3. الفرق بين recorded_at للقراءة التالية (pairwise — مثل Q10HerCalculator)
+          4. افتراضي 24 ساعة
         """
-        # أولاً: duration_minutes (الأكثر شيوعاً)
         minutes = getattr(reading, "duration_minutes", None)
         if minutes is not None:
             return float(minutes) / 60.0
 
-        # ثانياً: duration_hours (TemperatureReading)
         hours = getattr(reading, "duration_hours", None)
         if hours is not None:
             return float(hours)
 
-        # افتراضي: قراءة يومية
+        if next_reading is not None:
+            recorded_at = getattr(reading, "recorded_at", None)
+            next_recorded_at = getattr(next_reading, "recorded_at", None)
+            if recorded_at is not None and next_recorded_at is not None:
+                delta = (next_recorded_at - recorded_at).total_seconds() / 3600.0
+                return max(0.0, delta)
+
         return 24.0
 
     @staticmethod
@@ -265,19 +332,27 @@ class ExposureAnalysisService:
     ) -> float:
         """
         حساب إجمالي ساعات التعرض فوق عتبة معينة.
-
-        يدعم duration_minutes و duration_hours معاً.
+        يدعم duration_minutes و duration_hours و pairwise recorded_at.
         """
         total_hours: float = 0.0
-        for reading in readings:
+        for i, reading in enumerate(readings):
             if reading.value > threshold:
-                # استخدام نفس منطق _get_duration_hours
+                next_reading = readings[i + 1] if i + 1 < len(readings) else None
                 minutes = getattr(reading, "duration_minutes", None)
                 if minutes is not None:
                     total_hours += float(minutes) / 60.0
                 else:
                     hours = getattr(reading, "duration_hours", None)
-                    total_hours += float(hours) if hours is not None else 24.0
+                    if hours is not None:
+                        total_hours += float(hours)
+                    elif next_reading is not None:
+                        recorded_at = getattr(reading, "recorded_at", None)
+                        next_at = getattr(next_reading, "recorded_at", None)
+                        if recorded_at and next_at:
+                            delta = (next_at - recorded_at).total_seconds() / 3600.0
+                            total_hours += max(0.0, delta)
+                    else:
+                        total_hours += 24.0
         return total_hours
 
     @staticmethod
