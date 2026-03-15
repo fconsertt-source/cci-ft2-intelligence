@@ -12,11 +12,12 @@ class TemperatureMapper:
     يحوّل TemperatureEntry → TemperatureReading.
 
     DomainCenterContext يعمل على TemperatureEntry (domain pure).
-    Calculators (Q10HerCalculator) يعملون على TemperatureReading.
+    Calculators (ExposureAnalysisService) يعملون على TemperatureReading.
     هذا الـ Mapper هو نقطة العبور الوحيدة بينهما.
 
-    موضوع في infrastructure لأنه تحويل بنية بيانات،
-    وليس منطق domain.
+    التغيير في A4:
+      يمرر duration_hours = duration_minutes / 60.0
+      حتى يتمكن ExposureAnalysisService من الحساب الصحيح.
     """
 
     @staticmethod
@@ -24,21 +25,19 @@ class TemperatureMapper:
         """
         تحويل قائمة TemperatureEntry إلى TemperatureReading.
 
-        TemperatureEntry يحتوي على duration_minutes (مُحسوبة من pairwise).
-        TemperatureReading يحتوي على recorded_at (timestamp).
-        كلاهما يشيران لنفس القراءة — الفرق في الاستخدام فقط.
-
         Args:
             entries: قائمة مدخلات درجة الحرارة من DomainCenterContext
 
         Returns:
-            قائمة TemperatureReading جاهزة للـ Q10HerCalculator
+            قائمة TemperatureReading جاهزة للـ ExposureAnalysisService
         """
         return [
             TemperatureReading(
                 vaccine_id=entry.device_id,
                 value=entry.temperature,
                 recorded_at=entry.timestamp,
+                duration_hours=entry.duration_minutes / 60.0,  # ← A4
+                device_id=entry.device_id,
             )
             for entry in entries
         ]
