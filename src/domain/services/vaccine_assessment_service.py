@@ -262,6 +262,7 @@ class VaccineAssessmentService:
             entry_id=vaccine.entry_id,
             vaccine_type=vaccine.vaccine_type,
             batch_number=vaccine.batch_number,
+            expiry_date=vaccine.expiry_date,  # ✅ إضافة expiry_date
             decision=decision,
             reason=reason,
             her_ratio=her_ratio,
