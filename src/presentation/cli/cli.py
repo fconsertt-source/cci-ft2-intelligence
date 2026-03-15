@@ -48,7 +48,7 @@ def health_check():
         healthy = AppComposer.health_check()
         if healthy:
             print_green("Health check passed")
-            raise typer.Exit(code=0)
+            return  # ✅ نجاح بدون استثناء
         else:
             print_red("Health check failed")
             raise typer.Exit(code=1)
