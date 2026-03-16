@@ -83,3 +83,6 @@ build/
 .pytest_cache/
 .mypy_cache/
 pipeline.log
+changelog_temp.txt
+test_env/
+*.bak
