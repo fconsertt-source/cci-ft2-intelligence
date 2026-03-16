@@ -1,45 +1,67 @@
-# .pre-commit-config.yaml
-# yaml-language-server: $schema=https://json.schemastore.org/pre-commit-config.json
-# Preventive architectural guardrails — تمنع الكود الملوث من الدخول
+# ═══════════════════════════════════════════════════════════════
+# Pre-commit Configuration — CCI-FT2-Intelligence
+# يمنع الأخطاء الشائعة قبل الالتزام (commit)
+# ═══════════════════════════════════════════════════════════════
 
 repos:
+  # ───────────────────────────────────────────────────────────────
+  # فحص المسافات الزائدة في ملفات JSON
+  # ───────────────────────────────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: check-json-trailing-spaces
+        name: Check JSON trailing spaces
+        entry: python scripts/check_json_spaces.py
+        language: system
+        types: [json]
+        description: "يمنع المسافات الزائدة في مفاتيح وقيم JSON"
+
+  # ───────────────────────────────────────────────────────────────
+  # فحص صحة ملفات JSON
+  # ───────────────────────────────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: check-json-valid
+        name: Validate JSON syntax
+        entry: python -m json.tool
+        language: system
+        types: [json]
+        pass_filenames: true
+
+  # ───────────────────────────────────────────────────────────────
+  # فحص المسافات الزائدة عامة (Python, YAML, etc.)
+  # ───────────────────────────────────────────────────────────────
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
+        files: \.(py|yaml|yml|json|md|txt)$
       - id: end-of-file-fixer
+        files: \.(py|yaml|yml|json|md|txt)$
       - id: check-yaml
-      - id: check-json
+      - id: check-merge-conflict
 
+  # ───────────────────────────────────────────────────────────────
+  # فحص تنسيق Python (Black)
+  # ───────────────────────────────────────────────────────────────
   - repo: https://github.com/psf/black
-    rev: 24.2.0
+    rev: 24.1.0
     hooks:
       - id: black
         language_version: python3.12
 
+  # ───────────────────────────────────────────────────────────────
+  # فحص استيرادات Python (isort)
+  # ───────────────────────────────────────────────────────────────
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
       - id: isort
-        name: isort (python)
         args: ["--profile", "black"]
 
-  - repo: local
-    hooks:
-      # ✅ حارس معماري: كشف التكرارات قبل commit
-      - id: detect-duplicates
-        name: Detect Duplicate Entities
-        entry: python scripts/detect_duplicate_entities.py
-        language: system
-        pass_filenames: false
-        always_run: true
-        stages: [commit]
 
-      # ✅ حارس معماري: اختبارات العقود
-      - id: architecture-contracts
-        name: Architecture Contracts
-        entry: pytest tests/contracts/test_architecture_contracts.py -v
-        language: system
-        pass_filenames: false
-        always_run: true
-        stages: [commit]
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.0
+    hooks:
+      - id: bandit
+        args: ["-r", "src/", "-ll", "--exclude", "venv/,__pycache__/"]

@@ -228,10 +228,14 @@ class TestDeviceRegistry:
         old = registry.get_device("DEV-OLD")
         new = registry.get_device("DEV-NEW")
 
-        assert old.status == DeviceStatus.REPLACED
-        assert old.replaced_by == "DEV-NEW"
-        assert new.status == DeviceStatus.ACTIVE
-        assert new.equipment_id == "EQ-01"  # يرث equipment_id من القديم
+        if old.status != DeviceStatus.REPLACED:
+            raise AssertionError(f"Expected REPLACED, got {old.status}")
+        if old.replaced_by != "DEV-NEW":
+            raise AssertionError(f"Expected replaced_by DEV-NEW, got {old.replaced_by}")
+        if new.status != DeviceStatus.ACTIVE:
+            raise AssertionError(f"Expected ACTIVE, got {new.status}")
+        if new.equipment_id != "EQ-01":
+            raise AssertionError(f"Expected equipment_id EQ-01, got {new.equipment_id}")
         assert isinstance(link, DeviceLink)
 
     def test_replace_nonactive_device_raises(self, registry):

@@ -67,3 +67,9 @@ jobs:
       - name: Check pip consistency
         run: |
           pip check
+
+      # إضافة إلى CI/CD
+      - name: Check dependencies
+        run: |
+          pip install pip-audit
+          pip-audit --format json --output vulns.json

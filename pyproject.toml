@@ -33,3 +33,7 @@ ft2-cli = "src.cli:main"
 [build-system]
 requires = ["poetry-core>=1.8"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.bandit]
+exclude_dirs = ["venv", "test_env", "__pycache__", "tests", "scripts", "dist", "build"]
+skips = ["B101", "B311"]  # B101 للـ assert (مسموح في الاختبارات)
