@@ -15,9 +15,8 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
 
-from src.domain.entities.cooling_device import CoolingDevice, DeviceSafetyResult
+from src.domain.entities.cooling_device import CoolingDevice
 from src.domain.enums.vvm_stage import VVMStage
 from src.domain.value_objects.vaccine_specification import get_vaccine_spec
 

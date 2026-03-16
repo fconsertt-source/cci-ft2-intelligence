@@ -4,9 +4,7 @@
 تختبر توليد تقرير اللقاحات من نتائج التقييم.
 """
 
-import pytest
-from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from src.application.services.vaccines_report_generator import VaccinesReportGenerator
 from src.domain.value_objects.vaccine_assessment_result import VaccineAssessmentResult

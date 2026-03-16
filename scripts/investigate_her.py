@@ -9,9 +9,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.domain.services.exposure_analysis_service import ExposureAnalysisService
-from src.domain.value_objects.vaccine_specification import VaccineSpecification
 from src.domain.entities.temperature_reading import TemperatureReading
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 
 

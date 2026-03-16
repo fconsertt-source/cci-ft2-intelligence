@@ -3,7 +3,7 @@
 
 from dataclasses import dataclass
 from decimal import Decimal
-from datetime import date, datetime  # ← الإصلاح: إضافة datetime هنا
+from datetime import datetime  # ← الإصلاح: إضافة datetime هنا
 
 @dataclass(frozen=True)
 class PDFExtractionResult:
@@ -14,8 +14,8 @@ class PDFExtractionResult:
     serial: str
     
     # 📅 نطاق التقرير
-    start_date: date
-    stop_date: date
+    start_date: datetime
+    stop_date: datetime
     
     # 🌡️ القيم الحرارية
     min_temperature: Decimal

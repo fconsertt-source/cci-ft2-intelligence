@@ -19,7 +19,7 @@ import logging
 from datetime import date
 from typing import List, Optional
 
-from src.domain.entities.equipment_vaccine import EquipmentVaccine, VVMStageValue
+from src.domain.entities.equipment_vaccine import EquipmentVaccine
 from src.domain.enums.vaccine_decision import DecisionReason, VaccineDecision
 from src.domain.services.exposure_analysis_service import ExposureAnalysisService
 from src.domain.value_objects.vaccine_assessment_result import VaccineAssessmentResult

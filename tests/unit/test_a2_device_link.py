@@ -9,16 +9,13 @@
 """
 from __future__ import annotations
 
-import json
-import tempfile
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
+from datetime import datetime, timezone
 
 import pytest
 
 from src.domain.entities.device_link import DeviceLink
 from src.domain.enums.device_status import DeviceStatus
-from src.domain.services.device_registry import DeviceRecord, DeviceRegistry
+from src.domain.services.device_registry import DeviceRegistry
 
 
 # ══════════════════════════════════════════════════════════════

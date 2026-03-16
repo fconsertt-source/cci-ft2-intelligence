@@ -21,7 +21,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
 
-from src.domain.enums.device_status import DeviceStatus
 
 # الفجوة الزمنية المقبولة بالساعات قبل اعتبار السلسلة منقطعة
 _MAX_ACCEPTABLE_GAP_HOURS: float = 2.0

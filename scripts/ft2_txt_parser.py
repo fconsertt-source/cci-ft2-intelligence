@@ -12,7 +12,6 @@ FT2 Parser — Berlinger Fridge-tag 2 E
 
 import csv
 import re
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional
 

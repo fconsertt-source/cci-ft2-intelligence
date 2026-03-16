@@ -2,7 +2,6 @@
 """مولد تقرير اللقاحات — B3 Pipeline Integration."""
 from pathlib import Path
 from typing import List
-import csv
 
 from src.domain.value_objects.vaccine_assessment_result import VaccineAssessmentResult
 
