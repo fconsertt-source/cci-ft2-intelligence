@@ -18,8 +18,8 @@ def open_pdf(report_path: str):
     """فتح ملف PDF باستخدام التطبيق الافتراضي للنظام"""
     try:
         if sys.platform == "win32":
-            # Windows
-            subprocess.run(["start", report_path], shell=True)
+            # Windows - استخدام cmd /c start بدون shell=True
+            subprocess.run(["cmd", "/c", "start", report_path])
         elif sys.platform == "darwin":  # macOS
             subprocess.run(["open", report_path], check=True)
         else:  # Linux
