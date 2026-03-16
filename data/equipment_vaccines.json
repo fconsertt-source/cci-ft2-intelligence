@@ -1,66 +1,72 @@
-{
-  "_metadata": {
-    "description": "محتويات معدات التبريد — ملف هجين (تلقائي + يدوي)",
-    "auto_fields": ["equipment_id", "center_id", "last_updated"],
-    "manual_fields": ["vaccines[]"],
-    "version": "1.0.0"
+[
+  {
+    "equipment_id": "EQ001",
+    "entry_id": "ENT001",
+    "vaccine_type": "OPV",
+    "batch_number": "B2023-EXP",
+    "expiry_date": "2023-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true,
+    "center_id": "CENTER_001"
   },
-  "equipment_vaccines": [
-    {
-      "equipment_id": "EQ-FRIDGE-01",
-      "center_id": "TEST_CENTER_01",
-      "last_updated": "2024-07-01",
-      "updated_by": "مدير المخزن",
-      "vaccines": [
-        {
-          "entry_id": "VE-001",
-          "vaccine_type": "HEPB",
-          "display_name": "لقاح التهاب الكبد B",
-          "batch_number": "B-2024-001",
-          "expiry_date": "2026-01-01",
-          "quantity_doses": 200,
-          "has_vvm": true,
-          "vvm_stage": 1,
-          "vvm_stage_label": "المرحلة 1 — المربع أفتح من الدائرة (صالح)",
-          "notes": null
-        },
-        {
-          "entry_id": "VE-002",
-          "vaccine_type": "DTP",
-          "display_name": "لقاح الدفتيريا والكزاز والسعال الديكي",
-          "batch_number": "B-2024-002",
-          "expiry_date": "2025-06-01",
-          "quantity_doses": 150,
-          "has_vvm": true,
-          "vvm_stage": 1,
-          "vvm_stage_label": "المرحلة 1 — المربع أفتح من الدائرة (صالح)",
-          "notes": null
-        },
-        {
-          "entry_id": "VE-003",
-          "vaccine_type": "OPV",
-          "display_name": "لقاح شلل الأطفال الفموي",
-          "batch_number": "B-2024-003",
-          "expiry_date": "2024-12-01",
-          "quantity_doses": 500,
-          "has_vvm": true,
-          "vvm_stage": 2,
-          "vvm_stage_label": "المرحلة 2 — المربع يقترب من الدائرة (تحذير)",
-          "notes": "استخدام ذي أولوية"
-        },
-        {
-          "entry_id": "VE-004",
-          "vaccine_type": "BCG",
-          "display_name": "لقاح السل",
-          "batch_number": "B-2024-004",
-          "expiry_date": "2025-09-01",
-          "quantity_doses": 100,
-          "has_vvm": false,
-          "vvm_stage": null,
-          "vvm_stage_label": null,
-          "notes": null
-        }
-      ]
-    }
-  ]
-}
+  {
+    "equipment_id": "EQ001",
+    "entry_id": "ENT002",
+    "vaccine_type": "HepB",
+    "batch_number": "B2024-VVM3",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 3,
+    "has_vvm": true,
+    "center_id": "CENTER_001"
+  },
+  {
+    "equipment_id": "EQ002",
+    "entry_id": "ENT003",
+    "vaccine_type": "BCG",
+    "batch_number": "B2024-CCMD",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true,
+    "center_id": "CENTER_002"
+  },
+  {
+    "equipment_id": "EQ003",
+    "entry_id": "ENT004",
+    "vaccine_type": "Measles",
+    "batch_number": "B2024-HER15",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true,
+    "center_id": "CENTER_003"
+  },
+  {
+    "equipment_id": "EQ004",
+    "entry_id": "ENT005",
+    "vaccine_type": "HepB",
+    "batch_number": "B2024-FREEZE",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true,
+    "center_id": "CENTER_004"
+  },
+  {
+    "equipment_id": "EQ005",
+    "entry_id": "ENT006",
+    "vaccine_type": "OPV",
+    "batch_number": "B2024-PARTIAL",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true,
+    "center_id": "CENTER_005"
+  },
+  {
+    "equipment_id": "EQ006",
+    "entry_id": "ENT007",
+    "vaccine_type": "BCG",
+    "batch_number": "B2024-SAFE",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true,
+    "center_id": "CENTER_006"
+  }
+]

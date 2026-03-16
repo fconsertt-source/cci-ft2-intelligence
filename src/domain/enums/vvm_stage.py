@@ -3,13 +3,37 @@ from enum import Enum
 
 
 class VVMStage(Enum):
-    """مراحل نافذة المراقبة المرئية (VVM)"""
-
-    NONE = "NONE"  # لا تعرض حراري مهم
-    A = "A"  # 2-3 أيام فوق 8°C
-    B = "B"  # 6-8 أيام فوق 8°C
-    C = "C"  # 11-14 يوم فوق 8°C
-    D = "D"  # >14 يوم أو حرارة شديدة
+    """مراحل نافذة المراقبة المرئية (VVM) — نسخة متوافقة مع الكود الحالي."""
+    
+    NONE = 1
+    A = 2
+    B = 3
+    C = 4
+    D = 5
+    
+    @property
+    def is_usable(self) -> bool:
+        """
+        اللقاح صالح للاستخدام حتى المرحلة B (VVM2 مكافئ).
+        C و D = التخلص فوراً.
+        """
+        return self in (VVMStage.NONE, VVMStage.A, VVMStage.B)
+    
+    @property
+    def is_critical(self) -> bool:
+        """مرحلة حرجة (يجب التخلص)."""
+        return self in (VVMStage.C, VVMStage.D)
+    
+    @property
+    def label_ar(self) -> str:
+        """تسمية عربية للعرض."""
+        return {
+            VVMStage.NONE: "لا تعرض",
+            VVMStage.A: "مرحلة A",
+            VVMStage.B: "مرحلة B",
+            VVMStage.C: "مرحلة C",
+            VVMStage.D: "مرحلة D",
+        }[self]
 
     @classmethod
     def from_duration(cls, minutes: float) -> "VVMStage":

@@ -1,0 +1,76 @@
+# config/device_center_mapping.yaml
+#
+# خريطة الربط الكامل: device_id → equipment_id → center_id
+#
+# البنية الهرمية:
+#   center (مركز التطعيم)
+#     └── equipment (معدة التبريد)
+#           └── device (جهاز FT2 النشط)
+#
+# ملاحظات:
+#   - device_id يأتي من Serial في ملف FT2 (12 رقم)
+#   - equipment_id ثابت حتى عند استبدال الجهاز
+#   - center_id يطابق id في ملف تكوين المراكز
+#   - status: ACTIVE فقط هو من يُستخدم في التحليل الحالي
+#
+
+# ══════════════════════════════════════════════════════════════
+# خريطة الأجهزة → المعدات → المراكز
+# ══════════════════════════════════════════════════════════════
+device_center_map:
+
+  # ── الجهاز الحقيقي في البيانات ──────────────────────────────
+  "130600113437":
+    center_id: "TEST_CENTER_01"
+    equipment_id: "EQ-FRIDGE-01"
+    equipment_type: "REFRIGERATOR"
+    location_note: "الثلاجة الرئيسية — غرفة التخزين"
+    status: "ACTIVE"
+
+  # ── أمثلة إضافية (قابلة للتعديل) ────────────────────────────
+  "DEVICE_002":
+    center_id: "CENTER_TRIPOLI_01"
+    equipment_id: "EQ-FRIDGE-02"
+    equipment_type: "REFRIGERATOR"
+    location_note: "ثلاجة الاستقبال"
+    status: "ACTIVE"
+
+  "DEVICE_003":
+    center_id: "CENTER_TRIPOLI_01"
+    equipment_id: "EQ-COLDROOM-01"
+    equipment_type: "COLD_ROOM"
+    location_note: "غرفة التبريد المركزية"
+    status: "ACTIVE"
+
+  "DEVICE_004":
+    center_id: "CENTER_BENGHAZI_01"
+    equipment_id: "EQ-FRIDGE-03"
+    equipment_type: "REFRIGERATOR"
+    location_note: "الثلاجة الرئيسية"
+    status: "ACTIVE"
+
+# ══════════════════════════════════════════════════════════════
+# سجل المعدات (اختياري — للمرجعية)
+# ══════════════════════════════════════════════════════════════
+equipment_registry:
+
+  "EQ-FRIDGE-01":
+    center_id: "TEST_CENTER_01"
+    equipment_type: "REFRIGERATOR"
+    capacity_liters: 120.0
+    location_note: "الثلاجة الرئيسية — غرفة التخزين"
+
+  "EQ-FRIDGE-02":
+    center_id: "CENTER_TRIPOLI_01"
+    equipment_type: "REFRIGERATOR"
+    capacity_liters: 80.0
+
+  "EQ-COLDROOM-01":
+    center_id: "CENTER_TRIPOLI_01"
+    equipment_type: "COLD_ROOM"
+    capacity_liters: 2000.0
+
+  "EQ-FRIDGE-03":
+    center_id: "CENTER_BENGHAZI_01"
+    equipment_type: "REFRIGERATOR"
+    capacity_liters: 120.0
