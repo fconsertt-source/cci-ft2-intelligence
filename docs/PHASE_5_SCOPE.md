@@ -1,11 +1,11 @@
 # Phase 5 Scope — Controlled Evolution Under Architectural Guard
 
-Date: 2026-02-06  
-Tag: v0.4.0  
+Date: 2026-02-06
+Tag: v0.4.0
 Status: ✅ Phase 1 debt cleared — DTOs are 100% pure
 
 ## Executive Principle
-Phase 5 is NOT feature development.  
+Phase 5 is NOT feature development.
 Phase 5 is **Controlled Evolution** — every change MUST prove it preserves architectural integrity.
 
 ## Precondition Checklist (ALL must be ✅)
@@ -66,6 +66,6 @@ Presentation → Use Case → Port (`IReporter`) → Adapter (`PdfReportGenerato
 No feature may skip any link in this chain.
 
 ## Warning
-Phase 5 is a privilege — not a right.  
-It exists ONLY because Phase 4 proved the reference is hardened.  
+Phase 5 is a privilege — not a right.
+It exists ONLY because Phase 4 proved the reference is hardened.
 Any drift will trigger immediate rollback to Phase 4 state.

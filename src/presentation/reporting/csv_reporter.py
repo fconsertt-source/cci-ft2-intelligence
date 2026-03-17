@@ -99,7 +99,7 @@ def generate_centers_report(centers: List[CenterDTO], output_path: str):
                     ]
                 )
 
-        logger.info(f"✅ تم إنشاء تقرير المراكز: {output_path}")
+        logger.info("✅ تم إنشاء تقرير المراكز: %s", output_path)
 
     except Exception as e:
-        logger.error(f"❌ خطأ في إنشاء تقرير المراكز: {e}")
+        logger.error("❌ خطأ في إنشاء تقرير المراكز: %s", e)

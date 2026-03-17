@@ -1,5 +1,3 @@
-
-
 from src.presentation.cli import gui_main
 from src.presentation.messages.message_map import MessageMap
 

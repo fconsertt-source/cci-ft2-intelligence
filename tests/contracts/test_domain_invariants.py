@@ -2,8 +2,8 @@
 اختبارات ثوابت المجال — تضمن عدم كسر القواعد الأساسية
 """
 
-
-from src.domain.entities.vaccination_center import FreezeTolerance, VaccinationCenter
+from src.domain.entities.vaccination_center import (FreezeTolerance,
+                                                    VaccinationCenter)
 
 
 # helper dummy to mimic minimal interface expected by VaccinationCenter

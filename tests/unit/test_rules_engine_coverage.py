@@ -3,14 +3,9 @@
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
-
-from src.domain.services.rules_engine import (
-    ExpiryRule,
-    FreezeRule,
-    HeatCriticalRule,
-    TemperatureWarningRule,
-    ThawRule,
-)
+from src.domain.services.rules_engine import (ExpiryRule, FreezeRule,
+                                              HeatCriticalRule,
+                                              TemperatureWarningRule, ThawRule)
 
 
 def make_center(**kwargs):

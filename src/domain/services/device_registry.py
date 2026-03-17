@@ -128,9 +128,7 @@ class DeviceRegistry:
         self._devices[device_id] = record
         self._save_devices()
 
-        logger.info(
-            "تم تسجيل جهاز جديد: %s (معدة: %s)", device_id, equipment_id
-        )
+        logger.info("تم تسجيل جهاز جديد: %s (معدة: %s)", device_id, equipment_id)
         return record
 
     def replace_device(
@@ -177,15 +175,12 @@ class DeviceRegistry:
         old_record = self._devices[old_device_id]
         if old_record.status != DeviceStatus.ACTIVE:
             raise ValueError(
-                f"الجهاز {old_device_id} غير نشط "
-                f"(حالته: {old_record.status.value})"
+                f"الجهاز {old_device_id} غير نشط " f"(حالته: {old_record.status.value})"
             )
 
         # التحقق من عدم تسجيل الجهاز الجديد مسبقاً
         if new_device_id in self._devices:
-            raise ValueError(
-                f"الجهاز الجديد {new_device_id} مسجل مسبقاً"
-            )
+            raise ValueError(f"الجهاز الجديد {new_device_id} مسجل مسبقاً")
 
         equipment_id = old_record.equipment_id
 
@@ -248,8 +243,7 @@ class DeviceRegistry:
         record = self._devices[device_id]
         if record.status != DeviceStatus.ACTIVE:
             raise ValueError(
-                f"الجهاز {device_id} ليس نشطاً "
-                f"(حالته: {record.status.value})"
+                f"الجهاز {device_id} ليس نشطاً " f"(حالته: {record.status.value})"
             )
 
         record.status = DeviceStatus.RETIRED
@@ -303,10 +297,7 @@ class DeviceRegistry:
             return []
 
         # إذا لا توجد links → ترتيب بسيط بـ registered_at
-        eq_links = [
-            lnk for lnk in self._links
-            if lnk.equipment_id == equipment_id
-        ]
+        eq_links = [lnk for lnk in self._links if lnk.equipment_id == equipment_id]
 
         if not eq_links:
             return sorted(eq_devices.values(), key=lambda r: r.registered_at)
@@ -314,8 +305,7 @@ class DeviceRegistry:
         # تحديد الجهاز الأول: لا يظهر كـ new_device في أي link
         new_device_ids = {lnk.new_device_id for lnk in eq_links}
         first_devices = [
-            dev_id for dev_id in eq_devices
-            if dev_id not in new_device_ids
+            dev_id for dev_id in eq_devices if dev_id not in new_device_ids
         ]
 
         if not first_devices:
@@ -340,10 +330,7 @@ class DeviceRegistry:
 
     def get_links_for_equipment(self, equipment_id: str) -> List[DeviceLink]:
         """جلب جميع سجلات الاستبدال لمعدة معينة مرتبة زمنياً."""
-        links = [
-            lnk for lnk in self._links
-            if lnk.equipment_id == equipment_id
-        ]
+        links = [lnk for lnk in self._links if lnk.equipment_id == equipment_id]
         return sorted(links, key=lambda lnk: lnk.handover_date)
 
     def is_cold_chain_intact(self, equipment_id: str) -> bool:
@@ -355,17 +342,12 @@ class DeviceRegistry:
         links = self.get_links_for_equipment(equipment_id)
         return all(lnk.cold_chain_intact for lnk in links)
 
-    def get_all_device_ids_for_equipment(
-        self, equipment_id: str
-    ) -> List[str]:
+    def get_all_device_ids_for_equipment(self, equipment_id: str) -> List[str]:
         """
         جلب جميع معرفات الأجهزة (قديمة وجديدة) لمعدة معينة.
         يُستخدم لجلب السجل التاريخي الكامل من ft2_data.json.
         """
-        return [
-            r.device_id
-            for r in self.get_device_chain(equipment_id)
-        ]
+        return [r.device_id for r in self.get_device_chain(equipment_id)]
 
     # ──────────────────────────────────────────────────────────
     # التخزين
@@ -377,10 +359,7 @@ class DeviceRegistry:
         try:
             with open(self._devices_path, encoding="utf-8") as f:
                 data = json.load(f)
-            return {
-                item["device_id"]: DeviceRecord.from_dict(item)
-                for item in data
-            }
+            return {item["device_id"]: DeviceRecord.from_dict(item) for item in data}
         except Exception as e:
             logger.error("فشل تحميل devices.json: %s", e)
             return {}

@@ -3,7 +3,8 @@ import threading
 import pytest
 
 from src.domain.enums.ledger_event import LedgerEvent
-from src.infrastructure.adapters.ledger_writer_adapter import HashChainedLedgerWriter
+from src.infrastructure.adapters.ledger_writer_adapter import \
+    HashChainedLedgerWriter
 
 
 @pytest.fixture

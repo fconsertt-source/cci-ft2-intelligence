@@ -101,7 +101,7 @@
 
 ### ٧.١ Weekly Epidemiological Records (WER 1986-2017)
 - **HER Calculation Logic**: مستوحى من WER No. 39, 2017 (Section X.X)
-- **CCM Calculation Logic**: مستوحى من WER No. 19, 2014 (Section Y.Y)  
+- **CCM Calculation Logic**: مستوحى من WER No. 19, 2014 (Section Y.Y)
 - **VVM Stage Definitions**: مستوحى من WER No. 50, 2012 (Section Z.Z)
 
 ### ٧.٢ WHO Technical Standards (WHO_IVB Series)
@@ -110,14 +110,14 @@
 
 ## 🏛️ الختم
 
-هذا المشروع هو **حارس رقمي لحياة بشرية**.  
+هذا المشروع هو **حارس رقمي لحياة بشرية**.
 كل سطر كود فيه مسؤولية أخلاقية — وليس مجرد وظيفة تقنية.
 
 > "السطر الأول من `simple_pipeline.py` كُتب ليكون شاهدًا صامتًا، صارمًا، لا يتعاطف مع الظروف، ولا يفاوض على الفيزياء."
 
-هذا هو دستورنا.  
-احفظه.  
-احترمه.  
+هذا هو دستورنا.
+احفظه.
+احترمه.
 ودافع عنه.
 
 ---

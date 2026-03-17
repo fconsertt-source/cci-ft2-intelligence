@@ -3,7 +3,8 @@
 import pytest
 
 from src.domain.evidence.verification_result import VerificationStatus
-from src.infrastructure.security.text_signature_verifier import TextSignatureVerifier
+from src.infrastructure.security.text_signature_verifier import \
+    TextSignatureVerifier
 
 
 class DummyKeyRecord:
@@ -39,7 +40,8 @@ def test_signature_missing(verifier):
     raw = b"Device: X\nTemp: 5.0\n"
     result = verifier.verify(raw)
     assert result.status == VerificationStatus.SIGNATURE_MISSING
-    
+
+
 @pytest.fixture
 def sample_public_key_pem():
     """Minimal RSA public key for testing."""

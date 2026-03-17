@@ -1,12 +1,11 @@
 """Unit tests for the new PDFGenerator stub (Phase 1).
 """
 
-
 import pytest
 
-from src.utils.time import utc_now_iso
 from src.domain.dtos.device_report_dto import DeviceReportDTO
 from src.infrastructure.adapters.reporting.new_pdf_engine import PDFGenerator
+from src.utils.time import utc_now_iso
 
 # determine if reportlab is installed so tests can be skipped gracefully
 try:
@@ -60,5 +59,3 @@ def test_generate_contains_page():
     # when reportlab present expect more than minimal size
     if len(pdf) > 200:
         assert b"/Type /Page" in pdf
-
-

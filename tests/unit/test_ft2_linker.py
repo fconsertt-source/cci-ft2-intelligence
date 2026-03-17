@@ -4,10 +4,10 @@ from datetime import datetime
 import pytest
 
 from src.domain.entities.vaccination_center import VaccinationCenter
-from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import (
-    FT2Reading as FT2Entry,
-)
-from src.infrastructure.adapters.ft2_reader.services.ft2_linker import FT2Linker
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import \
+    FT2Reading as FT2Entry
+from src.infrastructure.adapters.ft2_reader.services.ft2_linker import \
+    FT2Linker
 
 # Fixtures for test data
 

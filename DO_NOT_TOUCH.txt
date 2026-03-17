@@ -1,0 +1,10 @@
+src/domain/calculators/q10_her_calculator.py
+src/domain/calculators/time_weighted_ccm_calculator.py
+src/domain/calculators/her_calculator.py
+src/domain/calculators/ccm_calculator.py
+src/domain/services/exposure_analysis_service.py
+src/domain/services/her_calculator_service.py
+src/domain/value_objects/temperature_reading.py
+src/domain/value_objects/her_result.py
+src/domain/value_objects/ccm_result.py
+src/domain/value_objects/exposure_result.py

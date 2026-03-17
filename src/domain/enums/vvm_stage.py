@@ -4,13 +4,13 @@ from enum import Enum
 
 class VVMStage(Enum):
     """مراحل نافذة المراقبة المرئية (VVM) — نسخة متوافقة مع الكود الحالي."""
-    
+
     NONE = 1
     A = 2
     B = 3
     C = 4
     D = 5
-    
+
     @property
     def is_usable(self) -> bool:
         """
@@ -18,12 +18,12 @@ class VVMStage(Enum):
         C و D = التخلص فوراً.
         """
         return self in (VVMStage.NONE, VVMStage.A, VVMStage.B)
-    
+
     @property
     def is_critical(self) -> bool:
         """مرحلة حرجة (يجب التخلص)."""
         return self in (VVMStage.C, VVMStage.D)
-    
+
     @property
     def label_ar(self) -> str:
         """تسمية عربية للعرض."""

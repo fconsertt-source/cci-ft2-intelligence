@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta
 
-
-from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import (
-    FT2Reading as FT2Entry,
-)
-from src.infrastructure.adapters.ft2_reader.validator.ft2_validator import FT2Validator
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import \
+    FT2Reading as FT2Entry
+from src.infrastructure.adapters.ft2_reader.validator.ft2_validator import \
+    FT2Validator
 
 
 class TestFT2Validator:

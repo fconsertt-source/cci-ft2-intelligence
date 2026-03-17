@@ -3,7 +3,6 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import Mock
 
-
 from src.application.ports.ft2_reader_port import Ft2ReaderPort
 from src.application.ports.ft2_writer_port import Ft2WriterPort
 from src.application.ports.logger_port import LoggerPort

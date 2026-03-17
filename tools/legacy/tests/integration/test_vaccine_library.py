@@ -1,5 +1,7 @@
 import pytest
+
 from src.utils.vaccine_library_loader import VaccineLibrary
+
 
 @pytest.fixture
 def library():

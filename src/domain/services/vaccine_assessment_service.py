@@ -21,14 +21,12 @@ from typing import List, Optional
 
 from src.domain.entities.equipment_vaccine import EquipmentVaccine
 from src.domain.enums.vaccine_decision import DecisionReason, VaccineDecision
-from src.domain.services.exposure_analysis_service import ExposureAnalysisService
-from src.domain.value_objects.vaccine_assessment_result import VaccineAssessmentResult
+from src.domain.services.exposure_analysis_service import \
+    ExposureAnalysisService
+from src.domain.value_objects.vaccine_assessment_result import \
+    VaccineAssessmentResult
 from src.domain.value_objects.vaccine_specification import (
-    HER_PARTIAL_MAX,
-    HER_SAFE_MAX,
-    get_vaccine_spec,
-    VaccineSpecification,
-)
+    HER_PARTIAL_MAX, HER_SAFE_MAX, VaccineSpecification, get_vaccine_spec)
 
 logger = logging.getLogger(__name__)
 
@@ -94,8 +92,7 @@ class VaccineAssessmentService:
                     her_ratio=0.0,
                     ccm_index="N/A",
                     detail=(
-                        f"VVM وصل {vaccine.vvm_stage.label_ar} — "
-                        "تجاوز نقطة الإلغاء"
+                        f"VVM وصل {vaccine.vvm_stage.label_ar} — " "تجاوز نقطة الإلغاء"
                     ),
                 )
 

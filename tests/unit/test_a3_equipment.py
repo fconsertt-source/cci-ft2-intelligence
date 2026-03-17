@@ -9,13 +9,11 @@
 """
 from __future__ import annotations
 
-
 import pytest
 import yaml
 
-from src.domain.entities.equipment_record import EquipmentRecord, EquipmentType
 from src.application.services.device_center_mapper import DeviceCenterMapper
-
+from src.domain.entities.equipment_record import EquipmentRecord, EquipmentType
 
 # ══════════════════════════════════════════════════════════════
 # Fixtures
@@ -76,6 +74,7 @@ def mapper(mapping_file) -> DeviceCenterMapper:
 # ══════════════════════════════════════════════════════════════
 # 1. اختبارات EquipmentRecord
 # ══════════════════════════════════════════════════════════════
+
 
 class TestEquipmentRecord:
 
@@ -153,6 +152,7 @@ class TestEquipmentRecord:
 # 2. اختبارات DeviceCenterMapper المحدَّث
 # ══════════════════════════════════════════════════════════════
 
+
 class TestDeviceCenterMapper:
 
     # ── التحميل ───────────────────────────────────────────────
@@ -163,9 +163,7 @@ class TestDeviceCenterMapper:
 
     def test_missing_file_no_crash(self, tmp_path):
         """ملف غير موجود → لا crash، mapper فارغ."""
-        mapper = DeviceCenterMapper(
-            mapping_file=str(tmp_path / "nonexistent.yaml")
-        )
+        mapper = DeviceCenterMapper(mapping_file=str(tmp_path / "nonexistent.yaml"))
         assert mapper.get_center_context("ANY") is None
 
     # ── get_center_context (توافق رجعي) ───────────────────────

@@ -1,13 +1,9 @@
 """Ensure PDF strategies successfully produce byte output."""
 
-from src.utils.time import utc_now_iso
-
 from src.domain.dtos.device_report_dto import DeviceReportDTO
 from src.infrastructure.adapters.reporting.pdf_strategy import (
-    ArabicPDFStrategy,
-    OfficialPDFStrategy,
-    TechnicalPDFStrategy,
-)
+    ArabicPDFStrategy, OfficialPDFStrategy, TechnicalPDFStrategy)
+from src.utils.time import utc_now_iso
 
 
 def make_dto():
@@ -29,5 +25,3 @@ def test_strategies_generate():
         pdf = strat.generate(dto, language="ar")
         assert isinstance(pdf, (bytes, bytearray))
         assert pdf.startswith(b"%PDF")
-
-

@@ -2,7 +2,8 @@
 """Verify AppComposer health check and new use case builders."""
 
 from src.application.app_composer import AppComposer
-from src.application.use_cases.import_ft2_bundle_uc import ImportFT2BundleUseCase
+from src.application.use_cases.import_ft2_bundle_uc import \
+    ImportFT2BundleUseCase
 
 
 def test_health_check_passes():

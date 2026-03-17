@@ -17,15 +17,16 @@ import pytest
 
 from src.domain.calculators.q10_her_calculator import Q10HerCalculator
 from src.domain.entities.temperature_reading import TemperatureReading
-from src.domain.services.exposure_analysis_service import ExposureAnalysisService
+from src.domain.services.exposure_analysis_service import \
+    ExposureAnalysisService
 from src.domain.value_objects.temperature_entry import TemperatureEntry
 from src.domain.value_objects.vaccine_specification import VaccineSpecification
 from src.infrastructure.mappers.temperature_mapper import TemperatureMapper
 
-
 # ---------------------------------------------------------------------------
 # fixtures
 # ---------------------------------------------------------------------------
+
 
 def make_spec(freeze_sensitive: bool = True) -> VaccineSpecification:
     return VaccineSpecification(
@@ -60,6 +61,7 @@ def make_entries(
 # TemperatureMapper
 # ---------------------------------------------------------------------------
 
+
 class TestTemperatureMapper:
 
     def test_entries_to_readings_preserves_values(self):
@@ -74,7 +76,11 @@ class TestTemperatureMapper:
         t0 = datetime(2025, 1, 1)
         entries = [
             TemperatureEntry(temperature=6.0, timestamp=t0, duration_minutes=5.0),
-            TemperatureEntry(temperature=7.0, timestamp=t0 + timedelta(minutes=5), duration_minutes=5.0),
+            TemperatureEntry(
+                temperature=7.0,
+                timestamp=t0 + timedelta(minutes=5),
+                duration_minutes=5.0,
+            ),
         ]
         readings = TemperatureMapper.entries_to_readings(entries)
         assert readings[0].recorded_at == t0
@@ -82,8 +88,12 @@ class TestTemperatureMapper:
 
     def test_device_id_mapped_to_vaccine_id(self):
         entries = [
-            TemperatureEntry(temperature=5.0, timestamp=datetime(2025, 1, 1),
-                           duration_minutes=5.0, device_id="FT2-007")
+            TemperatureEntry(
+                temperature=5.0,
+                timestamp=datetime(2025, 1, 1),
+                duration_minutes=5.0,
+                device_id="FT2-007",
+            )
         ]
         readings = TemperatureMapper.entries_to_readings(entries)
         assert readings[0].vaccine_id == "FT2-007"
@@ -95,6 +105,7 @@ class TestTemperatureMapper:
 # ---------------------------------------------------------------------------
 # ExposureAnalysisService
 # ---------------------------------------------------------------------------
+
 
 class TestExposureAnalysisService:
 
@@ -153,6 +164,7 @@ class TestExposureAnalysisService:
 # Q10HerCalculator — midpoint + max_gap
 # ---------------------------------------------------------------------------
 
+
 class TestQ10HerCalculatorMidpoint:
 
     def test_midpoint_used_not_current_temp(self):
@@ -161,7 +173,9 @@ class TestQ10HerCalculatorMidpoint:
         midpoint = 10°C، factor = 2^((10-5)/10) = 2^0.5 ≈ 1.414
         her_hours ≈ 1.414
         """
-        calc = Q10HerCalculator(q10_value=2.0, reference_temp=5.0, shelf_life_hours=100.0)
+        calc = Q10HerCalculator(
+            q10_value=2.0, reference_temp=5.0, shelf_life_hours=100.0
+        )
         t0 = datetime(2025, 1, 1)
         readings = [
             TemperatureReading("V", 5.0, t0),
@@ -169,6 +183,7 @@ class TestQ10HerCalculatorMidpoint:
         ]
         result = calc.calculate(readings)
         import math
+
         expected = math.pow(2.0, (10.0 - 5.0) / 10.0) * 1.0  # midpoint=10, Δt=1h
         assert abs(result.cumulative_degradation_hours - expected) < 1e-6
 
@@ -199,7 +214,10 @@ class TestQ10HerCalculatorMidpoint:
         r_unclamped = calc_unclamped.calculate(readings)
 
         # النسخة المقيَّدة يجب أن تكون أصغر بكثير
-        assert r_clamped.cumulative_degradation_hours < r_unclamped.cumulative_degradation_hours
+        assert (
+            r_clamped.cumulative_degradation_hours
+            < r_unclamped.cumulative_degradation_hours
+        )
 
     def test_no_gap_no_flag(self):
         """قراءات منتظمة كل 5 دقائق لا تُسجَّل فجوة."""
@@ -235,6 +253,7 @@ class TestQ10HerCalculatorMidpoint:
 # تكامل كامل: Entries → Mapper → Service → her_ratio
 # ---------------------------------------------------------------------------
 
+
 class TestFullHERFlow:
 
     def test_entries_flow_produces_nonzero_her(self):
@@ -260,10 +279,16 @@ class TestFullHERFlow:
             TemperatureReading("V", 12.0, t0 + timedelta(hours=1)),
         ]
 
-        svc = ExposureAnalysisService(q10_value=2.0, reference_temp=5.0, shelf_life_hours=48.0)
-        calc = Q10HerCalculator(q10_value=2.0, reference_temp=5.0, shelf_life_hours=48.0)
+        svc = ExposureAnalysisService(
+            q10_value=2.0, reference_temp=5.0, shelf_life_hours=48.0
+        )
+        calc = Q10HerCalculator(
+            q10_value=2.0, reference_temp=5.0, shelf_life_hours=48.0
+        )
 
         service_result = svc.analyze(readings)
         calc_result = calc.calculate(readings)
 
-        assert service_result["her_ratio"] == pytest.approx(calc_result.her_ratio, rel=1e-9)
+        assert service_result["her_ratio"] == pytest.approx(
+            calc_result.her_ratio, rel=1e-9
+        )

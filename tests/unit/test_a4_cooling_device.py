@@ -15,15 +15,14 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-
 from src.domain.entities.cooling_device import CoolingDevice
 from src.domain.enums.vvm_stage import VVMStage
 from src.domain.value_objects.vaccine_specification import get_vaccine_spec
 
-
 # ══════════════════════════════════════════════════════════════
 # Fixtures
 # ══════════════════════════════════════════════════════════════
+
 
 def make_reading(temp: float, duration_minutes: float = 1440.0):
     """قراءة حرارية مبسطة للاختبار."""
@@ -46,6 +45,7 @@ def make_device(vaccine_type: str = "GENERAL") -> CoolingDevice:
 # 1. بيانات فارغة
 # ══════════════════════════════════════════════════════════════
 
+
 class TestEmptyReadings:
 
     def test_no_readings_returns_no_data(self):
@@ -65,6 +65,7 @@ class TestEmptyReadings:
 # ══════════════════════════════════════════════════════════════
 # 2. قراءات طبيعية → SAFE
 # ══════════════════════════════════════════════════════════════
+
 
 class TestSafeReadings:
 
@@ -97,6 +98,7 @@ class TestSafeReadings:
 # ══════════════════════════════════════════════════════════════
 # 3. HER ratio → PARTIAL / DISCARD
 # ══════════════════════════════════════════════════════════════
+
 
 class TestHerBasedDecision:
 
@@ -138,7 +140,7 @@ class TestHerBasedDecision:
 
         assert result.status == "DISCARD"
         assert result.circuit_breaker is None  # لا circuit_breaker
-        assert result.her > 1.5               # DISCARD عبر HER فقط
+        assert result.her > 1.5  # DISCARD عبر HER فقط
 
     def test_moderate_exposure_partial(self):
         """
@@ -194,6 +196,7 @@ class TestHerBasedDecision:
 # 4. Circuit Breakers
 # ══════════════════════════════════════════════════════════════
 
+
 class TestCircuitBreakers:
 
     def test_freeze_sensitive_vaccine_discarded_on_freeze(self):
@@ -217,7 +220,9 @@ class TestCircuitBreakers:
         result = device.evaluate_safety(readings, spec=spec)
 
         assert result.circuit_breaker is None
-        assert result.status != "DISCARD" or result.circuit_breaker != "FREEZE_EXCURSION"
+        assert (
+            result.status != "DISCARD" or result.circuit_breaker != "FREEZE_EXCURSION"
+        )
 
     def test_critical_heat_discarded(self):
         """35°C لمدة 3 ساعات → DISCARD فوري."""
@@ -240,12 +245,16 @@ class TestCircuitBreakers:
         device = make_device("HEPB")
         readings = [make_reading(-1.0, 60.0)]
         result = device.evaluate_safety(readings, spec=spec)
-        assert "تجمد" in result.decision_reason or "freeze" in result.decision_reason.lower()
+        assert (
+            "تجمد" in result.decision_reason
+            or "freeze" in result.decision_reason.lower()
+        )
 
 
 # ══════════════════════════════════════════════════════════════
 # 5. CCM Index D
 # ══════════════════════════════════════════════════════════════
+
 
 class TestCCMIndex:
 
@@ -276,6 +285,7 @@ class TestCCMIndex:
 # ══════════════════════════════════════════════════════════════
 # 6. التكامل مع VaccineSpecification
 # ══════════════════════════════════════════════════════════════
+
 
 class TestVaccineSpecIntegration:
 
@@ -310,6 +320,7 @@ class TestVaccineSpecIntegration:
 # ══════════════════════════════════════════════════════════════
 # 7. التحقق من عدم استخدام المعادلة القديمة
 # ══════════════════════════════════════════════════════════════
+
 
 class TestOldFormulaNotUsed:
 

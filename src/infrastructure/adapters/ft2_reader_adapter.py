@@ -1,4 +1,5 @@
 from typing import List
+
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
 
 
@@ -19,6 +20,7 @@ class FT2ReaderAdapter:
     def read_all(self) -> List:
         # Parse all files in input_dir using FT2Parser
         import os
+
         entries = []
         if not os.path.exists(self.input_dir):
             return entries

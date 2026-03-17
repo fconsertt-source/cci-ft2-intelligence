@@ -21,34 +21,35 @@ SRC_DIR = os.path.join(ROOT, 'src')
 
 ALLOWED_ITEMS = {
     'domain',
-    'application', 
+    'application',
     'infrastructure',
     'presentation',
     'shared',
     '__init__.py',
-    '__pycache__'
+    '__pycache__',
 }
+
 
 def main():
     if not os.path.exists(SRC_DIR):
         print(f"ERROR: {SRC_DIR} does not exist")
         sys.exit(1)
-    
+
     violations = []
     items = os.listdir(SRC_DIR)
-    
+
     for item in items:
         if item not in ALLOWED_ITEMS:
             path = os.path.join(SRC_DIR, item)
             violations.append(path)
-    
+
     if violations:
         print("❌ ERROR: Found forbidden items in src/ root:")
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         for v in violations:
             rel = os.path.relpath(v, ROOT)
             print(f"   ⚠️  {rel}")
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("\n✅ ALLOWED structure:")
         print("   src/")
         print("     domain/")
@@ -58,8 +59,9 @@ def main():
         print("     shared/")
         print("\n📖 See: ADR-0009 (Presentation Boundary Lock)")
         sys.exit(1)
-    
+
     print("✅ OK: src/ root is clean (4 layers + shared only)")
+
 
 if __name__ == '__main__':
     main()

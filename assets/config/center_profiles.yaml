@@ -8,7 +8,7 @@
   decision_thresholds:
     freeze_tolerance: 0
     ccm_limit: 600
-  
+
 - id: "CLINIC_02"
   name: "عيادة الحي الشمالي"
   device_ids: ["130600112767", "130600112768"]
@@ -18,7 +18,7 @@
   decision_thresholds:
     freeze_tolerance: 0
     ccm_limit: 300
-  
+
 - id: "MOBILE_03"
   name: "وحدة التطعيم المتنقلة"
   device_ids: ["130600112769"]

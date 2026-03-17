@@ -15,12 +15,11 @@ import re
 from pathlib import Path
 from typing import List, Optional
 
-
 # ── ثوابت الجهاز (من ملف البيانات) ─────────────────────────────────────────
-FREEZE_ALARM_THRESHOLD = -0.5   # °C — حد إنذار التجميد
-HEAT_ALARM_THRESHOLD = 8.0      # °C — حد إنذار الحرارة
+FREEZE_ALARM_THRESHOLD = -0.5  # °C — حد إنذار التجميد
+HEAT_ALARM_THRESHOLD = 8.0  # °C — حد إنذار الحرارة
 FREEZE_ALARM_DURATION_MIN = 60  # دقيقة — مدة تفعيل إنذار التجميد
-HEAT_ALARM_DURATION_MIN = 600   # دقيقة — مدة تفعيل إنذار الحرارة
+HEAT_ALARM_DURATION_MIN = 600  # دقيقة — مدة تفعيل إنذار الحرارة
 
 
 def parse_temp(value: str) -> Optional[float]:
@@ -194,9 +193,15 @@ def extract_and_convert(input_path: Path, output_path: Path) -> int:
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     fieldnames = [
-        "device_id", "date", "avg_temp", "min_temp", "max_temp",
-        "alarm_freeze_minutes", "alarm_heat_minutes",
-        "has_freeze_alarm", "has_heat_alarm",
+        "device_id",
+        "date",
+        "avg_temp",
+        "min_temp",
+        "max_temp",
+        "alarm_freeze_minutes",
+        "alarm_heat_minutes",
+        "has_freeze_alarm",
+        "has_heat_alarm",
     ]
 
     with open(output_path, "w", newline="", encoding="utf-8") as f:

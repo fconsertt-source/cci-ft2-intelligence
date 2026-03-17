@@ -70,7 +70,11 @@ class RegulatoryDecisionService:
                 return "DISCARD"
 
         # اللقاح غير حساس ولا يملك freeze_range معرّف — تجميد غير متوقع
-        if not spec.freeze_sensitive and spec.freeze_range is None and temperature <= 0.0:
+        if (
+            not spec.freeze_sensitive
+            and spec.freeze_range is None
+            and temperature <= 0.0
+        ):
             return "DISCARD"
 
         # ── 3. تجاوز الحد الأقصى المطلق (max_heat_temp) ─────────────────────

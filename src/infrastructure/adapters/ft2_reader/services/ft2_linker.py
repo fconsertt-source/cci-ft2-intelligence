@@ -21,7 +21,7 @@ class FT2Linker:
         count = 0
         for _ in generator:
             count += 1
-        logger.debug(f"تمت معالجة {count} إدخال عبر خدمة الربط")
+        logger.debug("تمت معالجة %d إدخال عبر خدمة الربط", count)
 
     @staticmethod
     def link_generator(entries_generator, centers: List["VaccinationCenter"]):
@@ -44,4 +44,4 @@ class FT2Linker:
                 skipped_count += 1
                 yield entry, None
 
-        logger.info(f"تم ربط {linked_count} إدخال، تم تخطي {skipped_count}")
+        logger.info("تم ربط %d إدخال، تم تخطي %d", linked_count, skipped_count)

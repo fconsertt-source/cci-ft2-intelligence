@@ -3,6 +3,7 @@
 DeviceStatus — حالة جهاز المراقبة الحرارية
 """
 from __future__ import annotations
+
 from enum import Enum
 
 
@@ -14,6 +15,7 @@ class DeviceStatus(Enum):
     RETIRED   → انتهت صلاحيته أو توقف — لا يقبل بيانات جديدة
     REPLACED  → تم استبداله بجهاز جديد — السجل التاريخي محفوظ
     """
+
     ACTIVE = "ACTIVE"
     RETIRED = "RETIRED"
     REPLACED = "REPLACED"

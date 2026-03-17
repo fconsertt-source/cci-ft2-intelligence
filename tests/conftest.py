@@ -1,38 +1,31 @@
 # tests/conftest.py
 
 import json
+from datetime import date, datetime
 from pathlib import Path
-from datetime import datetime, date
 
 import pytest
 
-from src.application.use_cases.generate_device_report_uc import (
-    GenerateDeviceReportUseCase,
-)
-
-from src.domain.services.regulatory_decision_service import RegulatoryDecisionService
-from src.domain.services.thermal_degradation_estimator import (
-    ThermalDegradationEstimator,
-)
-
-from src.infrastructure.adapters.json_device_repository import JsonDeviceRepository
-from src.infrastructure.adapters.json_vaccine_spec_repository import (
-    JsonVaccineSpecRepository,
-)
-
-from src.infrastructure.adapters.validation_protocol_service import (
-    ValidationProtocolService,
-)
-
+from src.application.services.vaccines_report_generator import \
+    VaccinesReportGenerator
+from src.application.use_cases.generate_device_report_uc import \
+    GenerateDeviceReportUseCase
 # B4 imports
 from src.domain.entities.equipment_vaccine import EquipmentVaccine
-from src.domain.enums.vvm_stage import VVMStage
 from src.domain.entities.temperature_reading import TemperatureReading
-from src.domain.services.vaccine_assessment_service import VaccineAssessmentService
-
-from src.application.services.vaccines_report_generator import (
-    VaccinesReportGenerator,
-)
+from src.domain.enums.vvm_stage import VVMStage
+from src.domain.services.regulatory_decision_service import \
+    RegulatoryDecisionService
+from src.domain.services.thermal_degradation_estimator import \
+    ThermalDegradationEstimator
+from src.domain.services.vaccine_assessment_service import \
+    VaccineAssessmentService
+from src.infrastructure.adapters.json_device_repository import \
+    JsonDeviceRepository
+from src.infrastructure.adapters.json_vaccine_spec_repository import \
+    JsonVaccineSpecRepository
+from src.infrastructure.adapters.validation_protocol_service import \
+    ValidationProtocolService
 
 # ------------------------------------------------------------------
 # Test Double
@@ -171,9 +164,7 @@ def equipment_vaccines(test_data_dir):
             entry_id=item["entry_id"],
             vaccine_type=item["vaccine_type"],
             batch_number=item["batch_number"],
-            expiry_date=datetime.strptime(
-                item["expiry_date"], "%Y-%m-%d"
-            ).date(),
+            expiry_date=datetime.strptime(item["expiry_date"], "%Y-%m-%d").date(),
             vvm_stage=vvm_stage,
             has_vvm=item.get("has_vvm", False),
         )
@@ -223,14 +214,14 @@ def freezer_temperature_readings():
 def high_her_temperature_readings():
     """قراءات حرارية تؤدي إلى HER = 0.092855 (محسوب بدقة)."""
     base_time = datetime(2024, 6, 1, 10, 0)
-    
+
     return {
         "EQ003": [
             TemperatureReading(
-                vaccine_id="test", 
-                value=33.0, 
-                recorded_at=base_time, 
-                duration_hours=72.0
+                vaccine_id="test",
+                value=33.0,
+                recorded_at=base_time,
+                duration_hours=72.0,
             ),
         ],
     }
@@ -240,17 +231,18 @@ def high_her_temperature_readings():
 def partial_temperature_readings():
     """قراءات حرارية تؤدي إلى HER = 0.035556 (محسوب بدقة)."""
     base_time = datetime(2024, 6, 1, 10, 0)
-    
+
     return {
         "EQ005": [
             TemperatureReading(
-                vaccine_id="test", 
-                value=25.0, 
-                recorded_at=base_time, 
-                duration_hours=48.0
+                vaccine_id="test",
+                value=25.0,
+                recorded_at=base_time,
+                duration_hours=48.0,
             ),
         ],
     }
+
 
 @pytest.fixture
 def excursion_use_case(tmp_path, excursion_json_data):
@@ -270,8 +262,8 @@ def excursion_use_case(tmp_path, excursion_json_data):
         validator=ValidationProtocolService(),
         license_guard=DummyLicenseGuard(),
     )
-    
-    
+
+
 # ------------------------------------------------------------------
 # Services
 # ------------------------------------------------------------------

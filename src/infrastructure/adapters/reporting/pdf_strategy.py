@@ -8,9 +8,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional
 
 # Import the single, unified generator factory
-from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import (
-    get_pdf_generator,
-)
+from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import \
+    get_pdf_generator
 
 if TYPE_CHECKING:
     from src.domain.dtos.device_report_dto import DeviceReportDTO
@@ -97,8 +96,7 @@ class ArabicPDFStrategy(PDFReportStrategy):
         the factory; the underlying singleton means that only the first call
         can influence the instance created.
         """
-        from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import (
-            get_pdf_generator,
-        )
+        from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import \
+            get_pdf_generator
 
         return get_pdf_generator(language=language)

@@ -25,12 +25,13 @@ try:
 except ImportError as e:
     LANG_AVAILABLE = False
     lang = None
-    logger.error(f"فشل استيراد LanguageManager: {e}")
+    logger.error("فشل استيراد LanguageManager: %s", e)
 
 
 # استيراد Repository
 try:
-    from src.infrastructure.repositories.device_repository import DeviceDataRepository
+    from src.infrastructure.repositories.device_repository import \
+        DeviceDataRepository
 
     REPO_AVAILABLE = True
 except ImportError:
@@ -106,14 +107,14 @@ class GuardianGUI:
             lang.set_language(self.current_lang)
             logger.info("تم تحميل الترجمة العربية بنجاح")
         except Exception as e:
-            logger.warning(f"فشل تحميل العربية: {e}")
+            logger.warning("فشل تحميل العربية: %s", e)
             try:
                 lang.load_language("en", translations_dir=locales_dir)
                 self.current_lang = "en"
                 lang.set_language(self.current_lang)
                 logger.info("تم تحميل الترجمة الإنجليزية كبديل")
             except Exception as e2:
-                logger.error(f"فشل تحميل أي لغة: {e2}")
+                logger.error("فشل تحميل أي لغة: %s", e2)
 
     def _get_text(self, key: str, **kwargs) -> str:
         """الحصول على نص مترجم مع fallback آمن."""
@@ -172,7 +173,7 @@ class GuardianGUI:
 
             lang.set_language(lang_code)
             self.current_lang = lang_code
-            logger.info(f"تم تبديل اللغة إلى: {lang_code}")
+            logger.info("تم تبديل اللغة إلى: %s", lang_code)
             # إعادة تشغيل الواجهة باللغة الجديدة
             self.root.destroy()
             import os
@@ -409,9 +410,8 @@ class GuardianGUI:
             messagebox.showerror(self._get_text("error.title"), "AppComposer غير متوفر")
             return
 
-        from src.application.use_cases.generate_device_report_uc import (
-            GenerateDeviceReportRequest,
-        )
+        from src.application.use_cases.generate_device_report_uc import \
+            GenerateDeviceReportRequest
 
         try:
             # build the use case through the composition root
@@ -516,7 +516,7 @@ class GuardianGUI:
                         self.cycle_data["reports_generated"].append(str(report_path))
                         reports_count += 1
                     except Exception as e:
-                        logger.error(f"فشل توليد تقرير للجهاز {device_id}: {e}")
+                        logger.error("فشل توليد تقرير للجهاز %s: %s", device_id, e)
                         continue
 
                 messagebox.showinfo(

@@ -2,7 +2,6 @@
 
 from datetime import datetime, timezone
 
-
 from src.domain.engines.heat_exposure_engine import HeatExposureEngine
 from src.domain.entities.device_report import DeviceReport
 from src.domain.entities.heat_exposure import HeatExposure

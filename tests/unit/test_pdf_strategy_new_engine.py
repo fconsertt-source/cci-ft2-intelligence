@@ -1,13 +1,9 @@
 """Verify that PDF strategies use the new engine when available."""
 
 from src.infrastructure.adapters.reporting.pdf_strategy import (
-    ArabicPDFStrategy,
-    OfficialPDFStrategy,
-    TechnicalPDFStrategy,
-)
-from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import (
-    UnifiedPDFGeneratorWrapper,
-)
+    ArabicPDFStrategy, OfficialPDFStrategy, TechnicalPDFStrategy)
+from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import \
+    UnifiedPDFGeneratorWrapper
 
 
 def test_strategies_use_wrapper():

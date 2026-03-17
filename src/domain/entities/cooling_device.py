@@ -16,18 +16,15 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from src.domain.enums.vvm_stage import VVMStage
-from src.domain.services.exposure_analysis_service import ExposureAnalysisService
+from src.domain.services.exposure_analysis_service import \
+    ExposureAnalysisService
 from src.domain.value_objects.vaccine_specification import (
-    VaccineSpecification,
-    get_vaccine_spec,
-    HER_SAFE_MAX,
-    HER_PARTIAL_MAX,
-)
+    HER_PARTIAL_MAX, HER_SAFE_MAX, VaccineSpecification, get_vaccine_spec)
 
 # ──────────────────────────────────────────────────────────────
 # عتبات القرار — WHO/IVB/06.10
 # ──────────────────────────────────────────────────────────────
-_HER_SAFE: float = HER_SAFE_MAX      # ≤ 1.0  → SAFE
+_HER_SAFE: float = HER_SAFE_MAX  # ≤ 1.0  → SAFE
 _HER_PARTIAL: float = HER_PARTIAL_MAX  # ≤ 1.5  → PARTIAL
 # > 1.5 → DISCARD
 
@@ -37,9 +34,9 @@ class DeviceSafetyResult:
     """نتيجة تقييم سلامة جهاز واحد."""
 
     device_id: str
-    status: str        # SAFE | PARTIAL | DISCARD | NO_DATA
-    her: float         # HER ratio (0.0 → ∞)
-    ccm: str           # CCM index (0 | A | AB | ABC | D)
+    status: str  # SAFE | PARTIAL | DISCARD | NO_DATA
+    her: float  # HER ratio (0.0 → ∞)
+    ccm: str  # CCM index (0 | A | AB | ABC | D)
     vvm_stage: VVMStage
     circuit_breaker: Optional[str] = None  # سبب الوقف الفوري إن وجد
     max_temp: float = 0.0
@@ -57,7 +54,7 @@ class CoolingDevice:
     """
 
     device_id: str
-    location: str           # وصفي فقط
+    location: str  # وصفي فقط
     vaccine_type: str
     capacity_liters: float  # وصفي فقط
 

@@ -13,17 +13,10 @@ Re-export shim — Phase 5 Refactor (2026-03-10)
 """
 
 from src.infrastructure.pdf.arabic_font_manager import (  # noqa: F401
-    ARABIC_FONT_NAME,
-    FALLBACK_FONT_NAME,
-    ArabicFontManager,
-    ArabicPDFGenerator,
-    LegacyPDFGenerator,
-    UnifiedPDFGeneratorWrapper,
-    _register_arabic_font,
-    get_pdf_generator,
-    register_arabic_font,
-    shape_arabic_text,
-)
+    ARABIC_FONT_NAME, FALLBACK_FONT_NAME, ArabicFontManager,
+    ArabicPDFGenerator, LegacyPDFGenerator, UnifiedPDFGeneratorWrapper,
+    _register_arabic_font, get_pdf_generator, register_arabic_font,
+    shape_arabic_text)
 
 __all__ = [
     "ARABIC_FONT_NAME",

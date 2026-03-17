@@ -11,20 +11,22 @@ from typing import Any, List, Optional, Tuple
 
 from src.application.ports.device_repository_port import DeviceRepositoryPort
 from src.application.ports.ledger_writer_port import LedgerWriterPort
-from src.application.ports.vaccine_specification_port import VaccineSpecificationPort
-from src.application.ports.validation_protocol_port import ValidationProtocolPort
+from src.application.ports.vaccine_specification_port import \
+    VaccineSpecificationPort
+from src.application.ports.validation_protocol_port import \
+    ValidationProtocolPort
 from src.application.security.license_guard import LicenseGuard
-
 # request DTO moved to dedicated module to satisfy Phase 3 contract
 from src.application.use_cases.requests import GenerateDeviceReportRequest
-from src.domain.dtos.device_report_dto import DeviceReportDTO, ThermalExcursionDTO
+from src.domain.dtos.device_report_dto import (DeviceReportDTO,
+                                               ThermalExcursionDTO)
 from src.domain.entities.thermal_record import ThermalRecord
 from src.domain.enums.ledger_event import LedgerEvent
 from src.domain.enums.regulatory_status import RegulatoryStatus
-from src.domain.services.regulatory_decision_service import RegulatoryDecisionService
-from src.domain.services.thermal_degradation_estimator import (
-    ThermalDegradationEstimator,
-)
+from src.domain.services.regulatory_decision_service import \
+    RegulatoryDecisionService
+from src.domain.services.thermal_degradation_estimator import \
+    ThermalDegradationEstimator
 
 
 class GenerateDeviceReportUseCase:

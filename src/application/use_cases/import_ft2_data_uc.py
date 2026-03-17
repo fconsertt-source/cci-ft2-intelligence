@@ -6,9 +6,8 @@ from typing import List
 from src.application.ports.ft2_reader_port import Ft2ReaderPort
 from src.application.ports.ft2_writer_port import Ft2WriterPort
 from src.application.ports.logger_port import LoggerPort
-from src.application.services.device_center_mapper import (  # ← الإضافة الوحيدة
-    DeviceCenterMapper,
-)
+from src.application.services.device_center_mapper import \
+    DeviceCenterMapper  # ← الإضافة الوحيدة
 from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
 
 
@@ -50,7 +49,7 @@ class ImportFt2DataUseCase:
             # 1. Read all data from source directory (raw physical reality)
             ft2_data = self._reader.read(str(input_dir))
             if self._logger:
-                self._logger.info(f"Read {len(ft2_data)} entries from source.")
+                self._logger.info("Read %d entries from source.", len(ft2_data))
 
             # 2. OPTIONAL: Enrich with administrative context (does NOT modify raw data)
             if self._mapper:
@@ -69,7 +68,7 @@ class ImportFt2DataUseCase:
 
         except Exception as e:
             if self._logger:
-                self._logger.error(f"An error occurred during data import: {e}")
+                self._logger.error("An error occurred during data import: %s", e)
             raise
 
     def _enrich_with_center_context(

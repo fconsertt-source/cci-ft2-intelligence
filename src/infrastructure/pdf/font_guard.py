@@ -2,6 +2,7 @@ from pathlib import Path
 
 try:
     from reportlab.pdfbase import pdfmetrics
+
     REPORTLAB_AVAILABLE = True
 except ImportError:
     REPORTLAB_AVAILABLE = False

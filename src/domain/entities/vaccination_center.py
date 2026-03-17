@@ -3,10 +3,8 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Any, Dict, List, Optional
 
-from src.domain.entities.ft2_entry import (  # افتراض وجود هذا الكيان في المسار الجديد
-    FT2Entry,
-)
-
+from src.domain.entities.ft2_entry import \
+    FT2Entry  # افتراض وجود هذا الكيان في المسار الجديد
 
 
 class FreezeTolerance(Enum):

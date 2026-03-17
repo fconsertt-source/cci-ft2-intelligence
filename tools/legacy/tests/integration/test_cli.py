@@ -1,13 +1,13 @@
 import logging
-import types
 import sys
+import types
 from pathlib import Path
 
 # إضافة المسار للوصول إلى main
 sys.path.append(str(Path(__file__).parent.parent.parent.parent))
 
-from src.presentation.cli import cli as main
 from src.application.app_composer import AppComposer
+from src.presentation.cli import cli as main
 
 
 def test_cli_evaluate_logs_results(monkeypatch, caplog):
@@ -37,7 +37,7 @@ def test_cli_evaluate_logs_results(monkeypatch, caplog):
     # محاكاة استدعاء CLI مع وسيط evaluate
     test_args = ["ft2-cli", "evaluate", "--center", "test-center"]
     monkeypatch.setattr(sys, "argv", test_args)
-    
+
     # تنفيذ الأمر
     try:
         main.app()

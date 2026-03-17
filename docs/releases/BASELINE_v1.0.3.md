@@ -8,7 +8,7 @@
 
 - **Tests Status:** ✅ 100% Passed (67 tests)
 - **Test Command:** `pytest tests/unit tests/integration`
-- **Dependency Check:** 
+- **Dependency Check:**
     - `src/ingestion`: REMOVED
     - `her_calculator.py`: REMOVED
     - `heat_exposure_engine.py`: REMOVED
@@ -17,7 +17,7 @@
 ## 2. Architectural Compliance
 
 ### 2.1 Use Case & Orchestration
-- `EvaluateColdChainSafetyUseCase`: Successfully refactored as an Orchestrator. 
+- `EvaluateColdChainSafetyUseCase`: Successfully refactored as an Orchestrator.
 - **Scientific Logic:** Outsourced to `VVMQ10Model`.
 - **Decision Making:** Outsourced to `RulesEngine`.
 

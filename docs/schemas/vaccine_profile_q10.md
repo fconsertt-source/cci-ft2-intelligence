@@ -20,12 +20,12 @@ A new dictionary named `q10_properties` will be added to each relevant vaccine p
         - condition_name: "Ideal"
           temperature_min: 2.0
           temperature_max: 8.0
-      
+
       # NEW SECTION FOR VVM Q10 MODEL
       q10_properties:
         q10_value: 2.0  # The degradation rate multiplier for a 10°C temperature increase.
         ideal_temp: 5.0 # The reference 'ideal' temperature for Q10 calculations.
-      
+
       stability_budgets:
         # ... existing stability budgets would remain here
 ```

@@ -3,9 +3,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
-from src.application.services.vaccines_report_generator import VaccinesReportGenerator
-from src.domain.value_objects.vaccine_assessment_result import VaccineAssessmentResult
+from src.application.services.vaccines_report_generator import \
+    VaccinesReportGenerator
 from src.domain.enums.vaccine_decision import VaccineDecision
+from src.domain.value_objects.vaccine_assessment_result import \
+    VaccineAssessmentResult
 
 
 @dataclass
@@ -28,16 +30,24 @@ class GenerateVaccinesReportUseCase:
     def __init__(self, report_generator: VaccinesReportGenerator):
         self.report_generator = report_generator
 
-    def execute(self, request: GenerateVaccinesReportRequest) -> GenerateVaccinesReportResponse:
+    def execute(
+        self, request: GenerateVaccinesReportRequest
+    ) -> GenerateVaccinesReportResponse:
         report_path = self.report_generator.generate(
             assessments=request.assessments,
             output_path=request.output_path,
         )
 
         safe = sum(1 for a in request.assessments if a.decision == VaccineDecision.SAFE)
-        partial = sum(1 for a in request.assessments if a.decision == VaccineDecision.PARTIAL)
-        discard = sum(1 for a in request.assessments if a.decision == VaccineDecision.DISCARD)
-        expired = sum(1 for a in request.assessments if a.decision == VaccineDecision.EXPIRED)
+        partial = sum(
+            1 for a in request.assessments if a.decision == VaccineDecision.PARTIAL
+        )
+        discard = sum(
+            1 for a in request.assessments if a.decision == VaccineDecision.DISCARD
+        )
+        expired = sum(
+            1 for a in request.assessments if a.decision == VaccineDecision.EXPIRED
+        )
 
         return GenerateVaccinesReportResponse(
             report_path=report_path,

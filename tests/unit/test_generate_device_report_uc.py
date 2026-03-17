@@ -13,9 +13,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.application.use_cases.generate_device_report_uc import (
-    GenerateDeviceReportUseCase,
-)
+from src.application.use_cases.generate_device_report_uc import \
+    GenerateDeviceReportUseCase
 from src.application.use_cases.requests import GenerateDeviceReportRequest
 from src.domain.entities.thermal_record import ThermalRecord
 from src.domain.enums.ledger_event import LedgerEvent

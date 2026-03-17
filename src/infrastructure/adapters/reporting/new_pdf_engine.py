@@ -19,6 +19,7 @@ from typing import Any, Optional
 
 try:
     from reportlab.pdfbase import pdfmetrics
+
     REPORTLAB_AVAILABLE = True
 except ImportError:
     REPORTLAB_AVAILABLE = False
@@ -95,9 +96,8 @@ class PDFGenerator:
         if self.language == "ar":
             try:
                 # reuse wrapper's font registration logic to avoid duplication
-                from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import (
-                    _register_arabic_font,
-                )
+                from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import \
+                    _register_arabic_font
 
                 self.font_name = _register_arabic_font()
             except Exception:
@@ -119,15 +119,15 @@ class PDFGenerator:
         from reportlab.lib.pagesizes import A4
         from reportlab.platypus import SimpleDocTemplate
 
-        from src.presentation.reporting.components.arabic_processor import shape
-        from src.presentation.reporting.components.chart_builder import ChartBuilder
-
+        from src.presentation.reporting.components.arabic_processor import \
+            shape
+        from src.presentation.reporting.components.chart_builder import \
+            ChartBuilder
         # import our builders
         from src.presentation.reporting.components.header_builder import (
-            FooterBuilder,
-            HeaderBuilder,
-        )
-        from src.presentation.reporting.components.table_builder import TableBuilder
+            FooterBuilder, HeaderBuilder)
+        from src.presentation.reporting.components.table_builder import \
+            TableBuilder
 
         # determine language for this run
         if language is not None:
@@ -166,7 +166,8 @@ class PDFGenerator:
             body = shape(body)
         if body:
             # convert to Paragraph to ensure it's a valid flowable
-            from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+            from reportlab.lib.styles import (ParagraphStyle,
+                                              getSampleStyleSheet)
             from reportlab.platypus import Paragraph
 
             base_style = getSampleStyleSheet()["Normal"]

@@ -1,7 +1,7 @@
 # ADR-0015: Production Trial Approved
 
-**Date:** 2026-02-27  
-**Status:** Approved  
+**Date:** 2026-02-27
+**Status:** Approved
 **Trial Period:** 2026-02-27 to 2026-05-28 (90 days)
 
 ## Metrics at Launch

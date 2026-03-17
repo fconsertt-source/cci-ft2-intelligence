@@ -20,15 +20,17 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.domain.entities.equipment_vaccine import EquipmentVaccine, VVMStageValue
+from src.domain.entities.equipment_vaccine import (EquipmentVaccine,
+                                                   VVMStageValue)
 from src.domain.enums.vaccine_decision import DecisionReason, VaccineDecision
-from src.domain.services.vaccine_assessment_service import VaccineAssessmentService
+from src.domain.services.vaccine_assessment_service import \
+    VaccineAssessmentService
 from src.domain.value_objects.vaccine_specification import get_vaccine_spec
-
 
 # ══════════════════════════════════════════════════════════════
 # Fixtures
 # ══════════════════════════════════════════════════════════════
+
 
 def future(days=365) -> date:
     return date.today() + timedelta(days=days)
@@ -73,6 +75,7 @@ def service() -> VaccineAssessmentService:
 # 1. انتهاء الصلاحية
 # ══════════════════════════════════════════════════════════════
 
+
 class TestExpiry:
 
     def test_expired_vaccine_returns_expired(self, service):
@@ -102,6 +105,7 @@ class TestExpiry:
 # 2. VVM مرحلة حرجة
 # ══════════════════════════════════════════════════════════════
 
+
 class TestVVMStage:
 
     def test_vvm_stage_3_discards(self, service):
@@ -118,8 +122,10 @@ class TestVVMStage:
     def test_vvm_stage_1_continues(self, service):
         v = make_vaccine(has_vvm=True, vvm_stage=1)
         result = service.assess(v, readings=[make_reading(5.0)])
-        assert result.decision != VaccineDecision.DISCARD or \
-               result.reason != DecisionReason.VVM_CRITICAL
+        assert (
+            result.decision != VaccineDecision.DISCARD
+            or result.reason != DecisionReason.VVM_CRITICAL
+        )
 
     def test_vvm_stage_2_continues(self, service):
         v = make_vaccine(has_vvm=True, vvm_stage=2)
@@ -142,6 +148,7 @@ class TestVVMStage:
 # ══════════════════════════════════════════════════════════════
 # 3. Circuit Breakers
 # ══════════════════════════════════════════════════════════════
+
 
 class TestCircuitBreakers:
 
@@ -180,6 +187,7 @@ class TestCircuitBreakers:
 # ══════════════════════════════════════════════════════════════
 # 4. HER ratio
 # ══════════════════════════════════════════════════════════════
+
 
 class TestHERDecision:
 
@@ -237,6 +245,7 @@ class TestHERDecision:
 # 5. بدون قراءات
 # ══════════════════════════════════════════════════════════════
 
+
 class TestNoReadings:
 
     def test_no_readings_safe_if_vvm_ok(self, service):
@@ -255,6 +264,7 @@ class TestNoReadings:
 # 6. assess_all — ترتيب النتائج
 # ══════════════════════════════════════════════════════════════
 
+
 class TestAssessAll:
 
     def test_assess_all_returns_list(self, service):
@@ -269,8 +279,7 @@ class TestAssessAll:
         """DISCARD يأتي قبل SAFE في النتائج."""
         safe_v = make_vaccine(vaccine_type="HEPB", batch="SAFE")
         discard_v = make_vaccine(
-            vaccine_type="OPV", batch="DISCARD",
-            has_vvm=True, vvm_stage=4
+            vaccine_type="OPV", batch="DISCARD", has_vvm=True, vvm_stage=4
         )
         results = service.assess_all(
             [safe_v, discard_v],
@@ -286,13 +295,15 @@ class TestAssessAll:
             readings=[],
         )
         decisions = [r.decision for r in results]
-        assert decisions.index(VaccineDecision.EXPIRED) < \
-               decisions.index(VaccineDecision.SAFE)
+        assert decisions.index(VaccineDecision.EXPIRED) < decisions.index(
+            VaccineDecision.SAFE
+        )
 
 
 # ══════════════════════════════════════════════════════════════
 # 7. VaccineAssessmentResult
 # ══════════════════════════════════════════════════════════════
+
 
 class TestVaccineAssessmentResult:
 

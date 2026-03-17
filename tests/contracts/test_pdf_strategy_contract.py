@@ -35,10 +35,7 @@ class TestPDFStrategyContract:
         """يجب أن ترجع الاستراتيجية bytes وليس str أو None"""
         try:
             from src.infrastructure.adapters.reporting.pdf_strategy import (
-                ArabicPDFStrategy,
-                OfficialPDFStrategy,
-                TechnicalPDFStrategy,
-            )
+                ArabicPDFStrategy, OfficialPDFStrategy, TechnicalPDFStrategy)
 
             strategy_map = {
                 "OfficialPDFStrategy": OfficialPDFStrategy,
@@ -72,10 +69,7 @@ class TestPDFStrategyContract:
         """يجب أن يبدأ الناتج بتوقيع PDF الصالح"""
         try:
             from src.infrastructure.adapters.reporting.pdf_strategy import (
-                ArabicPDFStrategy,
-                OfficialPDFStrategy,
-                TechnicalPDFStrategy,
-            )
+                ArabicPDFStrategy, OfficialPDFStrategy, TechnicalPDFStrategy)
 
             strategy_map = {
                 "OfficialPDFStrategy": OfficialPDFStrategy,
@@ -110,10 +104,7 @@ class TestPDFStrategyContract:
         """يجب ألا تسبب آثار جانبية خارجية (نفس المدخلات = نفس المخرجات)"""
         try:
             from src.infrastructure.adapters.reporting.pdf_strategy import (
-                ArabicPDFStrategy,
-                OfficialPDFStrategy,
-                TechnicalPDFStrategy,
-            )
+                ArabicPDFStrategy, OfficialPDFStrategy, TechnicalPDFStrategy)
 
             strategy_map = {
                 "OfficialPDFStrategy": OfficialPDFStrategy,

@@ -30,9 +30,9 @@ Why this satisfies ADR0004
 
 Operational next steps
 ----------------------
-1. Merge PR#1 → PR#2 → PR#3 (order matters).  
-2. Enable Branch Protection on `main` requiring the guard workflow and the tests contract to pass.  
-3. Update this file by replacing `<PR1_URL>`, `<PR2_URL>`, `<PR3_URL>` with actual PR URLs and push.  
+1. Merge PR#1 → PR#2 → PR#3 (order matters).
+2. Enable Branch Protection on `main` requiring the guard workflow and the tests contract to pass.
+3. Update this file by replacing `<PR1_URL>`, `<PR2_URL>`, `<PR3_URL>` with actual PR URLs and push.
 4. Update `docs/ProjectState.md` with the final project snapshot and note ADR0004 as implemented.
 
 Signed-off-by: Architecture Team

@@ -14,7 +14,8 @@ import typer
 
 # ✅ الاستيراد الوحيد المسموح: جذر التركيب + رسائل
 from src.application.app_composer import AppComposer
-from src.application.use_cases.generate_device_report_uc import GenerateDeviceReportRequest
+from src.application.use_cases.generate_device_report_uc import \
+    GenerateDeviceReportRequest
 from src.presentation.messages.message_map import MessageMap
 
 app = typer.Typer(

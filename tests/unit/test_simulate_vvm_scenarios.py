@@ -1,4 +1,4 @@
-from scripts.simulate_vvm_scenarios import simulate_scenario, MockEntry
+from scripts.simulate_vvm_scenarios import MockEntry, simulate_scenario
 
 
 def test_simulate_scenario_runs_without_error(capfd):

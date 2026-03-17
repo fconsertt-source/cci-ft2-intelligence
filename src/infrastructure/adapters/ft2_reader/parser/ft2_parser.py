@@ -81,14 +81,14 @@ class FT2Parser:
                             )
                             entries.append(entry)
                         except Exception as e:
-                            logger.warning(f"تخطي صف {i} في {file_path}: {e}")
+                            logger.warning("تخطي صف %d في %s: %s", i, file_path, e)
                 else:
-                    logger.warning(f"تنسيق غير معروف في {file_path}")
+                    logger.warning("تنسيق غير معروف في %s", file_path)
 
         except Exception as e:
-            logger.error(f"خطأ في تحليل {file_path}: {e}")
+            logger.error("خطأ في تحليل %s: %s", file_path, e)
 
-        logger.info(f"تم تحليل {len(entries)} إدخال من {file_path}")
+        logger.info("تم تحليل %d إدخال من %s", len(entries), file_path)
         return entries
 
 
@@ -97,6 +97,7 @@ class FT2Parser:
 # ---------------------------------------------------------------------------
 
 # preserve old name for external callers; emit warning at import time
+
 
 class FT2Entry(FT2Reading):  # type: ignore
     """Deprecated alias kept for backward compatibility.

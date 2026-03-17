@@ -25,6 +25,7 @@ class VVMStageValue(IntEnum):
     3 → المربع = الدائرة                (نقطة الإلغاء — لا تستخدم)
     4 → المربع أغمق من الدائرة          (تجاوز نقطة الإلغاء — تخلص)
     """
+
     STAGE_1 = 1  # USABLE
     STAGE_2 = 2  # USE_WITH_PRIORITY
     STAGE_3 = 3  # DISCARD
@@ -79,9 +80,7 @@ class EquipmentVaccine:
     recorded_by: Optional[str] = None
 
     entry_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    recorded_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    recorded_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __post_init__(self) -> None:
         if not self.equipment_id or not self.equipment_id.strip():
@@ -94,15 +93,12 @@ class EquipmentVaccine:
         # إذا has_vvm=True يجب أن يكون vvm_stage محدداً
         if self.has_vvm and self.vvm_stage is None:
             raise ValueError(
-                "vvm_stage مطلوب عند has_vvm=True — "
-                "حدد المرحلة (1/2/3/4)"
+                "vvm_stage مطلوب عند has_vvm=True — " "حدد المرحلة (1/2/3/4)"
             )
 
         # إذا has_vvm=False يجب أن يكون vvm_stage=None
         if not self.has_vvm and self.vvm_stage is not None:
-            raise ValueError(
-                "vvm_stage يجب أن يكون None عند has_vvm=False"
-            )
+            raise ValueError("vvm_stage يجب أن يكون None عند has_vvm=False")
 
     @property
     def is_expired(self) -> bool:

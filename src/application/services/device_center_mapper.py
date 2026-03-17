@@ -60,7 +60,9 @@ class DeviceCenterMapper:
                     return EquipmentRecord(
                         equipment_id=equipment_id,
                         center_id=device_entry.get("center_id", "UNKNOWN"),
-                        equipment_type=EquipmentType(device_entry.get("equipment_type", "REFRIGERATOR")),
+                        equipment_type=EquipmentType(
+                            device_entry.get("equipment_type", "REFRIGERATOR")
+                        ),
                         location_note=device_entry.get("location_note"),
                     )
             return None
@@ -74,7 +76,8 @@ class DeviceCenterMapper:
 
     def get_all_devices_for_equipment(self, equipment_id: str) -> List[str]:
         return [
-            device_id for device_id, entry in self._device_map.items()
+            device_id
+            for device_id, entry in self._device_map.items()
             if entry.get("equipment_id") == equipment_id
         ]
 

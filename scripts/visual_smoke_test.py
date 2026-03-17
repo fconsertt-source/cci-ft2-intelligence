@@ -5,11 +5,11 @@ interface.  The previous incarnation mixed a script with pytest and
 contained a syntax error.
 """
 
-
 import pytest
-from src.utils.time import utc_now_iso
+
 from src.application.dtos.device_report_dto import DeviceReportDTO
 from src.infrastructure.pdf.unified_pdf_generator import get_pdf_generator
+from src.utils.time import utc_now_iso
 
 
 def _make_dto() -> DeviceReportDTO:

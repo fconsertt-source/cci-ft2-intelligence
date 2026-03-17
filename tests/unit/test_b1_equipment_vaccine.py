@@ -14,18 +14,15 @@ from datetime import date, timedelta
 
 import pytest
 
-from src.domain.entities.equipment_vaccine import (
-    EquipmentVaccine,
-    VVMStageValue,
-)
-from src.infrastructure.adapters.equipment_vaccine_repository import (
-    EquipmentVaccineRepository,
-)
-
+from src.domain.entities.equipment_vaccine import (EquipmentVaccine,
+                                                   VVMStageValue)
+from src.infrastructure.adapters.equipment_vaccine_repository import \
+    EquipmentVaccineRepository
 
 # ══════════════════════════════════════════════════════════════
 # Fixtures
 # ══════════════════════════════════════════════════════════════
+
 
 def future_date(days: int = 365) -> date:
     return date.today() + timedelta(days=days)
@@ -63,6 +60,7 @@ def repo(tmp_path) -> EquipmentVaccineRepository:
 # 1. اختبارات VVMStageValue
 # ══════════════════════════════════════════════════════════════
 
+
 class TestVVMStageValue:
 
     def test_stage_1_usable(self):
@@ -89,6 +87,7 @@ class TestVVMStageValue:
 # ══════════════════════════════════════════════════════════════
 # 2. اختبارات EquipmentVaccine
 # ══════════════════════════════════════════════════════════════
+
 
 class TestEquipmentVaccine:
 
@@ -187,6 +186,7 @@ class TestEquipmentVaccine:
 # ══════════════════════════════════════════════════════════════
 # 3. اختبارات EquipmentVaccineRepository
 # ══════════════════════════════════════════════════════════════
+
 
 class TestEquipmentVaccineRepository:
 

@@ -1,8 +1,8 @@
 # Legacy Tools
 
-**Status:** DEPRECATED  
-**Date:** 2026-02-26  
-**Reason:** Replaced by scripts/ directory  
+**Status:** DEPRECATED
+**Date:** 2026-02-26
+**Reason:** Replaced by scripts/ directory
 **Removal Date:** 2026-03-26 (30 days from now)
 
 ## Contents

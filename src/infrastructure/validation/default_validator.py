@@ -8,6 +8,7 @@ DefaultValidator
 """
 
 from __future__ import annotations
+
 from typing import Any
 
 from src.application.ports.validation_port import ValidationPort
@@ -25,7 +26,7 @@ class DefaultValidator(ValidationPort):
         # ---- structural -------------------------------------------------
         if hasattr(obj, "dict"):
             # استدعاء ``dict`` يضمن أن الـ DTO قابل للتسلسل
-            _ = obj.dict()   # قد يرفع TypeError إذا لم يكن قابلاً للتمثيل
+            _ = obj.dict()  # قد يرفع TypeError إذا لم يكن قابلاً للتمثيل
 
         # ---- business ----------------------------------------------------
         policies = getattr(obj, "policies", None)

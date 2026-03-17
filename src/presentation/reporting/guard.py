@@ -15,9 +15,9 @@ import csv
 import datetime
 import json
 import uuid
-from pathlib import Path
 from contextlib import contextmanager
-from typing import Any, Mapping, Protocol, List, Set
+from pathlib import Path
+from typing import Any, List, Mapping, Protocol, Set
 
 
 # ----------------------------------------------------------------------
@@ -76,7 +76,7 @@ class _GuardWriter:
     # ------------------------------------------------------------------
     def finalize(self, start_ts: datetime.datetime) -> None:
         ts = datetime.datetime.utcnow().isoformat(timespec="seconds")
-        uid = uuid.uuid4().hex[:8]                     # short unique suffix
+        uid = uuid.uuid4().hex[:8]  # short unique suffix
 
         # -------------------- JSON file --------------------
         json_path = self._final_dir / f"{self.use_case}_{ts}_{uid}.json"
@@ -108,7 +108,9 @@ class _GuardWriter:
             if self._errors:
                 f.write("\nErrors:\n")
                 for err in self._errors:
-                    f.write(json.dumps(err, ensure_ascii=False, sort_keys=True, indent=2))
+                    f.write(
+                        json.dumps(err, ensure_ascii=False, sort_keys=True, indent=2)
+                    )
                     f.write("\n---\n")
 
         # -------------------- Separate error JSON (CI‑friendly) --------------------

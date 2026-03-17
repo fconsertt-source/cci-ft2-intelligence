@@ -12,4 +12,5 @@ class NotFoundException(DomainException):
 
 class InfrastructureException(Exception):
     """Represents failures in Infrastructure boundary."""
+
     pass

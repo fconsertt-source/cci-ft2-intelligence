@@ -1,16 +1,23 @@
 from __future__ import annotations
-from datetime import datetime, timezone
-from src.domain.policies.trial_policy import TrialPolicy, TrialStatus
-from src.application.security.license_validator import LicenseValidator
-from src.infrastructure.security.encrypted_license_repository import EncryptedLicenseRepository
-from src.infrastructure.security.fingerprint_provider import SystemFingerprintProvider
+
 import json
+from datetime import datetime, timezone
+
+from src.application.security.license_validator import LicenseValidator
+from src.domain.policies.trial_policy import TrialPolicy, TrialStatus
+from src.infrastructure.security.encrypted_license_repository import \
+    EncryptedLicenseRepository
+from src.infrastructure.security.fingerprint_provider import \
+    SystemFingerprintProvider
+
 
 class LicenseExpiredError(Exception):
     pass
 
+
 class IntegrityError(Exception):
     pass
+
 
 class LicenseGuard:
     def __init__(
@@ -43,25 +50,36 @@ class LicenseGuard:
             raise IntegrityError("License file missing or corrupted")
 
         # 2. Verify signature
-        data_to_verify = json.dumps({
-            "fingerprint": license_data["fingerprint"],
-            "expiry": license_data["expiry"],
-            "install_time": license_data["install_time"]
-        }, sort_keys=True).encode()
+        data_to_verify = json.dumps(
+            {
+                "fingerprint": license_data["fingerprint"],
+                "expiry": license_data["expiry"],
+                "install_time": license_data["install_time"],
+            },
+            sort_keys=True,
+        ).encode()
         sig = bytes.fromhex(license_data["signature"])
-        if not self._validator.verify_signature(data_to_verify, sig, self._public_key_pem):
+        if not self._validator.verify_signature(
+            data_to_verify, sig, self._public_key_pem
+        ):
             raise IntegrityError("Invalid license signature")
 
         # 3. Verify fingerprint (tolerance: 1 change allowed)
-        current_fingerprint = "|".join([
-            self._fingerprint_provider.get_machine_id(),
-            self._fingerprint_provider.get_os_uuid(),
-            self._fingerprint_provider.get_install_timestamp()
-        ])
+        current_fingerprint = "|".join(
+            [
+                self._fingerprint_provider.get_machine_id(),
+                self._fingerprint_provider.get_os_uuid(),
+                self._fingerprint_provider.get_install_timestamp(),
+            ]
+        )
         stored_fingerprint = license_data["fingerprint"]
 
-        if not self._fingerprint_tolerance_check(stored_fingerprint, current_fingerprint):
-            raise IntegrityError(f"Fingerprint mismatch: {stored_fingerprint} vs {current_fingerprint}")
+        if not self._fingerprint_tolerance_check(
+            stored_fingerprint, current_fingerprint
+        ):
+            raise IntegrityError(
+                f"Fingerprint mismatch: {stored_fingerprint} vs {current_fingerprint}"
+            )
 
         # 4. Evaluate trial policy
         now = datetime.now(timezone.utc)

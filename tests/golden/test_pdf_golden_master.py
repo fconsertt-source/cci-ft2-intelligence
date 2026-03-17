@@ -14,12 +14,11 @@ import pytest
 
 # ✅ استيراد من المسار الصحيح
 from src.domain.dtos.device_report_dto import DeviceReportDTO
-
 # ensure fresh wrapper for each test module run
-from src.infrastructure.adapters.reporting import (
-    unified_pdf_generator_wrapper as _wrapper_mod,
-)
-from src.infrastructure.adapters.reporting.new_pdf_engine import register_arabic_fonts
+from src.infrastructure.adapters.reporting import \
+    unified_pdf_generator_wrapper as _wrapper_mod
+from src.infrastructure.adapters.reporting.new_pdf_engine import \
+    register_arabic_fonts
 
 register_arabic_fonts()
 
@@ -44,10 +43,7 @@ def pdf_strategies():
     """تحميل استراتيجيات PDF"""
     try:
         from src.infrastructure.adapters.reporting.pdf_strategy import (
-            ArabicPDFStrategy,
-            OfficialPDFStrategy,
-            TechnicalPDFStrategy,
-        )
+            ArabicPDFStrategy, OfficialPDFStrategy, TechnicalPDFStrategy)
 
         return {
             "official": OfficialPDFStrategy(),
@@ -154,7 +150,6 @@ class TestPDFGoldenMaster:
                 from reportlab.pdfbase import pdfmetrics
             except ImportError:
                 pytest.skip("reportlab not available")
-
 
             if "Amiri" not in pdfmetrics.getRegisteredFontNames():
                 pytest.skip("Arabic font 'Amiri' not registered")

@@ -27,9 +27,9 @@ so they travel with every other DTO produced by the use‑case.
 
 from __future__ import annotations
 
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Iterable, List, Optional, Mapping, Any
-from dataclasses import dataclass, asdict
+from typing import Any, Iterable, List, Mapping, Optional
 
 # ----------------------------------------------------------------------
 #  Configuration – what to ignore while walking the tree
@@ -52,6 +52,7 @@ IGNORE_DIRS = {
 }
 IGNORE_FILES = {".DS_Store", "Thumbs.db"}
 
+
 # ----------------------------------------------------------------------
 #  DTO – immutable, implements the BaseDTO protocol
 # ----------------------------------------------------------------------
@@ -62,13 +63,15 @@ class ProjectTreeDTO:
     The class implements ``to_dict()`` so it can be consumed by the Guard
     writer exactly like every other DTO in the code‑base.
     """
-    root: str                # absolute path that was scanned
-    tree_markdown: str       # Markdown fenced‑code block
-    tree_plain: str          # plain‑text version
+
+    root: str  # absolute path that was scanned
+    tree_markdown: str  # Markdown fenced‑code block
+    tree_plain: str  # plain‑text version
 
     def to_dict(self) -> Mapping[str, Any]:
         """Return a JSON‑serialisable mapping (required by GuardWriter)."""
         return asdict(self)
+
 
 # ----------------------------------------------------------------------
 #  Low‑level helpers (ignore logic, tree walk)

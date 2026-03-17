@@ -1,7 +1,7 @@
 # Architectural Retrospective — Phase 4 Validation
 
-Date: 2026-02-06  
-Tag: v0.4.0  
+Date: 2026-02-06
+Tag: v0.4.0
 Author: fconsertt-source قائد الهندسة المعمارية
 
 This document captures the architectural decisions, rejections, and lessons learned during Phase 4, while the context and pressure were still fresh.
@@ -47,16 +47,16 @@ This document captures the architectural decisions, rejections, and lessons lear
 
 ## 4. القواعد الحديدية التي لا تُكسر (مع التبرير)
 
-1. **جذر التركيب هو النقطة الوحيدة للتوصيل**  
+1. **جذر التركيب هو النقطة الوحيدة للتوصيل**
    ← بدون هذا، يصبح المرجع المحصن وثيقة أخلاقية (ليست تقنية)
 
-2. **كل اعتماد في التطبيق يجب أن يكون على Port**  
+2. **كل اعتماد في التطبيق يجب أن يكون على Port**
    ← بدون هذا، تصبح حدود المرجع المحصن وهمية (لا يمكن فرضها آليًا)
 
-3. **الـ DTOs يجب أن تكون نظيفة (لا سلوك)**  
+3. **الـ DTOs يجب أن تكون نظيفة (لا سلوك)**
    ← بدون هذا، يصبح الفصل بين الطبقات غير قابل للتطبيق
 
-4. **الحراسات الأربع يجب أن تمر قبل أي دمج**  
+4. **الحراسات الأربع يجب أن تمر قبل أي دمج**
    ← بدون هذا، يصبح "المرجع المحصن" وثيقة جميلة فقط
 
 ## 5. التوصية النهائية للمشروع

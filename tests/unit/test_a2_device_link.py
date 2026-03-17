@@ -17,10 +17,10 @@ from src.domain.entities.device_link import DeviceLink
 from src.domain.enums.device_status import DeviceStatus
 from src.domain.services.device_registry import DeviceRegistry
 
-
 # ══════════════════════════════════════════════════════════════
 # Fixtures
 # ══════════════════════════════════════════════════════════════
+
 
 @pytest.fixture
 def registry(tmp_path):
@@ -37,6 +37,7 @@ def dt(year=2024, month=7, day=1, hour=0, minute=0) -> datetime:
 # 1. اختبارات DeviceStatus
 # ══════════════════════════════════════════════════════════════
 
+
 class TestDeviceStatus:
 
     def test_status_values(self):
@@ -52,6 +53,7 @@ class TestDeviceStatus:
 # ══════════════════════════════════════════════════════════════
 # 2. اختبارات DeviceLink
 # ══════════════════════════════════════════════════════════════
+
 
 class TestDeviceLink:
 
@@ -188,6 +190,7 @@ class TestDeviceLink:
 # 3. اختبارات DeviceRegistry
 # ══════════════════════════════════════════════════════════════
 
+
 class TestDeviceRegistry:
 
     def test_register_new_device(self, registry):
@@ -279,12 +282,8 @@ class TestDeviceRegistry:
     def test_get_device_chain_ordered(self, registry):
         """السلسلة مرتبة من الأقدم للأحدث."""
         registry.register_device("DEV-1", "SN-1", "EQ-01")
-        registry.replace_device(
-            "DEV-1", "DEV-2", "SN-2", dt(month=2)
-        )
-        registry.replace_device(
-            "DEV-2", "DEV-3", "SN-3", dt(month=3)
-        )
+        registry.replace_device("DEV-1", "DEV-2", "SN-2", dt(month=2))
+        registry.replace_device("DEV-2", "DEV-3", "SN-3", dt(month=3))
 
         chain = registry.get_device_chain("EQ-01")
         ids = [r.device_id for r in chain]
@@ -294,7 +293,10 @@ class TestDeviceRegistry:
         """استبدالات فورية → السلسلة متصلة."""
         registry.register_device("DEV-1", "SN-1", "EQ-01")
         registry.replace_device(
-            "DEV-1", "DEV-2", "SN-2", dt(hour=10),
+            "DEV-1",
+            "DEV-2",
+            "SN-2",
+            dt(hour=10),
             old_device_last_reading=dt(hour=10),
             new_device_first_reading=dt(hour=10, minute=30),
         )
@@ -305,7 +307,10 @@ class TestDeviceRegistry:
         """فجوة 6 ساعات → السلسلة منقطعة."""
         registry.register_device("DEV-1", "SN-1", "EQ-01")
         registry.replace_device(
-            "DEV-1", "DEV-2", "SN-2", dt(hour=12),
+            "DEV-1",
+            "DEV-2",
+            "SN-2",
+            dt(hour=12),
             old_device_last_reading=dt(hour=6),
             new_device_first_reading=dt(hour=12),
         )
@@ -328,9 +333,7 @@ class TestDeviceRegistry:
         # Instance 1: تسجيل واستبدال
         reg1 = DeviceRegistry(registry_dir=reg_dir)
         reg1.register_device("DEV-OLD", "SN-OLD", "EQ-01")
-        reg1.replace_device(
-            "DEV-OLD", "DEV-NEW", "SN-NEW", dt()
-        )
+        reg1.replace_device("DEV-OLD", "DEV-NEW", "SN-NEW", dt())
 
         # Instance 2: تحميل من نفس المجلد
         reg2 = DeviceRegistry(registry_dir=reg_dir)

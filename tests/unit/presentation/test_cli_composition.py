@@ -5,6 +5,7 @@
 
 import pytest
 from typer.testing import CliRunner
+
 from src.presentation.cli import cli
 
 
@@ -24,15 +25,13 @@ def test_cli_import_data_uses_composer(monkeypatch, tmp_path):
             called["imported"] = True
 
     monkeypatch.setattr(
-        AppComposer,
-        "create_import_ft2_bundle_uc",
-        staticmethod(lambda: DummyUC())
+        AppComposer, "create_import_ft2_bundle_uc", staticmethod(lambda: DummyUC())
     )
 
     runner = CliRunner()
     result = runner.invoke(
         cli.app,
-        ["import-data", "--input", str(tmp_path), "--output", str(tmp_path / "output")]
+        ["import-data", "--input", str(tmp_path), "--output", str(tmp_path / "output")],
     )
 
     assert result.exit_code == 0
@@ -48,35 +47,36 @@ def test_cli_generate_device_report_uses_composer(monkeypatch, tmp_path):
 
     data_file = tmp_path / "ft2_data.json"
     data_file.write_text("{}")
-    
+
     called = {}
 
     class DummyUC:
         def execute(self, request):
             called["generated"] = True
             from dataclasses import dataclass
+
             @dataclass
             class DummyReport:
                 device_id: str = "DEV-001"
+
             return DummyReport()
 
     monkeypatch.setattr(
-        AppComposer,
-        "create_generate_device_report_uc",
-        staticmethod(lambda: DummyUC())
+        AppComposer, "create_generate_device_report_uc", staticmethod(lambda: DummyUC())
     )
 
     runner = CliRunner()
     result = runner.invoke(
-        cli.app,
-        ["generate-device-report", "DEV-001", "--data", str(data_file)]
+        cli.app, ["generate-device-report", "DEV-001", "--data", str(data_file)]
     )
 
     assert result.exit_code == 0
     assert called.get("generated") is True
 
 
-@pytest.mark.skip(reason="Use case create_evaluate_cold_chain_uc not yet implemented in AppComposer")
+@pytest.mark.skip(
+    reason="Use case create_evaluate_cold_chain_uc not yet implemented in AppComposer"
+)
 def test_cli_evaluate_uses_composer(monkeypatch, tmp_path):
     """اختبار أن أمر evaluate يستخدم AppComposer.create_evaluate_cold_chain_uc"""
     pass
@@ -99,11 +99,7 @@ def test_cli_health_check_uses_composer(monkeypatch):
         tracker["called"] = True
         return True
 
-    monkeypatch.setattr(
-        AppComposer,
-        "health_check",
-        staticmethod(mock_health_check)
-    )
+    monkeypatch.setattr(AppComposer, "health_check", staticmethod(mock_health_check))
 
     runner = CliRunner()
     result = runner.invoke(cli.app, ["health-check"])
@@ -116,10 +112,9 @@ def test_cli_health_check_uses_composer(monkeypatch):
         print(f"Exception type: {type(result.exception)}")
         print(f"Exception: {result.exception}")
         import traceback
+
         traceback.print_exception(
-            type(result.exception),
-            result.exception,
-            result.exception.__traceback__
+            type(result.exception), result.exception, result.exception.__traceback__
         )
 
     assert tracker["called"] is True, "health_check was not called"
@@ -132,7 +127,7 @@ def test_cli_help_shows_commands():
     result = runner.invoke(cli.app, ["--help"])
 
     assert result.exit_code == 0
-    
+
     # ✅ الأوامر المتاحة فعلياً في CLI
     expected_commands = [
         "health-check",
@@ -141,8 +136,8 @@ def test_cli_help_shows_commands():
         "report",
         "generate-device-report",
         "generate-all-device-reports",
-        "verify-official"
+        "verify-official",
     ]
-    
+
     for cmd in expected_commands:
         assert cmd in result.stdout, f"Command '{cmd}' not shown in help"

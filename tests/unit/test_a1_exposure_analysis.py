@@ -19,17 +19,15 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from src.domain.services.exposure_analysis_service import \
+    ExposureAnalysisService
 from src.domain.value_objects.vaccine_specification import (
-    VaccineSpecification,
-    get_vaccine_spec,
-    VACCINE_CATALOGUE,
-)
-from src.domain.services.exposure_analysis_service import ExposureAnalysisService
-
+    VACCINE_CATALOGUE, VaccineSpecification, get_vaccine_spec)
 
 # ══════════════════════════════════════════════════════════════
 # Fixtures
 # ══════════════════════════════════════════════════════════════
+
 
 def make_reading(temp: float, duration_minutes: float, device_id: str = "DEV-001"):
     """إنشاء قراءة حرارية مبسطة للاختبار."""
@@ -48,6 +46,7 @@ def make_readings(temps_and_durations: list[tuple[float, float]]) -> list:
 # ══════════════════════════════════════════════════════════════
 # 1. اختبارات VaccineSpecification
 # ══════════════════════════════════════════════════════════════
+
 
 class TestVaccineSpecification:
 
@@ -103,6 +102,7 @@ class TestVaccineSpecification:
 # ══════════════════════════════════════════════════════════════
 # 2. اختبارات ExposureAnalysisService
 # ══════════════════════════════════════════════════════════════
+
 
 class TestExposureAnalysisService:
 
@@ -269,11 +269,13 @@ class TestExposureAnalysisService:
 
     def test_hours_above_10_correct(self):
         """ساعتان فوق 10°C + ساعة دون 10°C → 2 ساعات فقط."""
-        readings = make_readings([
-            (11.0, 60.0),  # فوق 10°C
-            (11.0, 60.0),  # فوق 10°C
-            (5.0, 60.0),   # دون 10°C
-        ])
+        readings = make_readings(
+            [
+                (11.0, 60.0),  # فوق 10°C
+                (11.0, 60.0),  # فوق 10°C
+                (5.0, 60.0),  # دون 10°C
+            ]
+        )
         result = self.service.analyze(readings, spec=self.general_spec)
         assert result["total_hours_above_10"] == 2.0
 
@@ -281,6 +283,7 @@ class TestExposureAnalysisService:
 # ══════════════════════════════════════════════════════════════
 # 3. اختبار التكامل — Use Case كامل
 # ══════════════════════════════════════════════════════════════
+
 
 class TestEvaluateColdChainSafetyUseCaseA1:
     """
@@ -291,9 +294,7 @@ class TestEvaluateColdChainSafetyUseCaseA1:
     def test_use_case_accepts_vaccine_spec(self):
         """Request يقبل vaccine_spec بدون خطأ."""
         from src.domain.dtos.evaluate_cold_chain_safety_request import (
-            EvaluateColdChainSafetyRequest,
-            TemperatureReading,
-        )
+            EvaluateColdChainSafetyRequest, TemperatureReading)
 
         spec = get_vaccine_spec("OPV")
         t0 = datetime(2024, 7, 1, 0, 0, tzinfo=timezone.utc)
@@ -315,9 +316,7 @@ class TestEvaluateColdChainSafetyUseCaseA1:
     def test_use_case_without_spec_uses_fallback(self):
         """بدون vaccine_spec → يستخدم نوع اللقاح من الإدخالات."""
         from src.domain.dtos.evaluate_cold_chain_safety_request import (
-            EvaluateColdChainSafetyRequest,
-            TemperatureReading,
-        )
+            EvaluateColdChainSafetyRequest, TemperatureReading)
 
         t0 = datetime(2024, 7, 1, 0, 0, tzinfo=timezone.utc)
         t1 = datetime(2024, 7, 2, 0, 0, tzinfo=timezone.utc)

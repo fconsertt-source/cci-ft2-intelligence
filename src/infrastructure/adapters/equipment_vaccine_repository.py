@@ -56,10 +56,7 @@ class EquipmentVaccineRepository:
 
     def get_active(self, equipment_id: str) -> List[EquipmentVaccine]:
         """جلب اللقاحات الصالحة (غير منتهية) في معدة معينة."""
-        return [
-            v for v in self.get_by_equipment(equipment_id)
-            if not v.is_expired
-        ]
+        return [v for v in self.get_by_equipment(equipment_id) if not v.is_expired]
 
     # ──────────────────────────────────────────────────────────
     # عمليات الكتابة
@@ -95,7 +92,8 @@ class EquipmentVaccineRepository:
         تحديث مرحلة VVM للقاح معين.
         يعيد النسخة المحدَّثة أو None إذا لم يُوجد.
         """
-        from src.domain.entities.equipment_vaccine import VVMStageValue, EquipmentVaccine
+        from src.domain.entities.equipment_vaccine import (EquipmentVaccine,
+                                                           VVMStageValue)
 
         updated = []
         result = None

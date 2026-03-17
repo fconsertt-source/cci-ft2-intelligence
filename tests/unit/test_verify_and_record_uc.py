@@ -4,12 +4,11 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.application.use_cases.verify_and_record_uc import VerifyAndRecordUseCase
+from src.application.use_cases.verify_and_record_uc import \
+    VerifyAndRecordUseCase
 from src.domain.enums.ledger_event import LedgerEvent
-from src.domain.evidence.verification_result import (
-    VerificationResult,
-    VerificationStatus,
-)
+from src.domain.evidence.verification_result import (VerificationResult,
+                                                     VerificationStatus)
 
 
 class TestVerifyAndRecordUseCaseBDD:

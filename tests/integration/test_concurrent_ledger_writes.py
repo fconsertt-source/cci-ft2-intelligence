@@ -22,7 +22,8 @@ if importlib.util.find_spec("filelock") is None:
     )
 
 from src.domain.enums.ledger_event import LedgerEvent
-from src.infrastructure.adapters.ledger_writer_adapter import HashChainedLedgerWriter
+from src.infrastructure.adapters.ledger_writer_adapter import \
+    HashChainedLedgerWriter
 
 
 def write_worker(ledger_path: Path, worker_id: int, iterations: int):

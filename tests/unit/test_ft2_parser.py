@@ -4,9 +4,8 @@ from datetime import datetime
 import pytest
 
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
-from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import (
-    FT2Reading as FT2Entry,
-)
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import \
+    FT2Reading as FT2Entry
 
 
 class TestFT2Parser:

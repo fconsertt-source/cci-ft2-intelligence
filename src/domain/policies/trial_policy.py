@@ -1,13 +1,16 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import datetime, timedelta  # ← timedelta مُستورد بشكل صحيح
 from enum import Enum
 from typing import Optional
 
+
 class TrialStatus(Enum):
     ACTIVE = "ACTIVE"
     EXPIRED = "EXPIRED"
     TAMPERED = "TAMPERED"
+
 
 @dataclass(frozen=True)
 class TrialPolicy:

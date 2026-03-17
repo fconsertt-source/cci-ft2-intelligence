@@ -21,7 +21,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional
 
-
 # الفجوة الزمنية المقبولة بالساعات قبل اعتبار السلسلة منقطعة
 _MAX_ACCEPTABLE_GAP_HOURS: float = 2.0
 
@@ -65,9 +64,7 @@ class DeviceLink:
 
     # معرف وتاريخ الإنشاء — يُولَّدان تلقائياً
     link_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __post_init__(self) -> None:
         """حساب gap_hours و cold_chain_intact تلقائياً عند الإنشاء."""
@@ -198,16 +195,11 @@ class DeviceLink:
             new_device_id=data["new_device_id"],
             equipment_id=data["equipment_id"],
             handover_date=_parse_dt(data["handover_date"]),
-            old_device_last_reading=_parse_dt(
-                data.get("old_device_last_reading")
-            ),
-            new_device_first_reading=_parse_dt(
-                data.get("new_device_first_reading")
-            ),
+            old_device_last_reading=_parse_dt(data.get("old_device_last_reading")),
+            new_device_first_reading=_parse_dt(data.get("new_device_first_reading")),
             gap_reason=data.get("gap_reason"),
             created_by=data.get("created_by"),
-            created_at=_parse_dt(data.get("created_at"))
-            or datetime.now(timezone.utc),
+            created_at=_parse_dt(data.get("created_at")) or datetime.now(timezone.utc),
         )
 
     def __str__(self) -> str:

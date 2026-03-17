@@ -8,7 +8,7 @@ import hashlib
 import json
 import re
 import sys
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Ensure package root is on PYTHONPATH
@@ -62,10 +62,7 @@ def main(languages: list[str] | None = None) -> bool:
     """
     try:
         from src.infrastructure.adapters.reporting.pdf_strategy import (
-            ArabicPDFStrategy,
-            OfficialPDFStrategy,
-            TechnicalPDFStrategy,
-        )
+            ArabicPDFStrategy, OfficialPDFStrategy, TechnicalPDFStrategy)
     except ImportError as e:
         print(f"PDF strategies not available: {e}")
         return False

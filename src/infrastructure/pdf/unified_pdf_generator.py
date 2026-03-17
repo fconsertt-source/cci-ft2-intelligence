@@ -10,16 +10,16 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
-from src.infrastructure.adapters.reporting.components.alert_circle import AlertCircle
-
+from src.infrastructure.adapters.reporting.components.alert_circle import \
+    AlertCircle
 # ----------------------------------------------------------------------
 # Import our own components (now from infrastructure)
 # ----------------------------------------------------------------------
-from src.infrastructure.adapters.reporting.components.stability_bar import StabilityBar
+from src.infrastructure.adapters.reporting.components.stability_bar import \
+    StabilityBar
 from src.infrastructure.adapters.reporting.components.vvm_icon import VVMIcon
 from src.infrastructure.utils.config_loader import ConfigLoader
 from src.shared.language_manager import lang
-
 
 # ----------------------------------------------------------------------
 # Dependency validation – fail-fast if required libraries are missing
@@ -54,15 +54,9 @@ try:
     from reportlab.lib.units import cm
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.platypus import (
-        Image,
-        PageBreak,
-        Paragraph,
-        SimpleDocTemplate,
-        Spacer,
-        Table,
-        TableStyle,
-    )
+    from reportlab.platypus import (Image, PageBreak, Paragraph,
+                                    SimpleDocTemplate, Spacer, Table,
+                                    TableStyle)
 
     _HAS_REPORTLAB = True
 except ImportError:
@@ -94,6 +88,7 @@ except ImportError:
 
     def get_display(s):
         return s
+
 
 # ----------------------------------------------------------------------
 # Enum for report types – safer than string constants
@@ -718,7 +713,7 @@ class UnifiedPDFGenerator:
                     # لا نغير الملف الفعلي، فقط نضمن ثبات المرجع
                     pass
         chart_path = os.path.join(self.output_dir, f"temp_dist_{uuid.uuid4().hex}.png")
-        
+
         elements.append(Image(chart_path, width=16 * cm, height=8 * cm))
 
         # Add system insight
@@ -805,9 +800,8 @@ class UnifiedPDFGenerator:
         """
         try:
             # direct importer to avoid circular import issues
-            from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import (
-                UnifiedPDFGeneratorWrapper,
-            )
+            from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import \
+                UnifiedPDFGeneratorWrapper
 
             wrapper = UnifiedPDFGeneratorWrapper()
             return wrapper.render(dto, force_report_type=force_report_type)
@@ -841,9 +835,8 @@ def get_pdf_generator(language: str = "ar") -> UnifiedPDFGenerator:
             _wrapper_instance = UnifiedPDFGenerator(language=language)
         except RuntimeError as err:
             if "reportlab" in str(err).lower():
-                from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import (
-                    UnifiedPDFGeneratorWrapper,
-                )
+                from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import \
+                    UnifiedPDFGeneratorWrapper
 
                 _wrapper_instance = UnifiedPDFGeneratorWrapper()
             else:

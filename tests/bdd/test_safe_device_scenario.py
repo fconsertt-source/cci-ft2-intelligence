@@ -7,9 +7,8 @@ BDD: Safe device scenario
 """
 
 
-from src.application.use_cases.generate_device_report_uc import (
-    GenerateDeviceReportRequest,
-)
+from src.application.use_cases.generate_device_report_uc import \
+    GenerateDeviceReportRequest
 
 
 def test_safe_device_with_normal_temperatures(device_use_case):

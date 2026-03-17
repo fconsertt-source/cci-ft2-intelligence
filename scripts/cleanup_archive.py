@@ -55,18 +55,18 @@ def main():
                     if file_path.stat().st_mtime < cutoff:
                         expired_count += 1
                         if dry_run:
-                            logger.info(f"🔍 Would delete: {file_path}")
+                            logger.info("🔍 Would delete: %s", file_path)
                         else:
-                            logger.info(f"🗑️  Deleting: {file_path}")
+                            logger.info("🗑️ Deleting: %s", file_path)
                             file_path.unlink()
 
     logger.info("=" * 60)
     logger.info("📊 Cleanup Results:")
-    logger.info(f"   Expired files found: {expired_count}")
+    logger.info(" Expired files found: %d", expired_count)
     if dry_run:
         logger.info("   (DRY RUN - no files deleted)")
     else:
-        logger.info(f"   Files deleted: {expired_count}")
+        logger.info(" Files deleted: %d", expired_count)
 
     sys.exit(0)
 

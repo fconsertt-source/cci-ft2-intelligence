@@ -17,13 +17,9 @@ from src.application.ports.pdf_extractor_port import PdfExtractorPort
 from src.domain.enums.ledger_event import LedgerEvent
 from src.domain.evidence.cross_validation_result import CrossValidationResult
 from src.domain.evidence.evidence_integrity_report import (
-    EvidenceGrade,
-    EvidenceIntegrityReport,
-)
-from src.domain.evidence.verification_result import (
-    VerificationResult,
-    VerificationStatus,
-)
+    EvidenceGrade, EvidenceIntegrityReport)
+from src.domain.evidence.verification_result import (VerificationResult,
+                                                     VerificationStatus)
 
 logger = logging.getLogger(__name__)
 

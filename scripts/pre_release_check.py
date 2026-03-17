@@ -176,7 +176,8 @@ def generate_report(
     # Log to Ledger if requested
     if ledger_log and failed == 0:
         try:
-            from src.application.ports.ledger_writer_port import LedgerWriterPort
+            from src.application.ports.ledger_writer_port import \
+                LedgerWriterPort
             from src.domain.enums.ledger_event import LedgerEvent
             from src.shared.di_container import container
 

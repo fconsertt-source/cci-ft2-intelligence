@@ -14,15 +14,14 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from src.domain.calculators.time_weighted_ccm_calculator import (
-    TimeWeightedCcmCalculator,
-)
+from src.domain.calculators.time_weighted_ccm_calculator import \
+    TimeWeightedCcmCalculator
 from src.domain.entities.temperature_reading import TemperatureReading
-
 
 # ---------------------------------------------------------------------------
 # helpers
 # ---------------------------------------------------------------------------
+
 
 def make_readings(
     temps: list[float],
@@ -45,6 +44,7 @@ def make_readings(
 # ---------------------------------------------------------------------------
 # edge cases
 # ---------------------------------------------------------------------------
+
 
 class TestTimeWeightedCcmCalculatorEdgeCases:
 
@@ -77,6 +77,7 @@ class TestTimeWeightedCcmCalculatorEdgeCases:
 # ---------------------------------------------------------------------------
 # AUC correctness — TIME_UNIT = minutes
 # ---------------------------------------------------------------------------
+
 
 class TestTimeWeightedCcmCalculatorAUC:
 
@@ -157,6 +158,7 @@ class TestTimeWeightedCcmCalculatorAUC:
 # Delta correctness
 # ---------------------------------------------------------------------------
 
+
 class TestTimeWeightedCcmCalculatorDelta:
 
     def test_delta_below_threshold_ignored(self):
@@ -186,6 +188,7 @@ class TestTimeWeightedCcmCalculatorDelta:
 # unsorted input
 # ---------------------------------------------------------------------------
 
+
 class TestTimeWeightedCcmCalculatorOrdering:
 
     def test_unsorted_readings_same_result(self):
@@ -208,6 +211,7 @@ class TestTimeWeightedCcmCalculatorOrdering:
 # ---------------------------------------------------------------------------
 # independence from HER
 # ---------------------------------------------------------------------------
+
 
 class TestCcmHerIndependence:
 

@@ -2,11 +2,8 @@
 """Unit tests for ImportFT2BundleUseCase."""
 
 
-
 from src.application.use_cases.import_ft2_bundle_uc import (
-    ImportFT2BundleRequest,
-    ImportFT2BundleUseCase,
-)
+    ImportFT2BundleRequest, ImportFT2BundleUseCase)
 from src.domain.entities.device_identity import DeviceIdentity
 
 

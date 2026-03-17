@@ -5,21 +5,20 @@ Application Composer - الحارس الرقمي
 
 import logging
 
-from src.application.use_cases.generate_device_report_uc import (
-    GenerateDeviceReportUseCase,
-)
-from src.application.use_cases.import_ft2_bundle_uc import ImportFT2BundleUseCase
-from src.domain.services.regulatory_decision_service import RegulatoryDecisionService
-from src.domain.services.thermal_degradation_estimator import (
-    ThermalDegradationEstimator,
-)
-from src.infrastructure.adapters.json_vaccine_spec_repository import (
-    JsonVaccineSpecRepository,
-)
-from src.infrastructure.adapters.validation_protocol_service import (
-    ValidationProtocolService,
-)
-from src.infrastructure.repositories.device_repository import DeviceDataRepository
+from src.application.use_cases.generate_device_report_uc import \
+    GenerateDeviceReportUseCase
+from src.application.use_cases.import_ft2_bundle_uc import \
+    ImportFT2BundleUseCase
+from src.domain.services.regulatory_decision_service import \
+    RegulatoryDecisionService
+from src.domain.services.thermal_degradation_estimator import \
+    ThermalDegradationEstimator
+from src.infrastructure.adapters.json_vaccine_spec_repository import \
+    JsonVaccineSpecRepository
+from src.infrastructure.adapters.validation_protocol_service import \
+    ValidationProtocolService
+from src.infrastructure.repositories.device_repository import \
+    DeviceDataRepository
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +38,7 @@ class AppComposer:
         """يبني حالة استخدام إنشاء تقرير الجهاز مع التبعيات الضرورية."""
         logger.info("Building GenerateDeviceReportUseCase...")
         repository = DeviceDataRepository()
-        logger.info(f"Repository initialized: {type(repository).__name__}")
+        logger.info("Repository initialized: %s", type(repository).__name__)
 
         vaccine_specs = JsonVaccineSpecRepository()
         logger.info(
@@ -52,16 +51,16 @@ class AppComposer:
         )
 
         estimator = ThermalDegradationEstimator()
-        logger.info(f"Estimator initialized: {type(estimator).__name__}")
+        logger.info("Estimator initialized: %s", type(estimator).__name__)
 
         validator = ValidationProtocolService()
-        logger.info(f"Validator initialized: {type(validator).__name__}")
+        logger.info("Validator initialized: %s", type(validator).__name__)
 
         # a simple guard that will always succeed; enables use cases without
         # requiring the full license stack. production could swap in a real
         # LicenseGuard if needed by adjusting the composer accordingly.
         license_guard = AppComposer._NoOpLicenseGuard()
-        logger.info(f"LicenseGuard initialized: {type(license_guard).__name__}")
+        logger.info("LicenseGuard initialized: %s", type(license_guard).__name__)
 
         # ملاحظة: سيتم إضافة التبعيات الأخرى (مثل مولد PDF) هنا تدريجياً
         # حسب الخطة الموضوعة.
@@ -100,5 +99,5 @@ class AppComposer:
             logger.info("Health check passed")
             return True
         except Exception as e:
-            logger.error(f"Health check failed: {e}")
+                logger.error("Health check failed: %s", e)
             return False

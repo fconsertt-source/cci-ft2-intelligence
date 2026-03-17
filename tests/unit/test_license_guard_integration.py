@@ -3,20 +3,20 @@ from unittest.mock import Mock
 import pytest
 
 from src.application.ports.device_repository_port import DeviceRepositoryPort
-from src.application.ports.vaccine_specification_port import VaccineSpecificationPort
-from src.application.ports.validation_protocol_port import ValidationProtocolPort
+from src.application.ports.vaccine_specification_port import \
+    VaccineSpecificationPort
+from src.application.ports.validation_protocol_port import \
+    ValidationProtocolPort
 from src.application.security.license_guard import LicenseGuard
-
 # Assume these modules and classes exist from previous work
-from src.application.use_cases.generate_device_report_uc import (
-    GenerateDeviceReportUseCase,
-)
+from src.application.use_cases.generate_device_report_uc import \
+    GenerateDeviceReportUseCase
 from src.application.use_cases.requests import GenerateDeviceReportRequest
 from src.domain.exceptions.license_exceptions import LicenseExpiredError
-from src.domain.services.regulatory_decision_service import RegulatoryDecisionService
-from src.domain.services.thermal_degradation_estimator import (
-    ThermalDegradationEstimator,
-)
+from src.domain.services.regulatory_decision_service import \
+    RegulatoryDecisionService
+from src.domain.services.thermal_degradation_estimator import \
+    ThermalDegradationEstimator
 
 
 @pytest.fixture

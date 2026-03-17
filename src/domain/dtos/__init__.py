@@ -8,16 +8,10 @@ Domain DTOs - كائنات نقل البيانات التجارية
 from .analysis_result_dto import AnalysisResultDTO, VaccineStatus
 from .base_dto import BaseDTO
 from .center_dto import CenterDTO
-from .device_report_dto import (
-    AdvisorySection,
-    DeviceReportDTO,
-    ThermalExcursionDTO,
-    ValidationProtocol,
-)
+from .device_report_dto import (AdvisorySection, DeviceReportDTO,
+                                ThermalExcursionDTO, ValidationProtocol)
 from .evaluate_cold_chain_safety_request import (
-    EvaluateColdChainSafetyRequest,
-    TemperatureReading,
-)
+    EvaluateColdChainSafetyRequest, TemperatureReading)
 from .ft2_entry_dto import FT2EntryDTO
 from .report_input_dto import ReportInputDTO
 from .vaccine_dto import VaccineDTO

@@ -21,7 +21,9 @@ class TemperatureMapper:
     """
 
     @staticmethod
-    def entries_to_readings(entries: List[TemperatureEntry]) -> List[TemperatureReading]:
+    def entries_to_readings(
+        entries: List[TemperatureEntry],
+    ) -> List[TemperatureReading]:
         """
         تحويل قائمة TemperatureEntry إلى TemperatureReading.
 

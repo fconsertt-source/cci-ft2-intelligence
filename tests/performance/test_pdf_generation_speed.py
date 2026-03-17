@@ -39,7 +39,8 @@ def create_realistic_dto() -> DeviceReportDTO:
 def test_pdf_generation_performance():
     """اختبار الزمن + الحجم + الذاكرة معاً"""
     try:
-        from src.infrastructure.pdf.unified_pdf_generator import UnifiedPDFGenerator
+        from src.infrastructure.pdf.unified_pdf_generator import \
+            UnifiedPDFGenerator
     except ImportError:
         pytest.skip("UnifiedPDFGenerator not available yet")
 

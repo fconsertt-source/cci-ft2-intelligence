@@ -1,9 +1,7 @@
 from unittest.mock import MagicMock
 
-
-from src.application.use_cases.evaluate_cold_chain_safety_uc import (
-    EvaluateColdChainSafetyUC,
-)
+from src.application.use_cases.evaluate_cold_chain_safety_uc import \
+    EvaluateColdChainSafetyUC
 
 
 class TestEvaluateColdChainSafetyUC:

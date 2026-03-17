@@ -11,17 +11,12 @@ from unittest.mock import Mock
 import pytest
 
 from src.domain.dtos.device_report_dto import DeviceReportDTO
-
 # make sure each unit test gets a fresh singleton instance
-from src.infrastructure.adapters.reporting import (
-    unified_pdf_generator_wrapper as _wrapper_module,
-)
-
+from src.infrastructure.adapters.reporting import \
+    unified_pdf_generator_wrapper as _wrapper_module
 # Import the refactored wrapper and its singleton factory
 from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import (
-    UnifiedPDFGeneratorWrapper,
-    get_pdf_generator,
-)
+    UnifiedPDFGeneratorWrapper, get_pdf_generator)
 
 
 @pytest.fixture(autouse=True)
@@ -166,9 +161,8 @@ class TestLoggingSafety:
 
     def test_logger_configured(self):
         """التأكد من أن logger مُعد بشكل صحيح"""
-        from src.infrastructure.pdf import (
-            arabic_font_manager as unified_pdf_generator_wrapper,
-        )
+        from src.infrastructure.pdf import \
+            arabic_font_manager as unified_pdf_generator_wrapper
 
         assert hasattr(unified_pdf_generator_wrapper, "logger")
 

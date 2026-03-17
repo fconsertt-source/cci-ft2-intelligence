@@ -31,9 +31,8 @@ class TestFallbackChainIntegration:
 
     def test_full_fallback_chain(self, sample_dto, caplog):
         """اختبار السلسلة الكاملة من Unified → Fallback → Placeholder"""
-        from src.infrastructure.pdf.unified_pdf_generator_wrapper import (
-            UnifiedPDFGeneratorWrapper,
-        )
+        from src.infrastructure.pdf.unified_pdf_generator_wrapper import \
+            UnifiedPDFGeneratorWrapper
 
         caplog.set_level(logging.INFO)
 
@@ -54,9 +53,8 @@ class TestFallbackChainIntegration:
 
     def test_unified_generator_priority(self, sample_dto):
         """التأكد من أن المولد الحقيقي له أولوية"""
-        from src.infrastructure.pdf.unified_pdf_generator_wrapper import (
-            UnifiedPDFGeneratorWrapper,
-        )
+        from src.infrastructure.pdf.unified_pdf_generator_wrapper import \
+            UnifiedPDFGeneratorWrapper
 
         wrapper = UnifiedPDFGeneratorWrapper()
         wrapper._ensure_initialized()

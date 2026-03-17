@@ -23,17 +23,17 @@ def load_yaml(file_path: str) -> Any:
         with open(file_path, "r", encoding="utf-8") as f:
             content = yaml.safe_load(f)
 
-        logger.info(f"تم تحميل YAML من: {file_path}")
+        logger.info("تم تحميل YAML من: %s", file_path)
         return content
 
     except FileNotFoundError:
-        logger.error(f"ملف YAML غير موجود: {file_path}")
+        logger.error("ملف YAML غير موجود: %s", file_path)
         raise
     except yaml.YAMLError as e:
-        logger.error(f"خطأ في تحليل YAML: {e}")
+        logger.error("خطأ في تحليل YAML: %s", e)
         raise
     except Exception as e:
-        logger.error(f"خطأ غير متوقع في تحميل YAML: {e}")
+        logger.error("خطأ غير متوقع في تحميل YAML: %s", e)
         raise
 
 
@@ -49,8 +49,8 @@ def save_yaml(data: Any, file_path: str):
         with open(file_path, "w", encoding="utf-8") as f:
             yaml.dump(data, f, allow_unicode=True, default_flow_style=False)
 
-        logger.info(f"تم حفظ YAML إلى: {file_path}")
+        logger.info("تم حفظ YAML إلى: %s", file_path)
 
     except Exception as e:
-        logger.error(f"خطأ في حفظ YAML: {e}")
+        logger.error("خطأ في حفظ YAML: %s", e)
         raise

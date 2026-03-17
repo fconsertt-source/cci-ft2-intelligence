@@ -11,17 +11,12 @@ import json
 
 import pytest
 
-from src.domain.enums.ledger_event import (
-    LedgerEvent,
-    get_event_category,
-    get_event_priority,
-)
-
+from src.domain.enums.ledger_event import (LedgerEvent, get_event_category,
+                                           get_event_priority)
 # the project no longer has a subpackage 'ledger'; adapter lives at top of adapters
 # and the concrete implementation is HashChainedLedgerWriter
-from src.infrastructure.adapters.ledger_writer_adapter import (
-    HashChainedLedgerWriter as LedgerWriterAdapter,
-)
+from src.infrastructure.adapters.ledger_writer_adapter import \
+    HashChainedLedgerWriter as LedgerWriterAdapter
 
 
 class TestLedgerEventEnum:
@@ -167,10 +162,10 @@ class TestLedgerWriterWithTaxonomy:
 
     def test_append_with_taxonomy(self, ledger_path):
         """اختبار إضافة إدخال مع taxonomy كامل"""
-        writer = LedgerWriterAdapter(ledger_path) 
+        writer = LedgerWriterAdapter(ledger_path)
 
         # only include supported fields; extras removed
-        event_hash = writer.append( # noqa: F841
+        event_hash = writer.append(  # noqa: F841
             event_type=LedgerEvent.PDF_GENERATED,
             file_hash="dummy-hash-000",
             ft2_serial="130600112764",

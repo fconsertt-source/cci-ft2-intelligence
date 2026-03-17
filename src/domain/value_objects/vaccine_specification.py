@@ -11,16 +11,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-
 # ──────────────────────────────────────────────────────────────
 # ثوابت WHO/IVB/06.10 — عتبات CCM الرسمية
 # المصدر: WHO/PQS/E06/IN02.1 § 4.2.3
 # ──────────────────────────────────────────────────────────────
-CCM_WINDOW_A_DAYS_AT_12C: float = 3.0    # نافذة A عند 12°C
-CCM_WINDOW_AB_DAYS_AT_12C: float = 8.0   # نافذة A+B عند 12°C
-CCM_WINDOW_ABC_DAYS_AT_12C: float = 14.0 # نافذة A+B+C عند 12°C
-CCM_CRITICAL_TEMP: float = 34.0          # عتبة النافذة D
-CCM_CRITICAL_HOURS: float = 2.0          # ساعتان فوق 34°C = DISCARD
+CCM_WINDOW_A_DAYS_AT_12C: float = 3.0  # نافذة A عند 12°C
+CCM_WINDOW_AB_DAYS_AT_12C: float = 8.0  # نافذة A+B عند 12°C
+CCM_WINDOW_ABC_DAYS_AT_12C: float = 14.0  # نافذة A+B+C عند 12°C
+CCM_CRITICAL_TEMP: float = 34.0  # عتبة النافذة D
+CCM_CRITICAL_HOURS: float = 2.0  # ساعتان فوق 34°C = DISCARD
 
 # عتبة HER للقرار (مستنبطة من VVM reaction rates — Table 1 WHO/IVB/06.10)
 HER_SAFE_MAX: float = 1.0
@@ -46,10 +45,10 @@ class VaccineSpecification:
 
     vaccine_type: str
     q10_factor: float = 2.0
-    shelf_life_days: float = 730.0        # سنتان افتراضياً
+    shelf_life_days: float = 730.0  # سنتان افتراضياً
     reference_temp_c: float = 5.0
     freeze_sensitive: bool = False
-    vvm_type: Optional[str] = None        # VVM2 / VVM7 / VVM14 / VVM30
+    vvm_type: Optional[str] = None  # VVM2 / VVM7 / VVM14 / VVM30
     critical_temp_c: float = CCM_CRITICAL_TEMP
     critical_hours: float = CCM_CRITICAL_HOURS
     rationale: str = ""
@@ -98,7 +97,7 @@ VACCINE_CATALOGUE: dict[str, VaccineSpecification] = {
     "DTP": VaccineSpecification(
         vaccine_type="DTP",
         q10_factor=2.0,
-        shelf_life_days=548,   # 18 شهراً
+        shelf_life_days=548,  # 18 شهراً
         freeze_sensitive=True,
         vvm_type="VVM14",
         rationale="العامل المحدِّد: مكوّن السعال الديكي. حساس للتجمد",

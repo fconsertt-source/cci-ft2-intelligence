@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
+import fnmatch
+import hashlib
+import json
 import os
 import sys
-import json
-import hashlib
-import fnmatch
 from pathlib import Path
 
 from src.infrastructure.logging import get_logger
@@ -15,9 +15,16 @@ sys.path.append(str(PROJECT_ROOT))
 
 logger = get_logger(__name__)
 IGNORE_PATTERNS = [
-    '.git', '__pycache__', '.venv', 'venv', '*.pyc', '.pytest_cache',
-    'data/output/*', 'scripts/project_utility.py'
+    '.git',
+    '__pycache__',
+    '.venv',
+    'venv',
+    '*.pyc',
+    '.pytest_cache',
+    'data/output/*',
+    'scripts/project_utility.py',
 ]
+
 
 def get_sha256(file_path):
     sha256 = hashlib.sha256()
@@ -26,12 +33,19 @@ def get_sha256(file_path):
             sha256.update(block)
     return sha256.hexdigest()
 
+
 def generate_tree(dir_path, indent=""):
-    items = sorted([d for d in os.listdir(dir_path) if not any(fnmatch.fnmatch(d, p) for p in IGNORE_PATTERNS)])
+    items = sorted(
+        [
+            d
+            for d in os.listdir(dir_path)
+            if not any(fnmatch.fnmatch(d, p) for p in IGNORE_PATTERNS)
+        ]
+    )
     tree_output = ""
     for i, item in enumerate(items):
         path = os.path.join(dir_path, item)
-        is_last = (i == len(items) - 1)
+        is_last = i == len(items) - 1
         connector = "└── " if is_last else "├── "
         if os.path.isdir(path):
             tree_output += f"{indent}{connector}📂 {item}/\n"
@@ -40,24 +54,30 @@ def generate_tree(dir_path, indent=""):
             tree_output += f"{indent}{connector}📄 {item}\n"
     return tree_output
 
+
 def create_manifest():
     manifest = []
     for root, dirs, files in os.walk(PROJECT_ROOT):
-        dirs[:] = [d for d in dirs if not any(fnmatch.fnmatch(d, p) for p in IGNORE_PATTERNS)]
+        dirs[:] = [
+            d for d in dirs if not any(fnmatch.fnmatch(d, p) for p in IGNORE_PATTERNS)
+        ]
         for f in files:
             if any(fnmatch.fnmatch(f, p) for p in IGNORE_PATTERNS):
                 continue
             file_path = Path(root) / f
             rel_path = file_path.relative_to(PROJECT_ROOT)
-            manifest.append({
-                "path": str(rel_path).replace('\\', '/'),
-                "sha256": get_sha256(file_path)
-            })
+            manifest.append(
+                {
+                    "path": str(rel_path).replace('\\', '/'),
+                    "sha256": get_sha256(file_path),
+                }
+            )
     return sorted(manifest, key=lambda x: x['path'])
+
 
 def main():
     logger.info("🛡️ CCI-FT2 Intelligence - Project State Utility")
-    logger.info("%s", "="*45)
+    logger.info("%s", "=" * 45)
 
     # 1. عرض الشجرة
     logger.info("\n🌳 Project Structure:")
@@ -71,6 +91,7 @@ def main():
 
     logger.info("✅ Manifest updated: %s", manifest_file)
     logger.info("📊 Total tracked files: %d", len(manifest_data))
+
 
 if __name__ == "__main__":
     main()

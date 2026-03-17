@@ -16,7 +16,7 @@ class ThermalImpactCalculatorPort(ABC):
         self,
         temperature: float,
         duration_minutes: float,
-        specification: VaccineSpecification
+        specification: VaccineSpecification,
     ) -> str:  # Returns "SAFE", "PARTIAL", or "DISCARD"
         """
         Evaluate thermal impact based on temperature and duration.

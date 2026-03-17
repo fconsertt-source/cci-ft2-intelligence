@@ -11,13 +11,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.domain.services.regulatory_decision_service import RegulatoryDecisionService
+from src.domain.services.regulatory_decision_service import \
+    RegulatoryDecisionService
 from src.domain.value_objects.vaccine_specification import VaccineSpecification
-
 
 # ---------------------------------------------------------------------------
 # helpers — بناء specs بسرعة
 # ---------------------------------------------------------------------------
+
 
 def make_spec(
     min_temp: float = 2.0,
@@ -46,6 +47,7 @@ SVC = RegulatoryDecisionService()
 # المصدر: WHO/IVB/06.10 §5.2, §6.2, §3
 # ===========================================================================
 
+
 class TestFreezeSensitiveVaccines:
 
     def test_at_zero_discard(self):
@@ -65,7 +67,9 @@ class TestFreezeSensitiveVaccines:
 
     def test_just_above_zero_not_discard_by_freeze(self):
         """0.1°C ≠ تجميد — يُتابع الفحص للحرارة."""
-        spec = make_spec(freeze_sensitive=True, max_temp=8.0, max_heat_duration_hours=2.0)
+        spec = make_spec(
+            freeze_sensitive=True, max_temp=8.0, max_heat_duration_hours=2.0
+        )
         result = SVC.evaluate(0.1, 10.0, spec)
         # ليس تجميداً — يجب أن يكون SAFE (ضمن النطاق)
         assert result == "SAFE"
@@ -81,6 +85,7 @@ class TestFreezeSensitiveVaccines:
 # FREEZE STABLE WITH FREEZE RANGE — OPV, BCG, Measles, YF
 # المصدر: WHO/IVB/06.10 §12.2 (OPV يُحفظ عند -15 إلى -25°C)
 # ===========================================================================
+
 
 class TestFreezeStableWithFreezeRange:
 
@@ -115,6 +120,7 @@ class TestFreezeStableWithFreezeRange:
 # المصدر: WHO/IVB/06.10 §5.1 "At 60°C destroyed in 3-5 hours"
 # ===========================================================================
 
+
 class TestMaxHeatTempAbsoluteLimit:
 
     def test_exceeds_max_heat_temp_discard_immediately(self):
@@ -147,6 +153,7 @@ class TestMaxHeatTempAbsoluteLimit:
 # HEAT DURATION CHECK — PARTIAL vs DISCARD
 # المصدر: WHO/IVB/06.10 §5.1 Table 2
 # ===========================================================================
+
 
 class TestHeatDurationCheck:
 
@@ -198,6 +205,7 @@ class TestHeatDurationCheck:
 # SAFE — ضمن النطاق الطبيعي
 # ===========================================================================
 
+
 class TestSafeWithinRange:
 
     def test_within_normal_range_safe(self):
@@ -222,15 +230,19 @@ class TestSafeWithinRange:
 # OUTCOME CONTRACT — نتائج محدودة بـ 3 فقط
 # ===========================================================================
 
+
 class TestOutcomeContract:
 
-    @pytest.mark.parametrize("temp,duration,expected", [
-        (-5.0, 10.0, "DISCARD"),   # تجميد مؤذٍ
-        (5.0, 60.0, "SAFE"),       # طبيعي
-        (25.0, 30.0, "PARTIAL"),   # تجاوز مؤقت
-        (50.0, 1.0, "DISCARD"),    # تجاوز max_heat_temp
-        (25.0, 180.0, "DISCARD"),  # تجاوز مدة
-    ])
+    @pytest.mark.parametrize(
+        "temp,duration,expected",
+        [
+            (-5.0, 10.0, "DISCARD"),  # تجميد مؤذٍ
+            (5.0, 60.0, "SAFE"),  # طبيعي
+            (25.0, 30.0, "PARTIAL"),  # تجاوز مؤقت
+            (50.0, 1.0, "DISCARD"),  # تجاوز max_heat_temp
+            (25.0, 180.0, "DISCARD"),  # تجاوز مدة
+        ],
+    )
     def test_outcome_is_one_of_three(self, temp, duration, expected):
         spec = make_spec(
             max_temp=8.0,
@@ -256,7 +268,17 @@ class TestOutcomeContract:
         with open(mod.__file__) as f:
             source = f.read().lower()
 
-        forbidden = ["q10", "her_calculator", "ccm_calculator", "vvmq10model",
-                     "math.pow", "math.log", "probability", "estimate"]
+        forbidden = [
+            "q10",
+            "her_calculator",
+            "ccm_calculator",
+            "vvmq10model",
+            "math.pow",
+            "math.log",
+            "probability",
+            "estimate",
+        ]
         for term in forbidden:
-            assert term not in source, f"وُجد '{term}' في regulatory service — مخالف للمبدأ"
+            assert (
+                term not in source
+            ), f"وُجد '{term}' في regulatory service — مخالف للمبدأ"

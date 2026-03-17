@@ -20,11 +20,12 @@ from typing import Optional
 
 class EquipmentType(Enum):
     """نوع معدة التبريد."""
-    REFRIGERATOR = "REFRIGERATOR"   # ثلاجة عادية (+2 إلى +8°C)
-    COLD_ROOM = "COLD_ROOM"         # غرفة تبريد (+2 إلى +8°C)
-    FREEZER = "FREEZER"             # فريزر (-15 إلى -25°C)
-    DEEP_FREEZER = "DEEP_FREEZER"   # فريزر عميق (< -25°C)
-    TRANSPORT_BOX = "TRANSPORT_BOX" # صندوق نقل مؤقت
+
+    REFRIGERATOR = "REFRIGERATOR"  # ثلاجة عادية (+2 إلى +8°C)
+    COLD_ROOM = "COLD_ROOM"  # غرفة تبريد (+2 إلى +8°C)
+    FREEZER = "FREEZER"  # فريزر (-15 إلى -25°C)
+    DEEP_FREEZER = "DEEP_FREEZER"  # فريزر عميق (< -25°C)
+    TRANSPORT_BOX = "TRANSPORT_BOX"  # صندوق نقل مؤقت
 
 
 @dataclass(frozen=True)
@@ -80,9 +81,7 @@ class EquipmentRecord:
         return cls(
             equipment_id=data["equipment_id"],
             center_id=data["center_id"],
-            equipment_type=EquipmentType(
-                data.get("equipment_type", "REFRIGERATOR")
-            ),
+            equipment_type=EquipmentType(data.get("equipment_type", "REFRIGERATOR")),
             location_note=data.get("location_note"),
             active_device_id=data.get("active_device_id"),
             capacity_liters=data.get("capacity_liters"),

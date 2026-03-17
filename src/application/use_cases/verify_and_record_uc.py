@@ -5,10 +5,8 @@ from pathlib import Path
 from src.application.ports.ledger_writer_port import LedgerWriterPort
 from src.application.ports.official_verifier_port import OfficialVerifierPort
 from src.domain.enums.ledger_event import LedgerEvent
-from src.domain.evidence.verification_result import (
-    VerificationResult,
-    VerificationStatus,
-)
+from src.domain.evidence.verification_result import (VerificationResult,
+                                                     VerificationStatus)
 
 
 class VerifyAndRecordUseCase:

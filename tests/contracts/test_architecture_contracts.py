@@ -117,10 +117,10 @@ class TestLayerBoundaries:
 
     def test_usecase_uses_request_dto_only(self):
         """UseCase.execute يجب أن يقبل Request DTO فقط"""
-        from src.application.use_cases.generate_device_report_uc import (
-            GenerateDeviceReportUseCase,
-        )
-        from src.application.use_cases.requests import GenerateDeviceReportRequest
+        from src.application.use_cases.generate_device_report_uc import \
+            GenerateDeviceReportUseCase
+        from src.application.use_cases.requests import \
+            GenerateDeviceReportRequest
 
         sig = inspect.signature(GenerateDeviceReportUseCase.execute)
 

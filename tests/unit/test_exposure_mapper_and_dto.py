@@ -5,7 +5,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from src.application.mappers.exposure_mapper import ExposureMapper
-from src.domain.dtos.device_report_dto import DeviceReportDTO, ThermalExcursionDTO
+from src.domain.dtos.device_report_dto import (DeviceReportDTO,
+                                               ThermalExcursionDTO)
 
 # ---------------------------------------------------------------------------
 # ExposureMapper
@@ -157,9 +158,7 @@ class TestApplicationDeviceReportDTO:
     def test_import_and_validate(self):
         from datetime import datetime, timezone
 
-        from src.application.dtos.device_report_dto import (
-            DeviceReportDTO,
-        )
+        from src.application.dtos.device_report_dto import DeviceReportDTO
 
         dto = DeviceReportDTO(
             device_id="APP-001",
@@ -253,9 +252,7 @@ class TestApplicationDTOExtraCoverage:
         from datetime import datetime, timezone
 
         from src.application.dtos.device_report_dto import (
-            DeviceReportDTO,
-            ThermalExcursionDTO,
-        )
+            DeviceReportDTO, ThermalExcursionDTO)
 
         excursions = [
             ThermalExcursionDTO(
@@ -289,5 +286,3 @@ class TestApplicationDTOExtraCoverage:
         )
         counts = dto.get_batch_counts()
         assert counts == {"safe": 1, "warning": 1, "discard": 1}
-
-

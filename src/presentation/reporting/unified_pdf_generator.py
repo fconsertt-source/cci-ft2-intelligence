@@ -8,9 +8,8 @@ has moved to the adapters layer.
 # layer thin and ensures scripts/tests that expect ``ReportType`` continue to
 # work.
 from src.domain.enums.report_scope import ReportType
-from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import (
-    UnifiedPDFGeneratorWrapper,
-)
+from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import \
+    UnifiedPDFGeneratorWrapper
 
 
 class UnifiedPDFGenerator(UnifiedPDFGeneratorWrapper):

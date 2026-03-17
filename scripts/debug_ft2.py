@@ -12,8 +12,8 @@ from pathlib import Path
 # Add project root to path for src imports
 sys.path.append(str(Path(__file__).parent.parent))
 
-from src.infrastructure.logging import get_logger
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
+from src.infrastructure.logging import get_logger
 from src.presentation.messages.message_map import MessageProvider
 
 logger = get_logger(__name__)
@@ -51,7 +51,9 @@ def clean_bad_files():
 
             if should_remove:
                 os.remove(filepath)
-                logger.info(MessageProvider.get('DEBUG_FILE_DELETED', file=file, reason=reason))
+                logger.info(
+                    MessageProvider.get('DEBUG_FILE_DELETED', file=file, reason=reason)
+                )
                 removed_count += 1
 
         except Exception as e:
@@ -62,10 +64,11 @@ def clean_bad_files():
     else:
         logger.info(MessageProvider.get('DEBUG_CLEANED_COUNT', count=removed_count))
 
+
 def debug_raw_files():
     """فحص الملفات الخام (TSV/CSV) في data/input_raw"""
     input_dir = "data/input_raw"
-    
+
     if not os.path.exists(input_dir):
         logger.warning(MessageProvider.get('DEBUG_DIR_NOT_FOUND', path=input_dir))
         return
@@ -75,7 +78,9 @@ def debug_raw_files():
     files = [f for f in os.listdir(input_dir) if f.endswith(('.tsv', '.csv'))]
     if not files:
         logger.info("لا توجد ملفات .tsv أو .csv.")
-        logger.info("💡 تلميح: جرب إنشاء بيانات اختبار أولاً باستخدام: python -m scripts.run_ft2_pipeline --generate-data")
+        logger.info(
+            "💡 تلميح: جرب إنشاء بيانات اختبار أولاً باستخدام: python -m scripts.run_ft2_pipeline --generate-data"
+        )
         return
 
     for file in files:
@@ -93,10 +98,17 @@ def debug_raw_files():
             logger.info("📊 عدد الإدخالات: %d", len(entries))
             logger.info("📝 أول 3 عينات:")
             for i, e in enumerate(entries[:3]):
-                logger.info("  %d: device=%s ts=%s temp=%s", i+1, getattr(e, 'device_id', None), getattr(e, 'timestamp', None), getattr(e, 'temperature', None))
+                logger.info(
+                    "  %d: device=%s ts=%s temp=%s",
+                    i + 1,
+                    getattr(e, 'device_id', None),
+                    getattr(e, 'timestamp', None),
+                    getattr(e, 'temperature', None),
+                )
 
         except Exception as e:
             logger.error("❌ خطأ في قراءة الملف %s: %s", file, e)
+
 
 def debug_ft2_files():
     """تصحيح مشاكل ملفات FT2"""
@@ -122,7 +134,7 @@ def debug_ft2_files():
                     lines = content.split('\n')
                     logger.info("عدد الأسطر: %d", len(lines))
                     for i, line in enumerate(lines[:5]):
-                        logger.debug("سطر %d: %s", i+1, line[:100])
+                        logger.debug("سطر %d: %s", i + 1, line[:100])
 
                     # البحث عن كلمات مفتاحية
                     keywords = ['Hist:', 'Date:', 'Min T:', 'Serial:']
@@ -133,6 +145,7 @@ def debug_ft2_files():
                             logger.info("❌ لم يجد: %s", kw)
             except Exception as e:
                 logger.error("❌ خطأ في فحص %s: %s", file, e)
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--clean":

@@ -8,26 +8,26 @@
 
 from __future__ import annotations
 
-from typing import Protocol, Dict, Any
 from pathlib import Path
+from typing import Any, Dict, Protocol
 
 
 class PdfExtractorPort(Protocol):
     """
     واجهة مستخرج بيانات PDF.
-    
+
     يتبع مبدأ Dependency Inversion:
     - High-level modules (Validators, UseCases) لا تعتمد على low-level details
     - كلاهما يعتمد على هذه الواجهة المجردة
     """
-    
+
     def extract(self, pdf_path: Path) -> Dict[str, Any]:
         """
         استخراج البيانات من ملف PDF.
-        
+
         Args:
             pdf_path: مسار ملف PDF
-            
+
         Returns:
             dict: بيانات مستخرجة تحتوي على:
                 - serial (str): الرقم التسلسلي للجهاز

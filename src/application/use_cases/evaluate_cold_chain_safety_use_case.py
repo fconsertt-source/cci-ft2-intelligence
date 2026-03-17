@@ -3,10 +3,9 @@ from itertools import tee
 from typing import List
 
 from src.domain.dtos.evaluate_cold_chain_safety_request import (
-    EvaluateColdChainSafetyRequest,
-    EvaluateColdChainSafetyResponse,
-)
-from src.domain.services.rules_engine import apply_rules, calculate_center_stats
+    EvaluateColdChainSafetyRequest, EvaluateColdChainSafetyResponse)
+from src.domain.services.rules_engine import (apply_rules,
+                                              calculate_center_stats)
 from src.domain.value_objects.temperature_entry import TemperatureEntry
 
 
