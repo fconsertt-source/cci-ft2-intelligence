@@ -70,7 +70,6 @@ jobs:
 
       # إضافة إلى CI/CD
       - name: Check dependencies
-        continue-on-error: true 
         run: |
           pip install pip-audit
-          pip-audit --format json --output vulns.json
+          pip-audit --format json --output vulns.json || true
