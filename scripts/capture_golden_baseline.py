@@ -41,7 +41,7 @@ def calculate_hash(pdf_bytes: bytes) -> str:
 
 def create_test_dto():
     """Create a standard test DTO following the golden blueprint."""
-    from src.application.dtos.device_report_dto import DeviceReportDTO
+    from src.domain.dtos.device_report_dto import DeviceReportDTO
 
     return DeviceReportDTO(
         device_id="GOLDEN-TEST-001",

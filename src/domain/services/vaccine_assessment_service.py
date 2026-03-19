@@ -26,7 +26,7 @@ from src.domain.services.exposure_analysis_service import \
 from src.domain.value_objects.vaccine_assessment_result import \
     VaccineAssessmentResult
 from src.domain.value_objects.vaccine_specification import (
-    HER_PARTIAL_MAX, HER_SAFE_MAX, VaccineSpecification, get_vaccine_spec)
+    VaccineSpecification, get_vaccine_spec)
 
 logger = logging.getLogger(__name__)
 
@@ -184,8 +184,7 @@ class VaccineAssessmentService:
         priority = {
             VaccineDecision.DISCARD: 0,
             VaccineDecision.EXPIRED: 1,
-            VaccineDecision.PARTIAL: 2,
-            VaccineDecision.SAFE: 3,
+            VaccineDecision.SAFE: 2,
         }
         return sorted(results, key=lambda r: priority[r.decision])
 
@@ -199,33 +198,26 @@ class VaccineAssessmentService:
         her_ratio: float,
         ccm_index: str,
     ) -> VaccineAssessmentResult:
-        """تطبيق عتبات HER لتحديد القرار."""
+        """
+        تطبيق منطق HER حسب الخطة:
+
+        - HER ≥ 1.0 → DISCARD (استنفاد الميزانية الحرارية)
+        - HER < 1.0 → SAFE
+
+        ملاحظة:
+        - لا يوجد PARTIAL هنا
+        - التدرج (MEDIUM / HIGH) يتم في JudgmentEngine
+        """
         ccm_note = f" | CCM={ccm_index}" if ccm_index != "0" else ""
 
-        if her_ratio > HER_PARTIAL_MAX:
+        if her_ratio >= 1.0:
             return self._result(
                 vaccine=vaccine,
                 decision=VaccineDecision.DISCARD,
                 reason=DecisionReason.HEAT_EXCESS,
                 her_ratio=her_ratio,
                 ccm_index=ccm_index,
-                detail=(
-                    f"HER={her_ratio:.4f} تجاوز الحد الأقصى "
-                    f"{HER_PARTIAL_MAX}{ccm_note}"
-                ),
-            )
-
-        if her_ratio > HER_SAFE_MAX:
-            return self._result(
-                vaccine=vaccine,
-                decision=VaccineDecision.PARTIAL,
-                reason=DecisionReason.PARTIAL_EXPOSURE,
-                her_ratio=her_ratio,
-                ccm_index=ccm_index,
-                detail=(
-                    f"HER={her_ratio:.4f} في النطاق الجزئي "
-                    f"({HER_SAFE_MAX}–{HER_PARTIAL_MAX}){ccm_note}"
-                ),
+                detail=(f"HER={her_ratio:.4f} تجاوز الحد الحرج (≥ 1.0)" f"{ccm_note}"),
             )
 
         return self._result(
@@ -234,7 +226,7 @@ class VaccineAssessmentService:
             reason=DecisionReason.WITHIN_LIMITS,
             her_ratio=her_ratio,
             ccm_index=ccm_index,
-            detail=f"HER={her_ratio:.4f} ضمن الحدود المقبولة{ccm_note}",
+            detail=(f"HER={her_ratio:.4f} ضمن الميزانية الحرارية" f"{ccm_note}"),
         )
 
     @staticmethod

@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 logging.basicConfig(
-    level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ def main():
     logger.info("📁 Archive Root: data/archive/")
     logger.info("=" * 60)
 
-    archive_root = Path('data/archive')
+    archive_root = Path("data/archive")
     if not archive_root.exists():
         logger.warning("⚠️  Archive directory not found")
         sys.exit(0)
@@ -40,13 +40,13 @@ def main():
                 if not device_dir.is_dir():
                     continue
                 devices.add(device_dir.name)
-                for file_path in device_dir.glob('*'):
+                for file_path in device_dir.glob("*"):
                     total_files += 1
                     total_size += file_path.stat().st_size
 
     logger.info("\n📈 Archive Statistics:")
     logger.info(" Total Files: %d", total_files)
-    logger.info(" Total Size: %.2f MB", total_size / (1024*1024))
+    logger.info(" Total Size: %.2f MB", total_size / (1024 * 1024))
     logger.info(" Devices: %d", len(devices))
 
     # التحقق من الوجود

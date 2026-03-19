@@ -34,7 +34,7 @@ def create_professional_pdf():
         print("❌ ملف التقرير غير موجود:", input_file)
         return
 
-    df = pd.read_csv(input_file, sep='\t')
+    df = pd.read_csv(input_file, sep="\t")
 
     # إعداد وثيقة PDF
     doc = SimpleDocTemplate(
@@ -52,12 +52,12 @@ def create_professional_pdf():
     # ========== إضافة ترويسة التقرير ==========
     # العنوان الرئيسي
     title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
+        "CustomTitle",
+        parent=styles["Heading1"],
         fontSize=18,
         alignment=TA_CENTER,
         spaceAfter=30,
-        textColor=colors.HexColor('#2C3E50'),
+        textColor=colors.HexColor("#2C3E50"),
     )
 
     title = Paragraph("التقرير الرسمي لمراقبة سلسلة التبريد", title_style)
@@ -65,12 +65,12 @@ def create_professional_pdf():
 
     # العنوان الفرعي
     subtitle_style = ParagraphStyle(
-        'CustomSubtitle',
-        parent=styles['Heading2'],
+        "CustomSubtitle",
+        parent=styles["Heading2"],
         fontSize=14,
         alignment=TA_CENTER,
         spaceAfter=20,
-        textColor=colors.HexColor('#3498DB'),
+        textColor=colors.HexColor("#3498DB"),
     )
 
     subtitle = Paragraph(
@@ -80,8 +80,8 @@ def create_professional_pdf():
 
     # معلومات التقرير
     info_style = ParagraphStyle(
-        'CustomInfo',
-        parent=styles['Normal'],
+        "CustomInfo",
+        parent=styles["Normal"],
         fontSize=10,
         alignment=TA_CENTER,
         spaceAfter=30,
@@ -118,14 +118,14 @@ def create_professional_pdf():
     # إضافة البيانات
     for _, row in df.iterrows():
         table_row = [
-            row['center_id'],
-            row['center_name'],
-            translate_decision(row['decision']),
-            row['vvm_stage'],
-            row['recommended_action'],
-            str(row['num_ft2_entries']),
-            "نعم" if row['has_freeze'] == 'YES' else "لا",
-            "نعم" if row['has_ccm_violation'] == 'YES' else "لا",
+            row["center_id"],
+            row["center_name"],
+            translate_decision(row["decision"]),
+            row["vvm_stage"],
+            row["recommended_action"],
+            str(row["num_ft2_entries"]),
+            "نعم" if row["has_freeze"] == "YES" else "لا",
+            "نعم" if row["has_ccm_violation"] == "YES" else "لا",
             f"{row['avg_temperature']:.2f}",
             f"{row['min_temperature']:.2f}",
             f"{row['max_temperature']:.2f}",
@@ -155,21 +155,21 @@ def create_professional_pdf():
         TableStyle(
             [
                 # تنسيق الرأس
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2C3E50')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2C3E50")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, 0), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, 0), 10),
                 # خطوط الشبكة
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                ("ALIGN", (0, 1), (-1, -1), "CENTER"),
                 # تنسيق الصفوف بناءً على القرار
-                ('BACKGROUND', (0, 1), (-1, 1), colors.lightcoral),  # مرفوض
-                ('BACKGROUND', (0, 2), (-1, 2), colors.lightcoral),  # مرفوض
-                ('BACKGROUND', (0, 3), (-1, 3), colors.lightgrey),  # لا بيانات
+                ("BACKGROUND", (0, 1), (-1, 1), colors.lightcoral),  # مرفوض
+                ("BACKGROUND", (0, 2), (-1, 2), colors.lightcoral),  # مرفوض
+                ("BACKGROUND", (0, 3), (-1, 3), colors.lightgrey),  # لا بيانات
                 # جعل بعض الأعمدة أوسع للنص العربي
-                ('ALIGN', (1, 1), (1, -1), 'RIGHT'),  # اسم المركز
-                ('ALIGN', (4, 1), (4, -1), 'RIGHT'),  # الإجراء الموصى به
+                ("ALIGN", (1, 1), (1, -1), "RIGHT"),  # اسم المركز
+                ("ALIGN", (4, 1), (4, -1), "RIGHT"),  # الإجراء الموصى به
             ]
         )
     )
@@ -179,22 +179,22 @@ def create_professional_pdf():
 
     # ========== ملخص النتائج ==========
     summary_style = ParagraphStyle(
-        'CustomSummary',
-        parent=styles['Heading2'],
+        "CustomSummary",
+        parent=styles["Heading2"],
         fontSize=12,
         alignment=TA_CENTER,
         spaceAfter=10,
-        textColor=colors.HexColor('#2C3E50'),
+        textColor=colors.HexColor("#2C3E50"),
     )
 
     story.append(Paragraph("ملخص النتائج", summary_style))
 
     # إحصائيات
     total = len(df)
-    rejected = len(df[df['decision'].str.contains('REJECTED')])
-    accepted = len(df[df['decision'].str.contains('ACCEPTED')])
-    warning = len(df[df['decision'].str.contains('WARNING')])
-    no_data = len(df[df['decision'].str.contains('NO_DATA')])
+    rejected = len(df[df["decision"].str.contains("REJECTED")])
+    accepted = len(df[df["decision"].str.contains("ACCEPTED")])
+    warning = len(df[df["decision"].str.contains("WARNING")])
+    no_data = len(df[df["decision"].str.contains("NO_DATA")])
 
     summary_data = [
         ["المؤشر", "العدد", "النسبة"],
@@ -225,14 +225,14 @@ def create_professional_pdf():
     summary_table.setStyle(
         TableStyle(
             [
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498DB')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                ('BACKGROUND', (0, 1), (-1, 1), colors.lightgreen),
-                ('BACKGROUND', (0, 2), (-1, 2), colors.lightyellow),
-                ('BACKGROUND', (0, 3), (-1, 3), colors.lightcoral),
-                ('BACKGROUND', (0, 4), (-1, 4), colors.lightgrey),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#3498DB")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                ("BACKGROUND", (0, 1), (-1, 1), colors.lightgreen),
+                ("BACKGROUND", (0, 2), (-1, 2), colors.lightyellow),
+                ("BACKGROUND", (0, 3), (-1, 3), colors.lightcoral),
+                ("BACKGROUND", (0, 4), (-1, 4), colors.lightgrey),
             ]
         )
     )
@@ -242,8 +242,8 @@ def create_professional_pdf():
 
     # ========== منطقة التوقيعات ==========
     sign_style = ParagraphStyle(
-        'CustomSign',
-        parent=styles['Normal'],
+        "CustomSign",
+        parent=styles["Normal"],
         fontSize=11,
         alignment=TA_CENTER,
         spaceBefore=20,
@@ -263,8 +263,8 @@ def create_professional_pdf():
 
     # ========== تذييل الصفحة ==========
     footer_style = ParagraphStyle(
-        'CustomFooter',
-        parent=styles['Normal'],
+        "CustomFooter",
+        parent=styles["Normal"],
         fontSize=8,
         alignment=TA_CENTER,
         textColor=colors.grey,
@@ -290,11 +290,11 @@ def create_professional_pdf():
 def translate_decision(decision):
     """ترجمة القرار للإنجليزية/العربية"""
     translations = {
-        'REJECTED_FREEZE_SENSITIVE': 'مرفوض (تجميد)',
-        'NO_DATA': 'لا بيانات',
-        'ACCEPTED': 'مقبول',
-        'WARNING': 'تحت المراقبة',
-        'REJECTED': 'مرفوض',
+        "REJECTED_FREEZE_SENSITIVE": "مرفوض (تجميد)",
+        "NO_DATA": "لا بيانات",
+        "ACCEPTED": "مقبول",
+        "WARNING": "تحت المراقبة",
+        "REJECTED": "مرفوض",
     }
 
     for key, value in translations.items():

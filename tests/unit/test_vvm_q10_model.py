@@ -136,11 +136,11 @@ class TestCumulativeDegradation:
         """Tests handling of extreme temperatures that cause math overflow."""
         # 11000°C with Q10=2 will definitely trigger OverflowError in math.pow
         factor = model.calculate_acceleration_factor(11000.0)
-        assert factor == float('inf')
+        assert factor == float("inf")
 
     def test_calculate_acceleration_factor_nan_inf_check(self, model):
         """Manually check that the model handles non-finite results if math.pow didn't raise."""
         # This is hard to trigger with valid inputs, but we want to ensure coverage
         # by checking a very large temperature that might return inf without raising.
         factor = model.calculate_acceleration_factor(20000.0)
-        assert factor == float('inf')
+        assert factor == float("inf")

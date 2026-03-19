@@ -15,7 +15,7 @@ def to_canonical_json(obj: Any) -> str:
     return json.dumps(
         obj,
         sort_keys=True,
-        separators=(',', ':'),
+        separators=(",", ":"),
         ensure_ascii=False,
         default=str,  # Handle datetime, Path, etc.
     )

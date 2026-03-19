@@ -4,10 +4,16 @@
 """
 import ast
 from pathlib import Path
-import pytest
 
 DOMAIN_PATH = Path("src/domain")
-FORBIDDEN_IMPORTS = ["infrastructure", "presentation", "application", "django", "sqlalchemy"]
+FORBIDDEN_IMPORTS = [
+    "infrastructure",
+    "presentation",
+    "application",
+    "django",
+    "sqlalchemy",
+]
+
 
 def get_imports(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
@@ -24,6 +30,7 @@ def get_imports(filepath):
             if node.module:
                 imports.append(node.module.split(".")[0])
     return imports
+
 
 def test_domain_does_not_import_forbidden_layers():
     failed = []

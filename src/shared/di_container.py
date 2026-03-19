@@ -18,7 +18,7 @@ from src.application.ports.ledger_writer_port import LedgerWriterPort
 from src.infrastructure.adapters.ledger_writer_adapter import \
     HashChainedLedgerWriter
 
-T = TypeVar('T')
+T = TypeVar("T")
 logger = logging.getLogger(__name__)
 
 
@@ -67,7 +67,7 @@ def configure_ledger(
 ) -> HashChainedLedgerWriter:
     """تهيئة وتسجيل LedgerWriter في الحاوية."""
     if ledger_path is None:
-        ledger_path = Path('data/ledger/verification_ledger.jsonl')
+        ledger_path = Path("data/ledger/verification_ledger.jsonl")
     else:
         ledger_path = Path(ledger_path)
 

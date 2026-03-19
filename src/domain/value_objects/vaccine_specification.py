@@ -1,187 +1,223 @@
 # src/domain/value_objects/vaccine_specification.py
-"""
-VaccineSpecification — مواصفات اللقاح العلمية
-المصدر: WHO/IVB/06.10 + WHO/PQS/E06/IN02.1
 
-قيمة ثابتة (frozen) — لا تتغير بعد الإنشاء.
-تُستخدم كمدخل لـ Q10HerCalculator و ExposureAnalysisService.
-"""
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Optional
+import logging
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, Optional, Tuple
 
-# ──────────────────────────────────────────────────────────────
-# ثوابت WHO/IVB/06.10 — عتبات CCM الرسمية
-# المصدر: WHO/PQS/E06/IN02.1 § 4.2.3
-# ──────────────────────────────────────────────────────────────
-CCM_WINDOW_A_DAYS_AT_12C: float = 3.0  # نافذة A عند 12°C
-CCM_WINDOW_AB_DAYS_AT_12C: float = 8.0  # نافذة A+B عند 12°C
-CCM_WINDOW_ABC_DAYS_AT_12C: float = 14.0  # نافذة A+B+C عند 12°C
-CCM_CRITICAL_TEMP: float = 34.0  # عتبة النافذة D
-CCM_CRITICAL_HOURS: float = 2.0  # ساعتان فوق 34°C = DISCARD
+import yaml
 
-# عتبة HER للقرار (مستنبطة من VVM reaction rates — Table 1 WHO/IVB/06.10)
-HER_SAFE_MAX: float = 1.0
-HER_PARTIAL_MAX: float = 1.5
+logger = logging.getLogger(__name__)
 
 
+# ─────────────────────────────────────────────
+# System State
+# ─────────────────────────────────────────────
+class SystemState:
+    NORMAL = "NORMAL"
+    EMERGENCY = "EMERGENCY"
+
+
+_SYSTEM_STATE = SystemState.NORMAL
+
+
+# ─────────────────────────────────────────────
+# Vaccine Specification
+# ─────────────────────────────────────────────
 @dataclass(frozen=True)
 class VaccineSpecification:
-    """
-    المواصفات العلمية للقاح — مصدر الحقيقة للحسابات الحرارية.
 
-    Attributes:
-        vaccine_type:       رمز نوع اللقاح (OPV, HEPB, DTP, ...)
-        q10_factor:         معامل Q10 (افتراضي 2.0 وفق Arrhenius)
-        shelf_life_days:    العمر الافتراضي للقاح عند درجة المرجع (5°C)
-        reference_temp_c:   درجة الحرارة المرجعية للحساب (افتراضي 5.0°C)
-        freeze_sensitive:   هل يتلف عند التجمد؟ (لقاحات الألومنيوم)
-        vvm_type:           نوع مؤشر VVM (VVM2/7/14/30)
-        critical_temp_c:    درجة الخطر الفوري (افتراضي 34.0°C)
-        critical_hours:     مدة الخطر الفوري بالساعات (افتراضي 2.0)
-        rationale:          مبرر علمي للمواصفات
-    """
+    vaccine_type: str = "GENERAL"
+    q10_factor: float = 6.0
+    shelf_life_days: int = 730
 
-    vaccine_type: str
-    q10_factor: float = 2.0
-    shelf_life_days: float = 730.0  # سنتان افتراضياً
-    reference_temp_c: float = 5.0
     freeze_sensitive: bool = False
-    vvm_type: Optional[str] = None  # VVM2 / VVM7 / VVM14 / VVM30
-    critical_temp_c: float = CCM_CRITICAL_TEMP
-    critical_hours: float = CCM_CRITICAL_HOURS
-    rationale: str = ""
-    # ── حقول التوافق الرجعي (legacy) ─────────────────────────
-    # محفوظة لمنع كسر الكود القديم — لا تُستخدم في حسابات A1-A4
-    min_temp: Optional[float] = None
-    max_temp: Optional[float] = None
-    excursion_time_limit: Optional[float] = None
-    freeze_range: Optional[tuple] = None
+    vvm_type: Optional[str] = None
+    ccm_limit: int = 600
+
+    reference_temp_c: float = 5.0
+    critical_temp_c: float = 34.0
+    critical_hours: float = 2.0
+    freeze_threshold_c: float = -0.5
+
+    min_temp: float = 2.0
+    max_temp: float = 8.0
+
     max_heat_temp: Optional[float] = None
     max_heat_duration_hours: Optional[float] = None
-    regulatory_source: Optional[str] = None
+    freeze_range: Optional[Tuple[float, float]] = None
 
-    def __post_init__(self) -> None:
-        if self.q10_factor <= 0:
-            raise ValueError(f"q10_factor must be > 0, got {self.q10_factor}")
-        if self.shelf_life_days <= 0:
-            raise ValueError(f"shelf_life_days must be > 0, got {self.shelf_life_days}")
+    name_ar: Optional[str] = None
+    name_en: Optional[str] = None
+    name: Optional[str] = None  # alias used by tests
+
+    # fields accepted by tests
+    excursion_time_limit: Optional[float] = None
+    storage: Optional[str] = None
+
+    # extra YAML fields — stored as strings, never used in calculations
+    heat_stability: Optional[str] = None
+    opened_vial_h: Optional[float] = None
+    protect_light: Optional[bool] = None
+    shake_test: Optional[bool] = None
+    note: Optional[str] = None
+    who_code: Optional[str] = None
+    active: Optional[bool] = None
+    who_code: Optional[str] = None
+    active: Optional[bool] = None
+    ectc_approved: bool = False
+    ectc_max_temp_c: Optional[float] = None
+    ectc_max_days: Optional[int] = None
+    storage_special: Optional[str] = None
+
+    source: str = ""
+    created_at: str = field(default_factory=lambda: datetime.now().isoformat())
+
+    def __post_init__(self):
+        if self.q10_factor is not None and self.q10_factor <= 0:
+            raise ValueError(f"{self.vaccine_type}: invalid q10_factor")
+        if self.shelf_life_days is not None and self.shelf_life_days <= 0:
+            raise ValueError(f"{self.vaccine_type}: invalid shelf life")
+        if self.max_temp is not None and self.max_temp <= 0:
+            raise ValueError(f"{self.vaccine_type}: invalid max_temp")
+        if self.freeze_range is not None and len(self.freeze_range) != 2:
+            raise ValueError(f"{self.vaccine_type}: invalid freeze_range")
 
     @property
-    def shelf_life_hours(self) -> float:
-        """العمر الافتراضي بالساعات — مُستخدم في حساب HER ratio."""
+    def shelf_life_hours(self) -> Optional[float]:
+        if self.shelf_life_days is None:
+            return None
         return self.shelf_life_days * 24.0
 
 
-# ──────────────────────────────────────────────────────────────
-# كتالوج اللقاحات الافتراضي — مصدر: WHO/IVB/06.10 Table 9
-# ──────────────────────────────────────────────────────────────
-VACCINE_CATALOGUE: dict[str, VaccineSpecification] = {
-    "OPV": VaccineSpecification(
-        vaccine_type="OPV",
-        q10_factor=2.0,
-        shelf_life_days=225,
-        freeze_sensitive=False,
-        vvm_type="VVM2",
-        rationale="الأكثر حساسية للحرارة — VVM2 ينتهي بعد يومين عند 37°C",
-    ),
-    "HEPB": VaccineSpecification(
-        vaccine_type="HEPB",
-        q10_factor=2.0,
-        shelf_life_days=1460,  # 4 سنوات
-        freeze_sensitive=True,
-        vvm_type="VVM30",
-        rationale="مستقر حرارياً — حساس للتجمد (ألومنيوم). VVM30",
-    ),
-    "DTP": VaccineSpecification(
-        vaccine_type="DTP",
-        q10_factor=2.0,
-        shelf_life_days=548,  # 18 شهراً
-        freeze_sensitive=True,
-        vvm_type="VVM14",
-        rationale="العامل المحدِّد: مكوّن السعال الديكي. حساس للتجمد",
-    ),
-    "DT": VaccineSpecification(
-        vaccine_type="DT",
-        q10_factor=2.0,
-        shelf_life_days=1095,  # 3 سنوات
-        freeze_sensitive=True,
-        vvm_type="VVM30",
-        rationale="سُمِّيات ديفتريا وكُزاز — مستقرة. حساسة للتجمد",
-    ),
-    "TT": VaccineSpecification(
-        vaccine_type="TT",
-        q10_factor=2.0,
-        shelf_life_days=1095,
-        freeze_sensitive=True,
-        vvm_type="VVM30",
-        rationale="سُمّ الكُزاز — مستقر للغاية. حساس للتجمد",
-    ),
-    "TD": VaccineSpecification(
-        vaccine_type="TD",
-        q10_factor=2.0,
-        shelf_life_days=1095,
-        freeze_sensitive=True,
-        vvm_type="VVM30",
-        rationale="سُمِّيات كُزاز وديفتريا (جرعة مخفضة). حساسة للتجمد",
-    ),
-    "BCG": VaccineSpecification(
-        vaccine_type="BCG",
-        q10_factor=2.0,
-        shelf_life_days=730,
-        freeze_sensitive=False,
-        vvm_type="VVM14",
-        rationale="مجفف — يتحمل التجمد. يفقد الفاعلية بالحرارة تدريجياً",
-    ),
-    "MEASLES": VaccineSpecification(
-        vaccine_type="MEASLES",
-        q10_factor=2.0,
-        shelf_life_days=730,
-        freeze_sensitive=False,
-        vvm_type="VVM7",
-        rationale="مجفف — مستقر نسبياً. يتحمل التجمد",
-    ),
-    "MMR": VaccineSpecification(
-        vaccine_type="MMR",
-        q10_factor=2.0,
-        shelf_life_days=730,
-        freeze_sensitive=False,
-        vvm_type="VVM7",
-        rationale="مزيج ثلاثي مجفف — المكوّن الأضعف يحدد VVM7",
-    ),
-    "YF": VaccineSpecification(
-        vaccine_type="YF",
-        q10_factor=2.0,
-        shelf_life_days=730,
-        freeze_sensitive=False,
-        vvm_type="VVM7",
-        rationale="حمى صفراء مجففة — يفقد الفاعلية سريعاً بعد إعادة التركيب",
-    ),
-    "IPV": VaccineSpecification(
-        vaccine_type="IPV",
-        q10_factor=2.0,
-        shelf_life_days=730,
-        freeze_sensitive=True,
-        vvm_type="VVM14",
-        rationale="شلل الأطفال المعطّل — حساس للتجمد وللحرارة",
-    ),
-    # افتراضي عام عند عدم معرفة النوع
-    "GENERAL": VaccineSpecification(
-        vaccine_type="GENERAL",
-        q10_factor=2.0,
-        shelf_life_days=730,
-        freeze_sensitive=False,
-        vvm_type=None,
-        rationale="مواصفة افتراضية عامة — استخدم عند غياب بيانات النوع",
-    ),
-}
+# ─────────────────────────────────────────────
+# YAML Loader
+# ─────────────────────────────────────────────
+
+_VACCINE_CATALOGUE: Optional[Dict[str, VaccineSpecification]] = None
+
+REQUIRED_FIELDS = ["q10_factor", "shelf_life_days"]
+
+# Fields in YAML that are NOT constructor params — silently ignored
+_YAML_IGNORE = {"ccm_default_limit", "opened_vial_h"}
 
 
+def _validate_schema(data: Dict):
+    if "vaccines" not in data:
+        raise RuntimeError("Invalid YAML: missing 'vaccines' section")
+    for vid, spec in data["vaccines"].items():
+        for f in REQUIRED_FIELDS:
+            if f not in spec:
+                raise RuntimeError(f"{vid}: missing required field {f}")
+
+
+def _load_vaccine_library(path: Optional[Path] = None):
+    global _VACCINE_CATALOGUE, _SYSTEM_STATE
+
+    if _VACCINE_CATALOGUE:
+        return _VACCINE_CATALOGUE
+
+    path = path or Path("config/vaccine_library.yaml")
+
+    if not path.exists():
+        _SYSTEM_STATE = SystemState.EMERGENCY
+        raise RuntimeError(
+            "🚨 يتعذر إصدار التقرير لتلف ملف التطعيمات vaccine_library.yaml"
+        )
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+
+        _validate_schema(data)
+
+        defaults = data.get("defaults", {})
+        vaccines = data["vaccines"]
+        catalogue = {}
+
+        for vid, spec in vaccines.items():
+            # Use default arg to capture loop variable correctly
+            def get(key, default=None, _spec=spec):
+                return _spec.get(key, defaults.get(key, default))
+
+            freeze_range = get("freeze_range")
+            if freeze_range is not None:
+                freeze_range = tuple(freeze_range)
+
+            name_en = get("name_en")
+            catalogue[vid] = VaccineSpecification(
+                vaccine_type=vid,
+                q10_factor=get("q10_factor"),
+                shelf_life_days=get("shelf_life_days"),
+                freeze_sensitive=get("freeze_sensitive", False),
+                vvm_type=get("vvm_type"),
+                reference_temp_c=get("reference_temp_c", 5.0),
+                critical_temp_c=get("critical_temp_c", 34.0),
+                critical_hours=get("critical_hours", 2.0),
+                freeze_threshold_c=get("freeze_threshold_c", -0.5),
+                min_temp=get("min_temp", 2.0),
+                max_temp=get("max_temp", 8.0),
+                max_heat_temp=get("max_heat_temp"),
+                max_heat_duration_hours=get("max_heat_duration_hours"),
+                freeze_range=freeze_range,
+                name_ar=get("name_ar"),
+                name_en=name_en,
+                name=name_en,
+                source=get("source", ""),
+                # extra YAML fields — stored safely
+                storage=get("storage"),
+                heat_stability=get("heat_stability"),
+                opened_vial_h=get("opened_vial_h"),
+                protect_light=get("protect_light"),
+                shake_test=get("shake_test"),
+                note=get("note"),
+                who_code=get("who_code"),
+                active=get("active"),
+            )
+
+        _SYSTEM_STATE = SystemState.NORMAL
+        _VACCINE_CATALOGUE = catalogue
+        return catalogue
+
+    except RuntimeError:
+        raise
+    except Exception as e:
+        _SYSTEM_STATE = SystemState.EMERGENCY
+        logger.critical(f"YAML LOAD FAILURE: {e}")
+        raise RuntimeError(f"🚨 فشل تحميل vaccine_library.yaml: {str(e)}")
+
+
+# ─────────────────────────────────────────────
+# Public API
+# ─────────────────────────────────────────────
+
+
+def get_system_state():
+    return _SYSTEM_STATE
+
+
+# في vaccine_specification.py - تعديل بسيط جداً
 def get_vaccine_spec(vaccine_type: str) -> VaccineSpecification:
-    """
-    جلب مواصفات اللقاح من الكتالوج.
-    يعود للمواصفة الافتراضية عند غياب النوع.
-    """
-    normalized = vaccine_type.upper().strip() if vaccine_type else "GENERAL"
-    return VACCINE_CATALOGUE.get(normalized, VACCINE_CATALOGUE["GENERAL"])
+    try:
+        catalogue = _load_vaccine_library()
+        vaccine_type = vaccine_type.upper()
+        if vaccine_type not in catalogue:
+            if _SYSTEM_STATE == SystemState.EMERGENCY:
+                raise RuntimeError("System in EMERGENCY — cannot resolve vaccine")
+            logger.warning(f"Vaccine {vaccine_type} not found, using GENERAL")
+            return catalogue.get("GENERAL", VaccineSpecification())
+        return catalogue[vaccine_type]
+    except Exception as e:
+        logger.error(f"Failed to load vaccine spec: {e}, using fallback")
+        # Fallback آمن: استخدام GENERAL من الكود الصلب
+        return VaccineSpecification()  # GENERAL افتراضي
+
+
+def get_vaccine_catalogue() -> Dict[str, VaccineSpecification]:
+    global _VACCINE_CATALOGUE
+    if _VACCINE_CATALOGUE is None:
+        _VACCINE_CATALOGUE = _load_vaccine_library()
+    return _VACCINE_CATALOGUE

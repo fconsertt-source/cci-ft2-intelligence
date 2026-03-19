@@ -6,13 +6,12 @@ from typing import List
 from src.domain.entities.temperature_reading import TemperatureReading
 from src.domain.value_objects.ccm_result import CCMResult
 
-
 # ============================================================================
 # DECISION LOCK: TIME UNIT SOURCE OF TRUTH
 # 🔒 متوافق مع ccm_calculator.py — الوحدة: دقائق
 # ============================================================================
-DEFAULT_BASE_TEMP = 8.0   # °C — نهاية نطاق التخزين الموصى به (WHO: 2–8°C)
-DEFAULT_THRESHOLD = 1.0   # °C — حد التغيير المعتبر في طريقة Delta
+DEFAULT_BASE_TEMP = 8.0  # °C — نهاية نطاق التخزين الموصى به (WHO: 2–8°C)
+DEFAULT_THRESHOLD = 1.0  # °C — حد التغيير المعتبر في طريقة Delta
 
 
 class TimeWeightedCcmCalculator:

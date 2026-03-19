@@ -18,12 +18,12 @@ class RuntimeCenter:
         self.id = id
         self.name = name
         self.device_ids = device_ids
-        self.temperature_ranges = temperature_ranges or {'min': 2.0, 'max': 8.0}
+        self.temperature_ranges = temperature_ranges or {"min": 2.0, "max": 8.0}
         self.ft2_entries: List[MockEntry] = []
 
         # Results
-        self.decision = 'UNKNOWN'
-        self.vvm_stage = 'NONE'
+        self.decision = "UNKNOWN"
+        self.vvm_stage = "NONE"
         self.alert_level = None
         self.stability_budget_consumed_pct = 0.0
         self.thaw_remaining_hours = None
@@ -56,13 +56,13 @@ class CenterDTO:
 # --- Mocked Domain Services ---
 def apply_rules(center: RuntimeCenter):
     """Simplified rules engine respecting custom temperature_ranges"""
-    max_temp = center.temperature_ranges.get('max', 8.0)
+    max_temp = center.temperature_ranges.get("max", 8.0)
     for e in center.ft2_entries:
         if e.temperature > max_temp:
-            center.decision = 'REJECTED'
+            center.decision = "REJECTED"
             center.decision_reasons.append(f"Temp {e.temperature} > max {max_temp}")
             return
-    center.decision = 'ACCEPTED'
+    center.decision = "ACCEPTED"
     center.decision_reasons.append("All entries within custom range")
     # مثال على تحذير إذا درجة الحرارة ضمن نافذة حرجة
     if any(10 <= e.temperature <= max_temp for e in center.ft2_entries):
@@ -74,19 +74,19 @@ def calculate_center_stats(center: RuntimeCenter):
     temps = [e.temperature for e in center.ft2_entries]
     if not temps:
         return {}
-    max_temp = center.temperature_ranges.get('max', 8.0)
+    max_temp = center.temperature_ranges.get("max", 8.0)
     heat_duration = sum(
         e.duration_minutes for e in center.ft2_entries if e.temperature > max_temp
     )
     return {
-        'min_temp': min(temps),
-        'max_temp': max(temps),
-        'avg_temp': sum(temps) / len(temps),
-        'heat_duration': heat_duration,
-        'freeze_duration': 0,
-        'completeness_score': 100,
-        'has_freeze': False,
-        'has_ccm_violation': False,
+        "min_temp": min(temps),
+        "max_temp": max(temps),
+        "avg_temp": sum(temps) / len(temps),
+        "heat_duration": heat_duration,
+        "freeze_duration": 0,
+        "completeness_score": 100,
+        "has_freeze": False,
+        "has_ccm_violation": False,
     }
 
 
@@ -103,7 +103,7 @@ class TestPhase2StructuralCheck(unittest.TestCase):
             id="TEST_CUSTOM",
             name="Custom Range Center",
             device_ids=["D1"],
-            temperature_ranges={'min': 2.0, 'max': 15.0},  # Custom range
+            temperature_ranges={"min": 2.0, "max": 15.0},  # Custom range
         )
         rc.add_ft2_entry(MockEntry(temperature=10.0, duration_minutes=600))
 
@@ -136,7 +136,7 @@ class TestPhase2StructuralCheck(unittest.TestCase):
         )
         # 2. Stats calculation uses custom max limit
         self.assertEqual(
-            dto.stats.get('heat_duration', -1),
+            dto.stats.get("heat_duration", -1),
             0,
             "Heat duration should be 0 for 10°C < 15°C",
         )

@@ -159,14 +159,6 @@ class ArabicPDFGenerator:
 
     def _minimal_pdf(self, dto) -> bytes:
         device_id = getattr(dto, "device_id", "N/A")
-        status_raw = getattr(dto, "final_status", "safe")
-        logical_status = {
-            "safe": "آمن",
-            "warning": "تحذير",
-            "rejected": "مرفوض",
-        }.get(  # noqa: F841
-            status_raw.lower(), status_raw
-        )
         return (
             f"%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n"
             f"3 0 obj<</Type/Page/MediaBox[0 0 595 842]/Parent 2 0 R/Resources<</Font<</F1 4 0 R>>>>/Contents 5 0 R>>endobj\n"

@@ -147,24 +147,24 @@ class TextSignatureVerifier(ITextSignatureVerifier):
         public_key_hex = pubkey_match.group(1).strip()
 
         sig_lines = []
-        for line in text.split('\n'):
+        for line in text.split("\n"):
             line = line.strip()
             if not line:
                 continue
-            if line.startswith('Sig:') and not line.startswith('Sig Cert:'):
+            if line.startswith("Sig:") and not line.startswith("Sig Cert:"):
                 sig_lines.append(line)
 
         if not sig_lines:
             return None
 
         sig_line = sig_lines[0]
-        parts = sig_line.split(':', 1)
+        parts = sig_line.split(":", 1)
         if len(parts) != 2:
             return None
         signature_hex = parts[1].strip()
 
         if len(signature_hex) != 128 or not re.fullmatch(
-            r'[0-9a-fA-F]{128}', signature_hex
+            r"[0-9a-fA-F]{128}", signature_hex
         ):
             return None
 
@@ -205,6 +205,6 @@ class TextSignatureVerifier(ITextSignatureVerifier):
             raise ValueError(
                 f"التوقيع الخام يجب أن يكون 64 بايت، وجد: {len(raw_signature)}"
             )
-        r = int.from_bytes(raw_signature[:32], byteorder='big')
-        s = int.from_bytes(raw_signature[32:], byteorder='big')
+        r = int.from_bytes(raw_signature[:32], byteorder="big")
+        s = int.from_bytes(raw_signature[32:], byteorder="big")
         return asym_utils.encode_dss_signature(r, s)

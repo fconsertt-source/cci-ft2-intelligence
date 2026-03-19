@@ -1,0 +1,29 @@
+centers:
+  TEST_CENTER_01:
+    name: "مركز التطعيم التجريبي"
+    location: "طرابلس"
+    device_ids: ["130600113437"]   # إضافة هذا السطر
+    equipment:
+      EQ-FRIDGE-01:
+        type: "REFRIGERATOR"
+        status: "ACTIVE"
+        capacity: 120
+        note: "الثلاجة الرئيسية — مخصصة لجهاز 130600113437 فقط"
+
+  CENTER_TRIPOLI_01:
+    name: "مركز طرابلس الرئيسي"
+    location: "طرابلس"
+    device_ids: []   # قائمة فارغة إذا لم يكن هناك أجهزة محددة
+    equipment:
+      EQ-FRIDGE-02:
+        type: "REFRIGERATOR"
+        status: "ACTIVE"
+
+  CENTER_BENGHAZI_01:
+    name: "مركز بنغازي"
+    location: "بنغازي"
+    device_ids: []
+    equipment:
+      EQ-FRIDGE-03:
+        type: "REFRIGERATOR"
+        status: "ACTIVE"

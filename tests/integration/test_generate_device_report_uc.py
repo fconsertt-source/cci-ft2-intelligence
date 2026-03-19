@@ -109,7 +109,17 @@ def test_weakest_link_logic(guard):
         ),  # SAFE
     ]
     mock_repo.get_device_history.return_value = records
-    mock_specs.get_spec.return_value = MagicMock(vaccine_type="HepB")
+    mock_spec = MagicMock()
+    mock_spec.vaccine_type = "HepB"
+    mock_spec.critical_temp_c = 34.0
+    mock_spec.critical_hours = 2.0
+    mock_spec.freeze_threshold_c = -0.5
+    mock_spec.freeze_sensitive = False
+    mock_spec.q10_factor = 2.0
+    mock_spec.reference_temp_c = 5.0
+    mock_spec.shelf_life_days = 730
+    mock_spec.max_temp = 8.0
+    mock_specs.get_spec.return_value = mock_spec
 
     # استخدام side_effect بدلاً من التعيين المباشر للحفاظ على تتبع الـ Mock
     def mock_evaluate(*, temperature, duration_minutes, spec):
@@ -189,6 +199,14 @@ def test_generate_device_report_executes_successfully(mock_guard, tmp_path):
     mock_spec = Mock()
     mock_spec.vaccine_type = "Hepatitis_B"
     mock_spec.rationale = "Test rationale"
+    mock_spec.critical_temp_c = 34.0
+    mock_spec.critical_hours = 2.0
+    mock_spec.freeze_threshold_c = -0.5
+    mock_spec.freeze_sensitive = False
+    mock_spec.q10_factor = 2.0
+    mock_spec.reference_temp_c = 5.0
+    mock_spec.shelf_life_days = 730
+    mock_spec.max_temp = 8.0
 
     mock_specs = Mock(spec=VaccineSpecificationPort)
     mock_specs.get_spec.return_value = mock_spec
@@ -198,8 +216,8 @@ def test_generate_device_report_executes_successfully(mock_guard, tmp_path):
 
     mock_estimator = Mock(spec=ThermalDegradationEstimator)
     mock_estimator.calculate_cumulative_impact.return_value = {
-        'cumulative_impact': 0.0,
-        'remaining_shelf_life': 100,
+        "cumulative_impact": 0.0,
+        "remaining_shelf_life": 100,
     }
 
     mock_validator = Mock(spec=ValidationProtocolPort)

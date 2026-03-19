@@ -76,6 +76,9 @@ class DeviceReportDTO:
     readings: Tuple = field(default_factory=tuple)
     ledger_hash: str = ""
 
+    ccm_index: str = "0"  # ✅ CCM Index (A, AB, ABC, D, 0)
+    her_percentage: float = 0.0  # ✅ HER كنسبة مئوية
+
     def __post_init__(self):
         """التحقق من الصحة عند الإنشاء"""
         if self.generated_at is None:

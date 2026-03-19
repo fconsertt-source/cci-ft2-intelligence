@@ -1,67 +1,88 @@
-# ═══════════════════════════════════════════════════════════════
-# Pre-commit Configuration — CCI-FT2-Intelligence
-# يمنع الأخطاء الشائعة قبل الالتزام (commit)
-# ═══════════════════════════════════════════════════════════════
+# pre-commit configuration for CCI-FT2 Intelligence
+# Version: 1.1 (with scientific file exclusions)
 
 repos:
-  # ───────────────────────────────────────────────────────────────
-  # فحص المسافات الزائدة في ملفات JSON
-  # ───────────────────────────────────────────────────────────────
-  - repo: local
-    hooks:
-      - id: check-json-trailing-spaces
-        name: Check JSON trailing spaces
-        entry: python scripts/check_json_spaces.py
-        language: system
-        types: [json]
-        description: "يمنع المسافات الزائدة في مفاتيح وقيم JSON"
 
-  # ───────────────────────────────────────────────────────────────
-  # فحص صحة ملفات JSON
-  # ───────────────────────────────────────────────────────────────
-  - repo: local
-    hooks:
-      - id: check-json-valid
-        name: Validate JSON syntax
-        entry: python -m json.tool
-        language: system
-        types: [json]
-        pass_filenames: true
+- repo: https://github.com/psf/black
+  rev: 24.3.0
+  hooks:
+    - id: black
+      name: 🎨 Format with Black
+      language_version: python3.12
+      exclude: |
+        (?x)^(
+            src/domain/calculators/q10_her_calculator\.py|
+            src/domain/calculators/time_weighted_ccm_calculator\.py|
+            src/domain/calculators/her_calculator\.py|
+            src/domain/calculators/ccm_calculator\.py|
+            src/domain/services/exposure_analysis_service\.py|
+            src/domain/services/her_calculator_service\.py|
+            src/domain/value_objects/temperature_reading\.py|
+            src/domain/value_objects/her_result\.py|
+            src/domain/value_objects/ccm_result\.py
+        )$
 
-  # ───────────────────────────────────────────────────────────────
-  # فحص المسافات الزائدة عامة (Python, YAML, etc.)
-  # ───────────────────────────────────────────────────────────────
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
-    hooks:
-      - id: trailing-whitespace
-        files: \.(py|yaml|yml|json|md|txt)$
-      - id: end-of-file-fixer
-        files: \.(py|yaml|yml|json|md|txt)$
-      - id: check-yaml
-      - id: check-merge-conflict
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.3.5
+  hooks:
+    - id: ruff
+      name: 🔍 Lint with Ruff
+      args: [--fix, --exit-non-zero-on-fix]
+      exclude: |
+        (?x)^(
+            src/domain/calculators/q10_her_calculator\.py|
+            src/domain/calculators/time_weighted_ccm_calculator\.py|
+            src/domain/calculators/her_calculator\.py|
+            src/domain/calculators/ccm_calculator\.py|
+            src/domain/services/exposure_analysis_service\.py|
+            src/domain/services/her_calculator_service\.py|
+            src/domain/value_objects/temperature_reading\.py|
+            src/domain/value_objects/her_result\.py|
+            src/domain/value_objects/ccm_result\.py
+        )$
 
-  # ───────────────────────────────────────────────────────────────
-  # فحص تنسيق Python (Black)
-  # ───────────────────────────────────────────────────────────────
-  - repo: https://github.com/psf/black
-    rev: 24.1.0
-    hooks:
-      - id: black
-        language_version: python3.12
+- repo: https://github.com/PyCQA/isort
+  rev: 5.13.2
+  hooks:
+    - id: isort
+      name: 📦 Sort imports with isort
+      exclude: |
+        (?x)^(
+            src/domain/calculators/q10_her_calculator\.py|
+            src/domain/calculators/time_weighted_ccm_calculator\.py|
+            src/domain/calculators/her_calculator\.py|
+            src/domain/calculators/ccm_calculator\.py|
+            src/domain/services/exposure_analysis_service\.py|
+            src/domain/services/her_calculator_service\.py|
+            src/domain/value_objects/temperature_reading\.py|
+            src/domain/value_objects/her_result\.py|
+            src/domain/value_objects/ccm_result\.py
+        )$
 
-  # ───────────────────────────────────────────────────────────────
-  # فحص استيرادات Python (isort)
-  # ───────────────────────────────────────────────────────────────
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        args: ["--profile", "black"]
+- repo: https://github.com/PyCQA/bandit
+  rev: 1.7.8
+  hooks:
+    - id: bandit
+      name: 🛡️  Security scan with Bandit
+      args: ["-r", "src", "-ll", "-ii"]
+      pass_filenames: false
+      exclude: ^(tests/|venv/|__pycache__/)
 
+- repo: local
+  hooks:
 
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.0
-    hooks:
-      - id: bandit
-        args: ["-r", "src/", "-ll", "--exclude", "venv/,__pycache__/"]
+    - id: verify-sensitive-hashes
+      name: 🔒 Verify Scientific Core Integrity
+      entry: python scripts/verify_sensitive_hashes.py
+      language: system
+      pass_filenames: false
+      always_run: true
+      verbose: true
+
+    - id: check-lint-score
+      name: 📊 Check Pylint Score (≥8.5)
+      entry: python scripts/check_lint_score.py
+      language: system
+      pass_filenames: false
+      always_run: true
+      verbose: true

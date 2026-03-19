@@ -19,14 +19,10 @@ from src.domain.enums.vvm_stage import VVMStage
 from src.domain.services.exposure_analysis_service import \
     ExposureAnalysisService
 from src.domain.value_objects.vaccine_specification import (
-    HER_PARTIAL_MAX, HER_SAFE_MAX, VaccineSpecification, get_vaccine_spec)
+    VaccineSpecification, get_vaccine_spec)
 
-# ──────────────────────────────────────────────────────────────
-# عتبات القرار — WHO/IVB/06.10
-# ──────────────────────────────────────────────────────────────
-_HER_SAFE: float = HER_SAFE_MAX  # ≤ 1.0  → SAFE
-_HER_PARTIAL: float = HER_PARTIAL_MAX  # ≤ 1.5  → PARTIAL
-# > 1.5 → DISCARD
+_HER_SAFE = 1.0
+_HER_PARTIAL = 1.5
 
 
 @dataclass(frozen=True)
@@ -175,14 +171,14 @@ class CoolingDevice:
             )
 
         # ── المستوى 3: HER ratio ──────────────────────────────
-        if her_ratio > _HER_PARTIAL:
+        if her_ratio > 1.5:
             return (
                 "DISCARD",
                 VVMStage.C,
                 f"HER ratio={her_ratio:.3f} تجاوز الحد الأقصى {_HER_PARTIAL}",
             )
 
-        if her_ratio > _HER_SAFE:
+        if her_ratio > 1.0:
             return (
                 "PARTIAL",
                 VVMStage.B,

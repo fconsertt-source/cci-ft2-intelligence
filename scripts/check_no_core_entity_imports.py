@@ -8,10 +8,10 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
-TARGET_DIRS = [os.path.join(ROOT, 'scripts'), os.path.join(ROOT, 'src', 'presentation')]
+TARGET_DIRS = [os.path.join(ROOT, "scripts"), os.path.join(ROOT, "src", "presentation")]
 
 # Allowlisted legacy tool directories (explicit, minimal)
-ALLOWED_LEGACY = [os.path.join(ROOT, 'tools', 'legacy')]
+ALLOWED_LEGACY = [os.path.join(ROOT, "tools", "legacy")]
 
 PATTERN = re.compile(
     r"\bfrom\s+src\.core\.entities|\bimport\s+src\.core\.entities|src\.core\.entities\."
@@ -19,7 +19,7 @@ PATTERN = re.compile(
 
 
 def scan_file(path):
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, "r", encoding="utf-8") as f:
         for i, line in enumerate(f, start=1):
             if PATTERN.search(line):
                 return i, line.strip()
@@ -41,7 +41,7 @@ def main():
             if skip_root:
                 continue
             for fn in files:
-                if not fn.endswith(('.py',)):
+                if not fn.endswith((".py",)):
                     continue
                 path = os.path.join(root, fn)
                 res = scan_file(path)
@@ -61,5 +61,5 @@ def main():
     print("OK: No forbidden imports found in guarded paths.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

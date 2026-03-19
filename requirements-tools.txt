@@ -1,6 +1,22 @@
+# requirements-tools.txt - CCI-FT2 Intelligence Quality Tools
+# Frozen versions for reproducible builds
+# Last updated: 2024
+
+# Formatting & Linting
 black==24.3.0
 ruff==0.3.5
 isort==5.13.2
 pylint==3.0.3
-pydeps==1.12.20
+
+# Pre-commit hooks
+pre-commit==3.6.0
+
+# Security scanning
+bandit==1.7.8
+
+# Testing
 pytest==8.0.0
+pytest-xdist==3.5.0
+
+# Architecture analysis
+pydeps==1.12.20

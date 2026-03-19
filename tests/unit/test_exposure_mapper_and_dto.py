@@ -158,7 +158,7 @@ class TestApplicationDeviceReportDTO:
     def test_import_and_validate(self):
         from datetime import datetime, timezone
 
-        from src.application.dtos.device_report_dto import DeviceReportDTO
+        from src.domain.dtos.device_report_dto import DeviceReportDTO
 
         dto = DeviceReportDTO(
             device_id="APP-001",
@@ -178,7 +178,7 @@ class TestApplicationDeviceReportDTO:
 
         import pytest
 
-        from src.application.dtos.device_report_dto import DeviceReportDTO
+        from src.domain.dtos.device_report_dto import DeviceReportDTO
 
         with pytest.raises(ValueError):
             DeviceReportDTO(
@@ -193,7 +193,7 @@ class TestApplicationDeviceReportDTO:
             )
 
     def test_none_generated_at(self):
-        from src.application.dtos.device_report_dto import DeviceReportDTO
+        from src.domain.dtos.device_report_dto import DeviceReportDTO
 
         dto = DeviceReportDTO(
             device_id="APP-001",
@@ -234,7 +234,7 @@ class TestApplicationDTOExtraCoverage:
     def test_invalid_ledger_hash_raises(self):
         from datetime import datetime, timezone
 
-        from src.application.dtos.device_report_dto import DeviceReportDTO
+        from src.domain.dtos.device_report_dto import DeviceReportDTO
 
         with pytest.raises(ValueError, match="ledger_hash"):
             DeviceReportDTO(
@@ -251,8 +251,8 @@ class TestApplicationDTOExtraCoverage:
     def test_get_batch_counts_with_excursions(self):
         from datetime import datetime, timezone
 
-        from src.application.dtos.device_report_dto import (
-            DeviceReportDTO, ThermalExcursionDTO)
+        from src.domain.dtos.device_report_dto import (DeviceReportDTO,
+                                                       ThermalExcursionDTO)
 
         excursions = [
             ThermalExcursionDTO(

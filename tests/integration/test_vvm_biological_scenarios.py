@@ -34,7 +34,7 @@ def run_vvm_simulation(
         decision_thresholds={"ccm_limit": 100000},
     )
     # تعيين حد حراري حرج للمحاكاة (افتراضي 50 لتجنب التداخل مع VVM)
-    setattr(center, 'critical_temp_limit', critical_limit)
+    setattr(center, "critical_temp_limit", critical_limit)
 
     for entry in entries:
         center.add_ft2_entry(entry)
@@ -42,7 +42,7 @@ def run_vvm_simulation(
     # Calculate max_temp from entries for rules engine
     max_temp = max([e.temperature for e in entries]) if entries else 0.0
 
-    apply_rules(center, extra_stats={'her': her, 'max_temp': max_temp})
+    apply_rules(center, extra_stats={"her": her, "max_temp": max_temp})
     return center
 
 

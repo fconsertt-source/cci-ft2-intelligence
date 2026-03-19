@@ -58,7 +58,6 @@ class Q10HerCalculator:
         self._shelf_life = shelf_life_hours  # ✅ اسم الخاصية الجديد
         self._max_gap = max_gap_hours
 
-
     def calculate_her(self, readings: List[TemperatureReading]) -> HERResult:
         """
         حساب HER من قائمة قراءات درجة الحرارة.

@@ -216,7 +216,7 @@ def main():
     logger.info("Processing %d FT2 file(s)...", len(files))
     logger.info("Archive Root: %s", archive_root)
     logger.info("CSV Output: %s", csv_output_dir)
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     # معالجة كل ملف
     processed_count = 0
@@ -229,15 +229,15 @@ def main():
             failed_count += 1
 
     # الملخص
-    logger.info("\n" + "="*60)
+    logger.info("\n" + "=" * 60)
     logger.info("📊 Processing Summary")
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("✅ Processed: %d", processed_count)
     logger.info("❌ Failed: %d", failed_count)
     logger.info("📁 CSV Output: %s", csv_output_dir)
     logger.info("🗄️ Archive: %s", archive_root)
     logger.info("📜 Ledger: %s", ledger_path)
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     # عرض حالة السلسلة
     state = ledger.get_chain_state()

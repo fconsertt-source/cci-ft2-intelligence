@@ -49,7 +49,7 @@ class PDFStructuralExtractor:
         if not pdf_path.exists():
             raise ExtractionError(f"الملف غير موجود: {pdf_path}")
 
-        llogger.info("بدء استخراج البيانات من: %s", pdf_path.name)
+        logger.info("بدء استخراج البيانات من: %s", pdf_path.name)
 
         # 1. حساب الهاش للملف الأصلي
         pdf_hash = self._calculate_hash(pdf_path)
@@ -72,39 +72,39 @@ class PDFStructuralExtractor:
 
         try:
             device_id = self._extract_device_id(full_text)
-            extraction_log['device_id'] = device_id
+            extraction_log["device_id"] = device_id
             logger.info("✓ Device ID: %s", device_id)
 
             serial = self._extract_serial(full_text)
-            extraction_log['serial'] = serial
+            extraction_log["serial"] = serial
             logger.info("✓ Serial: %s", serial)
 
             start_date = self._extract_start_date(full_text)
-            extraction_log['start_date'] = start_date.isoformat()
+            extraction_log["start_date"] = start_date.isoformat()
             logger.info("✓ Start Date: %s", start_date)
 
             stop_date = self._extract_stop_date(full_text)
-            extraction_log['stop_date'] = stop_date.isoformat()
+            extraction_log["stop_date"] = stop_date.isoformat()
             logger.info("✓ Stop Date: %s", stop_date)
 
             min_temp = self._extract_min_temperature(full_text)
-            extraction_log['min_temp'] = str(min_temp)
+            extraction_log["min_temp"] = str(min_temp)
             logger.info("✓ Min Temp: %.1f°C", min_temp)  # أو %s حسب النوع
 
             max_temp = self._extract_max_temperature(full_text)
-            extraction_log['max_temp'] = str(max_temp)
+            extraction_log["max_temp"] = str(max_temp)
             logger.info("✓ Max Temp: %.1f°C", max_temp)
 
             avg_temp = self._extract_avg_temperature(full_text)
-            extraction_log['avg_temp'] = str(avg_temp)
+            extraction_log["avg_temp"] = str(avg_temp)
             logger.info("✓ Avg Temp: %.1f°C", avg_temp)
 
             alarm_count = self._extract_alarm_count(full_text)
-            extraction_log['alarm_count'] = alarm_count
+            extraction_log["alarm_count"] = alarm_count
             logger.info("✓ Alarm Count: %s", alarm_count)
 
             total_readings = self._extract_total_readings(full_text)
-            extraction_log['total_readings'] = total_readings
+            extraction_log["total_readings"] = total_readings
             logger.info("✓ Total Readings: %s", total_readings)
 
         except ExtractionError as e:
@@ -161,9 +161,9 @@ class PDFStructuralExtractor:
         """استخراج نوع الجهاز (Device ID)"""
         # البحث عن الأنماط الشائعة في تقارير Berlinger
         patterns = [
-            r'Device\s*[:\s]+(Q-tag Fridge-tag 2 E)',
-            r'Q-tag Fridge-tag 2 E',
-            r'Device Type\s*[:\s]+([^,\n\r]+)',
+            r"Device\s*[:\s]+(Q-tag Fridge-tag 2 E)",
+            r"Q-tag Fridge-tag 2 E",
+            r"Device Type\s*[:\s]+([^,\n\r]+)",
         ]
 
         for pattern in patterns:
@@ -175,7 +175,7 @@ class PDFStructuralExtractor:
 
         logger.warning("لم يتم العثور على Device ID باستخدام الأنماط المعروفة")
         # محاولة استخراج عام كحل بديل
-        match = re.search(r'Device\s*[:\s]+([^\n\r]+)', text, re.IGNORECASE)
+        match = re.search(r"Device\s*[:\s]+([^\n\r]+)", text, re.IGNORECASE)
         if match:
             result = match.group(1).strip()
             logger.debug("تم استخدام نمط عام للعثور على Device ID: %s", result)
@@ -186,9 +186,9 @@ class PDFStructuralExtractor:
     def _extract_serial(self, text: str) -> str:
         """استخراج الرقم التسلسلي (Serial Number)"""
         patterns = [
-            r'Serial\s*[:\s]+(\d{12,})',  # Berlinger تستخدم 12+ رقم
-            r'Serial No\.?\s*[:\s]+(\d+)',
-            r'S/N\s*[:\s]+(\d+)',
+            r"Serial\s*[:\s]+(\d{12,})",  # Berlinger تستخدم 12+ رقم
+            r"Serial No\.?\s*[:\s]+(\d+)",
+            r"S/N\s*[:\s]+(\d+)",
         ]
 
         for pattern in patterns:
@@ -228,7 +228,7 @@ class PDFStructuralExtractor:
 
     def _extract_all_dates(self, text: str) -> List[date]:
         """استخراج جميع التواريخ بتنسيق ISO من النص"""
-        matches = re.findall(r'(\d{4})-(\d{2})-(\d{2})', text)
+        matches = re.findall(r"(\d{4})-(\d{2})-(\d{2})", text)
         dates = []
 
         for year, month, day in matches:
@@ -245,16 +245,18 @@ class PDFStructuralExtractor:
     def _extract_min_temperature(self, text: str) -> Decimal:
         """استخراج أقل درجة حرارة من جميع القراءات"""
         matches = re.findall(
-            r'Min T\s*[:=]?\s*([+-]?\d+(?:\.\d+)?)', text, re.IGNORECASE
+            r"Min T\s*[:=]?\s*([+-]?\d+(?:\.\d+)?)", text, re.IGNORECASE
         )
 
         if not matches:
             raise ExtractionError("لم يتم العثور على قيم Min T في التقرير")
 
         try:
-            values = [Decimal(v.replace(',', '.')) for v in matches]
+            values = [Decimal(v.replace(",", ".")) for v in matches]
             result = min(values)
-            logger.debug("تم العثور على %d قيم Min T - الأدنى: %.1f°C", len(values), result)
+            logger.debug(
+                "تم العثور على %d قيم Min T - الأدنى: %.1f°C", len(values), result
+            )
             return result
         except InvalidOperation as e:
             raise ExtractionError(f"فشل تحويل قيم درجات الحرارة إلى أرقام: {e}")
@@ -262,16 +264,18 @@ class PDFStructuralExtractor:
     def _extract_max_temperature(self, text: str) -> Decimal:
         """استخراج أعلى درجة حرارة من جميع القراءات"""
         matches = re.findall(
-            r'Max T\s*[:=]?\s*([+-]?\d+(?:\.\d+)?)', text, re.IGNORECASE
+            r"Max T\s*[:=]?\s*([+-]?\d+(?:\.\d+)?)", text, re.IGNORECASE
         )
 
         if not matches:
             raise ExtractionError("لم يتم العثور على قيم Max T في التقرير")
 
         try:
-            values = [Decimal(v.replace(',', '.')) for v in matches]
+            values = [Decimal(v.replace(",", ".")) for v in matches]
             result = max(values)
-            logger.debug("تم العثور على %d قيم Max T - الأعلى: %.1f°C", len(values), result)
+            logger.debug(
+                "تم العثور على %d قيم Max T - الأعلى: %.1f°C", len(values), result
+            )
             return result
         except InvalidOperation as e:
             raise ExtractionError(f"فشل تحويل قيم درجات الحرارة إلى أرقام: {e}")
@@ -279,7 +283,7 @@ class PDFStructuralExtractor:
     def _extract_avg_temperature(self, text: str) -> Decimal:
         """استخراج متوسط درجات الحرارة"""
         matches = re.findall(
-            r'(?:Avrg|Avg|Average) T\s*[:=]?\s*([+-]?\d+(?:\.\d+)?)',
+            r"(?:Avrg|Avg|Average) T\s*[:=]?\s*([+-]?\d+(?:\.\d+)?)",
             text,
             re.IGNORECASE,
         )
@@ -290,7 +294,7 @@ class PDFStructuralExtractor:
             )
 
         try:
-            values = [Decimal(v.replace(',', '.')) for v in matches]
+            values = [Decimal(v.replace(",", ".")) for v in matches]
             result = sum(values) / len(values)
             logger.debug("تم حساب متوسط %d قراءة: %.1f°C", len(values), result)
             return result
@@ -300,7 +304,7 @@ class PDFStructuralExtractor:
     def _extract_alarm_count(self, text: str) -> int:
         """استخراج إجمالي عدد التنبيهات (t Acc > 0)"""
         # البحث عن قيم t Acc
-        matches = re.findall(r't Acc\s*[:=]?\s*(\d+)', text, re.IGNORECASE)
+        matches = re.findall(r"t Acc\s*[:=]?\s*(\d+)", text, re.IGNORECASE)
 
         if not matches:
             logger.debug("لم يتم العثور على قيم t Acc - افتراض عدم وجود تنبيهات")
@@ -313,7 +317,7 @@ class PDFStructuralExtractor:
     def _extract_total_readings(self, text: str) -> int:
         """استخراج عدد القراءات الكلية"""
         # الطريقة 1: البحث عن "Report history length"
-        match = re.search(r'Report history length\s*[:=]?\s*(\d+)', text, re.IGNORECASE)
+        match = re.search(r"Report history length\s*[:=]?\s*(\d+)", text, re.IGNORECASE)
         if match:
             result = int(match.group(1))
             logger.debug("تم العثور على Report history length: %s", result)
@@ -323,7 +327,7 @@ class PDFStructuralExtractor:
         dates = self._extract_all_dates(text)
         if dates:
             result = len(set(dates))
-            ogger.debug("تم حساب عدد القراءات من التواريخ الفريدة: %s", result)
+            logger.debug("تم حساب عدد القراءات من التواريخ الفريدة: %s", result)
             return result
 
         logger.warning(

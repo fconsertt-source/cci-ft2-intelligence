@@ -18,15 +18,15 @@ def export_vaccines_to_csv(vaccines: List[Dict], output_path: Path) -> None:
         return
 
     fieldnames = [
-        'name',
-        'quantity',
-        'batch_number',
-        'production_date',
-        'expiry_date',
-        'notes',
+        "name",
+        "quantity",
+        "batch_number",
+        "production_date",
+        "expiry_date",
+        "notes",
     ]
 
-    with open(output_path, 'w', newline='', encoding='utf-8') as f:
+    with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(vaccines)
@@ -38,7 +38,7 @@ def import_vaccines_from_csv(input_path: Path) -> List[Dict]:
         raise FileNotFoundError(f"CSV file not found: {input_path}")
 
     vaccines = []
-    with open(input_path, 'r', encoding='utf-8') as f:
+    with open(input_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
             vaccines.append(row)
@@ -51,9 +51,9 @@ def validate_vaccine_data(vaccines: List[Dict]) -> List[str]:
     errors = []
 
     for i, vaccine in enumerate(vaccines):
-        if not vaccine.get('name'):
+        if not vaccine.get("name"):
             errors.append(f"Row {i+1}: Vaccine name is required")
-        if not vaccine.get('batch_number'):
+        if not vaccine.get("batch_number"):
             errors.append(f"Row {i+1}: Batch number is required")
 
     return errors

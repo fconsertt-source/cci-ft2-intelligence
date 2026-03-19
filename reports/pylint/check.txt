@@ -1,0 +1,431 @@
+************* Module src
+src/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.domain.services.her_calculator_service
+src/domain/services/her_calculator_service.py:48:0: C0304: Final newline missing (missing-final-newline)
+************* Module src.domain.services.PATCH_VVMStageRule
+src/domain/services/PATCH_VVMStageRule.py:1:0: C0103: Module name "PATCH_VVMStageRule" doesn't conform to snake_case naming style (invalid-name)
+************* Module src.domain.services.exposure_analysis_service
+src/domain/services/exposure_analysis_service.py:371:0: C0304: Final newline missing (missing-final-newline)
+src/domain/services/exposure_analysis_service.py:287:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+************* Module src.domain.services.rules_engine
+src/domain/services/rules_engine.py:119:12: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+src/domain/services/rules_engine.py:202:12: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+src/domain/services/rules_engine.py:223:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+************* Module src.domain.engines.__init__
+src/domain/engines/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.domain.value_objects.her_result
+src/domain/value_objects/her_result.py:49:0: C0304: Final newline missing (missing-final-newline)
+************* Module src.domain.value_objects.ccm_result
+src/domain/value_objects/ccm_result.py:55:0: C0304: Final newline missing (missing-final-newline)
+************* Module src.domain.value_objects.CHANGES_DIFF
+src/domain/value_objects/CHANGES_DIFF.py:1:0: C0103: Module name "CHANGES_DIFF" doesn't conform to snake_case naming style (invalid-name)
+************* Module src.domain.value_objects.__init__
+src/domain/value_objects/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.domain.entities.retention_policy
+src/domain/entities/retention_policy.py:28:4: C0103: Attribute name "CRITICAL_KEYWORD" doesn't conform to snake_case naming style (invalid-name)
+************* Module src.domain.entities.equipment_vaccine
+src/domain/entities/equipment_vaccine.py:96:0: W1404: Implicit string concatenation found in call (implicit-str-concat)
+************* Module src.domain.ledger.models
+src/domain/ledger/models.py:145:20: W0707: Consider explicitly re-raising using 'except KeyError as exc' and 'raise ValueError(f'Invalid event_type: {val}') from exc' (raise-missing-from)
+************* Module src.domain.ledger.__init__
+src/domain/ledger/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.domain.evidence.__init__
+src/domain/evidence/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.domain.models.__init__
+src/domain/models/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.domain.rules.__init__
+src/domain/rules/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.domain.calculators.vvm_q10_model
+src/domain/calculators/vvm_q10_model.py:52:0: C0303: Trailing whitespace (trailing-whitespace)
+src/domain/calculators/vvm_q10_model.py:94:0: C0303: Trailing whitespace (trailing-whitespace)
+src/domain/calculators/vvm_q10_model.py:96:0: C0303: Trailing whitespace (trailing-whitespace)
+src/domain/calculators/vvm_q10_model.py:102:0: C0303: Trailing whitespace (trailing-whitespace)
+src/domain/calculators/vvm_q10_model.py:104:0: C0303: Trailing whitespace (trailing-whitespace)
+************* Module src.domain.calculators.time_weighted_ccm_calculator
+src/domain/calculators/time_weighted_ccm_calculator.py:116:0: C0304: Final newline missing (missing-final-newline)
+************* Module src.domain.calculators.q10_thermal_calculator
+src/domain/calculators/q10_thermal_calculator.py:30:0: C0303: Trailing whitespace (trailing-whitespace)
+src/domain/calculators/q10_thermal_calculator.py:33:0: C0303: Trailing whitespace (trailing-whitespace)
+src/domain/calculators/q10_thermal_calculator.py:34:12: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+************* Module src.domain.calculators.q10_her_calculator
+src/domain/calculators/q10_her_calculator.py:136:0: C0304: Final newline missing (missing-final-newline)
+src/domain/calculators/q10_her_calculator.py:23:0: C0103: Constant name "DEFAULT_shelf_life_hours" doesn't conform to UPPER_CASE naming style (invalid-name)
+************* Module src.domain.enums.ledger_event
+src/domain/enums/ledger_event.py:235:4: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+************* Module src.domain.enums.vvm_stage
+src/domain/enums/vvm_stage.py:43:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+************* Module src.domain.policies.__init__
+src/domain/policies/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.presentation.__init__
+src/presentation/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.presentation.cli.cli
+src/presentation/cli/cli.py:101:5: W0511: TODO: تنفيذ التقييم الفعلي عندما يكتمل الـ Use Case (fixme)
+src/presentation/cli/cli.py:192:9: W0511: TODO: تنفيذ get_all_device_ids() في المستقبل (fixme)
+src/presentation/cli/cli.py:50:8: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+src/presentation/cli/cli.py:78:4: E1123: Unexpected keyword argument 'input_dir' in method call (unexpected-keyword-arg)
+src/presentation/cli/cli.py:78:4: E1123: Unexpected keyword argument 'output_path' in method call (unexpected-keyword-arg)
+src/presentation/cli/cli.py:78:4: E1120: No value for argument 'request' in method call (no-value-for-parameter)
+src/presentation/cli/cli.py:100:9: E1101: Class 'AppComposer' has no 'create_evaluate_cold_chain_uc' member (no-member)
+src/presentation/cli/cli.py:102:15: E1101: Class 'MessageProvider' has no 'get_decision_message' member (no-member)
+src/presentation/cli/cli.py:85:4: W0613: Unused argument 'center_id' (unused-argument)
+src/presentation/cli/cli.py:100:4: W0612: Unused variable 'uc' (unused-variable)
+src/presentation/cli/cli.py:124:9: E1101: Class 'AppComposer' has no 'create_generate_report_uc' member (no-member)
+src/presentation/cli/cli.py:124:4: W0612: Unused variable 'uc' (unused-variable)
+src/presentation/cli/cli.py:155:8: W0621: Redefining name 'report' from outer scope (line 106) (redefined-outer-name)
+src/presentation/cli/cli.py:170:8: W0707: Consider explicitly re-raising using 'except ValueError as exc' and 'raise typer.Exit(code=1) from exc' (raise-missing-from)
+src/presentation/cli/cli.py:175:4: W0613: Unused argument 'output_dir' (unused-argument)
+src/presentation/cli/cli.py:209:19: E1101: Class 'AppComposer' has no 'create_official_verifier' member (no-member)
+************* Module src.presentation.cli.__init__
+src/presentation/cli/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.presentation.cli.gui_main
+src/presentation/cli/gui_main.py:109:8: W0621: Redefining name 'e' from outer scope (line 25) (redefined-outer-name)
+src/presentation/cli/gui_main.py:132:23: E1101: Instance of 'LanguageManager' has no 'get_direction' member (no-member)
+src/presentation/cli/gui_main.py:151:16: W0621: Redefining name 'logging' from outer scope (line 10) (redefined-outer-name)
+src/presentation/cli/gui_main.py:153:16: W0621: Redefining name 'logger' from outer scope (line 18) (redefined-outer-name)
+src/presentation/cli/gui_main.py:144:16: W0404: Reimport 'tkinter.messagebox' (imported line 14) (reimported)
+src/presentation/cli/gui_main.py:151:16: W0404: Reimport 'logging' (imported line 10) (reimported)
+src/presentation/cli/gui_main.py:195:8: W0621: Redefining name 'e' from outer scope (line 25) (redefined-outer-name)
+src/presentation/cli/gui_main.py:170:32: W0212: Access to a protected member _translations of a client class (protected-access)
+src/presentation/cli/gui_main.py:191:12: R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
+src/presentation/cli/gui_main.py:196:12: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/presentation/cli/gui_main.py:297:18: W0212: Access to a protected member _shape_arabic of a client class (protected-access)
+src/presentation/cli/gui_main.py:518:20: W0621: Redefining name 'e' from outer scope (line 25) (redefined-outer-name)
+src/presentation/cli/gui_main.py:547:8: W0621: Redefining name 'e' from outer scope (line 25) (redefined-outer-name)
+src/presentation/cli/gui_main.py:175:12: W0201: Attribute 'current_lang' defined outside __init__ (attribute-defined-outside-init)
+src/presentation/cli/gui_main.py:364:8: W0201: Attribute 'status_var' defined outside __init__ (attribute-defined-outside-init)
+************* Module src.presentation.messages.__init__
+src/presentation/messages/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.presentation.reporting.pdf_generator
+src/presentation/reporting/pdf_generator.py:45:0: W0104: Statement seems to have no effect (pointless-statement)
+src/presentation/reporting/pdf_generator.py:46:0: W0104: Statement seems to have no effect (pointless-statement)
+src/presentation/reporting/pdf_generator.py:47:0: W0104: Statement seems to have no effect (pointless-statement)
+************* Module src.presentation.reporting.csv_reporter
+src/presentation/reporting/csv_reporter.py:17:0: C0301: Line too long (125/120) (line-too-long)
+************* Module src.presentation.reporting.arabic_pdf_generator
+src/presentation/reporting/arabic_pdf_generator.py:17:4: W0404: Reimport 'sys' (imported line 9) (reimported)
+src/presentation/reporting/arabic_pdf_generator.py:69:8: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+src/presentation/reporting/arabic_pdf_generator.py:198:12: W0612: Unused variable 'index' (unused-variable)
+src/presentation/reporting/arabic_pdf_generator.py:17:4: C0412: Imports from package sys are not grouped (ungrouped-imports)
+************* Module src.presentation.reporting.professional_pdf_generator
+src/presentation/reporting/professional_pdf_generator.py:21:0: R1710: Either all return statements in a function should return an expression, or none of them should. (inconsistent-return-statements)
+************* Module src.utils.__init__
+src/utils/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.adapters.filesystem_adapter
+src/infrastructure/adapters/filesystem_adapter.py:105:12: W0707: Consider explicitly re-raising using 'raise RuntimeError(f'Atomic move failed: {e}') from e' (raise-missing-from)
+************* Module src.infrastructure.adapters.berlinger_verifier_adapter
+src/infrastructure/adapters/berlinger_verifier_adapter.py:272:0: C0301: Line too long (121/120) (line-too-long)
+src/infrastructure/adapters/berlinger_verifier_adapter.py:56:21: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
+src/infrastructure/adapters/berlinger_verifier_adapter.py:116:14: R1735: Consider using '{**os.environ}' instead of a call to 'dict'. (use-dict-literal)
+src/infrastructure/adapters/berlinger_verifier_adapter.py:225:12: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+************* Module src.infrastructure.adapters.ledger_writer_adapter
+src/infrastructure/adapters/ledger_writer_adapter.py:19:8: W0707: Consider explicitly re-raising using 'except ImportError as exc' and 'raise RuntimeError('filelock dependency missing - install with `pip install filelock` to enable cross-process ledger writes.') from exc' (raise-missing-from)
+src/infrastructure/adapters/ledger_writer_adapter.py:182:32: W0212: Access to a protected member _to_serializable_dict of a client class (protected-access)
+src/infrastructure/adapters/ledger_writer_adapter.py:197:20: W0707: Consider explicitly re-raising using 'raise LedgerWriteError(f'Failed to write to ledger: {e}') from e' (raise-missing-from)
+************* Module src.infrastructure.adapters.jsonl_index_adapter
+src/infrastructure/adapters/jsonl_index_adapter.py:27:8: W0707: Consider explicitly re-raising using 'except ImportError as exc' and 'raise ImportError('filelock is required in production to protect ledger integrity. Install with: pip install filelock') from exc' (raise-missing-from)
+src/infrastructure/adapters/jsonl_index_adapter.py:194:25: E1123: Unexpected keyword argument 'record_id' in classmethod call (unexpected-keyword-arg)
+************* Module src.infrastructure.adapters.ft2_repository_adapter
+src/infrastructure/adapters/ft2_repository_adapter.py:22:12: E1123: Unexpected keyword argument 'center_id' in constructor call (unexpected-keyword-arg)
+src/infrastructure/adapters/ft2_repository_adapter.py:22:12: E1123: Unexpected keyword argument 'location' in constructor call (unexpected-keyword-arg)
+src/infrastructure/adapters/ft2_repository_adapter.py:22:12: E1120: No value for argument 'id' in constructor call (no-value-for-parameter)
+src/infrastructure/adapters/ft2_repository_adapter.py:31:16: E1123: Unexpected keyword argument 'name' in constructor call (unexpected-keyword-arg)
+src/infrastructure/adapters/ft2_repository_adapter.py:31:16: E1123: Unexpected keyword argument 'full_loss_threshold_low' in constructor call (unexpected-keyword-arg)
+************* Module src.infrastructure.adapters.json_ft2_data_writer
+src/infrastructure/adapters/json_ft2_data_writer.py:16:4: W0237: Parameter 'destination' has been renamed to 'data' in overriding 'JsonFt2DataWriter.write' method (arguments-renamed)
+src/infrastructure/adapters/json_ft2_data_writer.py:16:4: W0237: Parameter 'data' has been renamed to 'destination' in overriding 'JsonFt2DataWriter.write' method (arguments-renamed)
+************* Module src.infrastructure.adapters.json_vaccine_spec_repository
+src/infrastructure/adapters/json_vaccine_spec_repository.py:28:17: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+************* Module src.infrastructure.adapters.equipment_vaccine_repository
+src/infrastructure/adapters/equipment_vaccine_repository.py:95:8: W0621: Redefining name 'EquipmentVaccine' from outer scope (line 16) (redefined-outer-name)
+src/infrastructure/adapters/equipment_vaccine_repository.py:95:8: W0404: Reimport 'EquipmentVaccine' (imported line 16) (reimported)
+************* Module src.infrastructure.adapters.json_vaccine_repository
+src/infrastructure/adapters/json_vaccine_repository.py:57:19: E1101: Class 'VaccineBatch' has no 'from_dict' member (no-member)
+************* Module src.infrastructure.adapters.ft2_reader.__init__
+src/infrastructure/adapters/ft2_reader/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.adapters.ft2_reader.services.__init__
+src/infrastructure/adapters/ft2_reader/services/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.adapters.ft2_reader.validator.__init__
+src/infrastructure/adapters/ft2_reader/validator/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.adapters.ft2_reader.parser.__init__
+src/infrastructure/adapters/ft2_reader/parser/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.adapters.ft2_reader.models.__init__
+src/infrastructure/adapters/ft2_reader/models/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.adapters.reporting.pdf_strategy
+src/infrastructure/adapters/reporting/pdf_strategy.py:99:8: W0621: Redefining name 'get_pdf_generator' from outer scope (line 11) (redefined-outer-name)
+src/infrastructure/adapters/reporting/pdf_strategy.py:99:8: W0404: Reimport 'get_pdf_generator' (imported line 11) (reimported)
+************* Module src.infrastructure.adapters.reporting.__init__
+src/infrastructure/adapters/reporting/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.adapters.reporting.new_pdf_engine
+src/infrastructure/adapters/reporting/new_pdf_engine.py:169:12: W0621: Redefining name 'ParagraphStyle' from outer scope (line 35) (redefined-outer-name)
+src/infrastructure/adapters/reporting/new_pdf_engine.py:171:12: W0621: Redefining name 'Paragraph' from outer scope (line 36) (redefined-outer-name)
+src/infrastructure/adapters/reporting/new_pdf_engine.py:169:12: W0404: Reimport 'getSampleStyleSheet' (imported line 141) (reimported)
+src/infrastructure/adapters/reporting/new_pdf_engine.py:193:12: W0404: Reimport 'getSampleStyleSheet' (imported line 141) (reimported)
+src/infrastructure/adapters/reporting/new_pdf_engine.py:35:4: C0412: Imports from package reportlab are not grouped (ungrouped-imports)
+src/infrastructure/adapters/reporting/new_pdf_engine.py:35:4: W0611: Unused ParagraphStyle imported from reportlab.lib.styles (unused-import)
+************* Module src.infrastructure.adapters.reporting.components.stability_bar
+src/infrastructure/adapters/reporting/components/stability_bar.py:16:4: C0103: Class name "colors" doesn't conform to PascalCase naming style (invalid-name)
+************* Module src.infrastructure.adapters.reporting.components.vvm_icon
+src/infrastructure/adapters/reporting/components/vvm_icon.py:16:4: C0103: Class name "colors" doesn't conform to PascalCase naming style (invalid-name)
+************* Module src.infrastructure.adapters.reporting.components.alert_circle
+src/infrastructure/adapters/reporting/components/alert_circle.py:16:4: C0103: Class name "colors" doesn't conform to PascalCase naming style (invalid-name)
+************* Module src.infrastructure.adapters.reporting.components.__init__
+src/infrastructure/adapters/reporting/components/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.mappers.__init__
+src/infrastructure/mappers/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.utils.runtime_resolver
+src/infrastructure/utils/runtime_resolver.py:43:21: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
+************* Module src.infrastructure.utils.vaccine_library_loader
+src/infrastructure/utils/vaccine_library_loader.py:21:12: W0212: Access to a protected member _load_library of a client class (protected-access)
+************* Module src.infrastructure.utils.hash_chain
+src/infrastructure/utils/hash_chain.py:20:8: W0707: Consider explicitly re-raising using 'raise LedgerStateCorruptedError(f'Corrupted state file: {e}') from e' (raise-missing-from)
+************* Module src.infrastructure.utils.import_helpers
+src/infrastructure/utils/import_helpers.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.utils.__init__
+src/infrastructure/utils/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.utils.atomic_writer
+src/infrastructure/utils/atomic_writer.py:15:4: E0401: Unable to import 'msvcrt' (import-error)
+src/infrastructure/utils/atomic_writer.py:25:20: W0707: Consider explicitly re-raising using 'except OSError as exc' and 'raise TimeoutError('Could not acquire file lock') from exc' (raise-missing-from)
+src/infrastructure/utils/atomic_writer.py:45:20: W0707: Consider explicitly re-raising using 'except OSError as exc' and 'raise TimeoutError('Could not acquire file lock') from exc' (raise-missing-from)
+************* Module src.infrastructure.security.pdf_structural_extractor
+src/infrastructure/security/pdf_structural_extractor.py:19:0: E0401: Unable to import 'domain.evidence.pdf_extraction_result' (import-error)
+src/infrastructure/security/pdf_structural_extractor.py:20:0: E0401: Unable to import 'domain.exceptions.license_exceptions' (import-error)
+src/infrastructure/security/pdf_structural_extractor.py:52:8: E0602: Undefined variable 'llogger' (undefined-variable)
+src/infrastructure/security/pdf_structural_extractor.py:62:12: W0707: Consider explicitly re-raising using 'raise ExtractionError(f'فشل فتح ملف PDF: {e}') from e' (raise-missing-from)
+src/infrastructure/security/pdf_structural_extractor.py:260:12: W0707: Consider explicitly re-raising using 'raise ExtractionError(f'فشل تحويل قيم درجات الحرارة إلى أرقام: {e}') from e' (raise-missing-from)
+src/infrastructure/security/pdf_structural_extractor.py:277:12: W0707: Consider explicitly re-raising using 'raise ExtractionError(f'فشل تحويل قيم درجات الحرارة إلى أرقام: {e}') from e' (raise-missing-from)
+src/infrastructure/security/pdf_structural_extractor.py:298:12: W0707: Consider explicitly re-raising using 'raise ExtractionError(f'فشل تحويل قيم المتوسط إلى أرقام: {e}') from e' (raise-missing-from)
+src/infrastructure/security/pdf_structural_extractor.py:326:12: E0602: Undefined variable 'ogger' (undefined-variable)
+************* Module src.infrastructure.security.hybrid_evidence_validator
+src/infrastructure/security/hybrid_evidence_validator.py:144:9: W0511: TODO: تطبيق منطق المقارنة الفعلي (fixme)
+src/infrastructure/security/hybrid_evidence_validator.py:60:16: E1101: Class 'CrossValidationResult' has no 'FILE_MISSING' member (no-member)
+src/infrastructure/security/hybrid_evidence_validator.py:73:12: E1101: Class 'VerificationStatus' has no 'INVALID_SIGNATURE' member (no-member)
+src/infrastructure/security/hybrid_evidence_validator.py:83:16: E1101: Class 'CrossValidationResult' has no 'SIGNATURE_INVALID' member (no-member)
+src/infrastructure/security/hybrid_evidence_validator.py:142:19: E1101: Class 'CrossValidationResult' has no 'TXT_ONLY' member (no-member)
+src/infrastructure/security/hybrid_evidence_validator.py:149:15: E1101: Class 'CrossValidationResult' has no 'MATCH' member (no-member)
+src/infrastructure/security/hybrid_evidence_validator.py:137:14: W0613: Unused argument 'txt_verification' (unused-argument)
+src/infrastructure/security/hybrid_evidence_validator.py:165:15: E1123: Unexpected keyword argument 'is_rejected' in constructor call (unexpected-keyword-arg)
+src/infrastructure/security/hybrid_evidence_validator.py:165:15: E1120: No value for argument 'verification_timestamp' in constructor call (no-value-for-parameter)
+src/infrastructure/security/hybrid_evidence_validator.py:165:15: E1120: No value for argument 'txt_hash' in constructor call (no-value-for-parameter)
+src/infrastructure/security/hybrid_evidence_validator.py:165:15: E1120: No value for argument 'pdf_hash' in constructor call (no-value-for-parameter)
+src/infrastructure/security/hybrid_evidence_validator.py:185:32: E1101: Class 'CrossValidationResult' has no 'MATCH' member (no-member)
+src/infrastructure/security/hybrid_evidence_validator.py:187:34: E1101: Class 'CrossValidationResult' has no 'TXT_ONLY' member (no-member)
+src/infrastructure/security/hybrid_evidence_validator.py:189:34: E1101: Class 'CrossValidationResult' has no 'MINOR_MISMATCH' member (no-member)
+src/infrastructure/security/hybrid_evidence_validator.py:196:15: E1123: Unexpected keyword argument 'is_rejected' in constructor call (unexpected-keyword-arg)
+src/infrastructure/security/hybrid_evidence_validator.py:196:15: E1120: No value for argument 'verification_timestamp' in constructor call (no-value-for-parameter)
+src/infrastructure/security/hybrid_evidence_validator.py:196:15: E1120: No value for argument 'pdf_hash' in constructor call (no-value-for-parameter)
+src/infrastructure/security/hybrid_evidence_validator.py:177:8: W0613: Unused argument 'txt_path' (unused-argument)
+************* Module src.infrastructure.security.__init__
+src/infrastructure/security/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.validation.__init__
+src/infrastructure/validation/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.pdf.unified_pdf_generator
+src/infrastructure/pdf/unified_pdf_generator.py:720:0: C0301: Line too long (161/120) (line-too-long)
+src/infrastructure/pdf/unified_pdf_generator.py:722:0: C0301: Line too long (179/120) (line-too-long)
+src/infrastructure/pdf/unified_pdf_generator.py:383:34: E1121: Too many positional arguments for method call (too-many-function-args)
+src/infrastructure/pdf/unified_pdf_generator.py:417:19: E1121: Too many positional arguments for method call (too-many-function-args)
+src/infrastructure/pdf/unified_pdf_generator.py:406:35: W0613: Unused argument 'report_type' (unused-argument)
+src/infrastructure/pdf/unified_pdf_generator.py:711:16: W0612: Unused variable 'i' (unused-variable)
+src/infrastructure/pdf/unified_pdf_generator.py:832:4: W0603: Using the global statement (global-statement)
+src/infrastructure/pdf/unified_pdf_generator.py:40:4: W0611: Unused import matplotlib (unused-import)
+************* Module src.infrastructure.pdf.arabic_font_manager
+src/infrastructure/pdf/arabic_font_manager.py:172:0: C0301: Line too long (126/120) (line-too-long)
+src/infrastructure/pdf/arabic_font_manager.py:51:8: W0612: Unused variable 'name' (unused-variable)
+src/infrastructure/pdf/arabic_font_manager.py:90:41: W0613: Unused argument 'data_path' (unused-argument)
+src/infrastructure/pdf/arabic_font_manager.py:163:8: W0612: Unused variable 'logical_status' (unused-variable)
+src/infrastructure/pdf/arabic_font_manager.py:231:23: E1124: Argument 'report_type' passed by position and keyword in method call (redundant-keyword-arg)
+src/infrastructure/pdf/arabic_font_manager.py:241:36: W0613: Unused argument 'dto' (unused-argument)
+src/infrastructure/pdf/arabic_font_manager.py:259:4: W0603: Using the global statement (global-statement)
+************* Module src.infrastructure.ingestion.ft2_converter
+src/infrastructure/ingestion/ft2_converter.py:66:20: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+************* Module src.infrastructure.ingestion.ft2_parser
+src/infrastructure/ingestion/ft2_parser.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.ingestion.ft2_linker
+src/infrastructure/ingestion/ft2_linker.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.ingestion.__init__
+src/infrastructure/ingestion/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.infrastructure.repositories.device_repository
+src/infrastructure/repositories/device_repository.py:11:0: W0105: String statement has no effect (pointless-string-statement)
+************* Module src.shared.path_utils
+src/shared/path_utils.py:63:4: W0621: Redefining name 're' from outer scope (line 5) (redefined-outer-name)
+src/shared/path_utils.py:63:4: W0404: Reimport 're' (imported line 5) (reimported)
+************* Module src.shared.language_manager
+src/shared/language_manager.py:48:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/shared/language_manager.py:63:12: W0621: Redefining name 'lang' from outer scope (line 120) (redefined-outer-name)
+src/shared/language_manager.py:78:12: W0621: Redefining name 'lang' from outer scope (line 120) (redefined-outer-name)
+************* Module src.application.app_composer
+src/application/app_composer.py:94:0: C0304: Final newline missing (missing-final-newline)
+************* Module src.application.__init__
+src/application/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.application.dtos.__init__
+src/application/dtos/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.application.security.license_guard
+src/application/security/license_guard.py:87:8: R1720: Unnecessary "elif" after "raise", remove the leading "el" from "elif" (no-else-raise)
+************* Module src.application.security.__init__
+src/application/security/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.application.use_cases.import_ft2_data_uc
+src/application/use_cases/import_ft2_data_uc.py:94:20: E1136: Value 'context' is unsubscriptable (unsubscriptable-object)
+src/application/use_cases/import_ft2_data_uc.py:106:30: E1136: Value 'context' is unsubscriptable (unsubscriptable-object)
+************* Module src.application.use_cases.track_batch_exposure_uc
+src/application/use_cases/track_batch_exposure_uc.py:3:0: E0401: Unable to import 'src.domain.value_objects.cumulative_exposure_result' (import-error)
+src/application/use_cases/track_batch_exposure_uc.py:3:0: E0611: No name 'cumulative_exposure_result' in module 'src.domain.value_objects' (no-name-in-module)
+src/application/use_cases/track_batch_exposure_uc.py:5:0: E0401: Unable to import 'src.domain.value_objects.heat_exposure' (import-error)
+src/application/use_cases/track_batch_exposure_uc.py:5:0: E0611: No name 'heat_exposure' in module 'src.domain.value_objects' (no-name-in-module)
+src/application/use_cases/track_batch_exposure_uc.py:9:4: W0613: Unused argument 'self' (unused-argument)
+src/application/use_cases/track_batch_exposure_uc.py:9:10: W0613: Unused argument 'batch_id' (unused-argument)
+src/application/use_cases/track_batch_exposure_uc.py:9:25: W0613: Unused argument 'exposures' (unused-argument)
+************* Module src.application.use_cases.import_ft2_bundle_uc
+src/application/use_cases/import_ft2_bundle_uc.py:118:26: W0613: Unused argument 'path' (unused-argument)
+src/application/use_cases/import_ft2_bundle_uc.py:118:38: W0613: Unused argument 'device' (unused-argument)
+src/application/use_cases/import_ft2_bundle_uc.py:122:26: W0613: Unused argument 'path' (unused-argument)
+src/application/use_cases/import_ft2_bundle_uc.py:122:38: W0613: Unused argument 'device' (unused-argument)
+src/application/use_cases/import_ft2_bundle_uc.py:126:29: W0613: Unused argument 'device' (unused-argument)
+src/application/use_cases/import_ft2_bundle_uc.py:126:53: W0613: Unused argument 'txt' (unused-argument)
+src/application/use_cases/import_ft2_bundle_uc.py:126:64: W0613: Unused argument 'pdf' (unused-argument)
+************* Module scripts
+scripts/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module scripts.check_domain_purity
+scripts/check_domain_purity.py:16:9: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
+************* Module scripts.verify_sensitive_hashes
+scripts/verify_sensitive_hashes.py:33:0: C0304: Final newline missing (missing-final-newline)
+scripts/verify_sensitive_hashes.py:16:5: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+scripts/verify_sensitive_hashes.py:24:4: C0103: Constant name "current" doesn't conform to UPPER_CASE naming style (invalid-name)
+************* Module scripts.verify_ledger
+scripts/verify_ledger.py:3:0: E0611: No name 'build_ledger_writer' in module 'src.shared.di_container' (no-name-in-module)
+************* Module scripts.simulate_vvm_scenarios
+scripts/simulate_vvm_scenarios.py:34:4: C0103: Constant name "main" doesn't conform to UPPER_CASE naming style (invalid-name)
+scripts/simulate_vvm_scenarios.py:36:4: C0103: Constant name "simulate_scenario" doesn't conform to UPPER_CASE naming style (invalid-name)
+scripts/simulate_vvm_scenarios.py:37:4: C0103: Constant name "MockEntry" doesn't conform to UPPER_CASE naming style (invalid-name)
+scripts/simulate_vvm_scenarios.py:38:4: C0103: Constant name "main" doesn't conform to UPPER_CASE naming style (invalid-name)
+scripts/simulate_vvm_scenarios.py:44:8: E1102: main is not callable (not-callable)
+************* Module scripts.build_readiness_gate
+scripts/build_readiness_gate.py:38:8: W0611: Unused import src (unused-import)
+scripts/build_readiness_gate.py:199:15: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
+************* Module scripts.create_backup
+scripts/create_backup.py:12:0: C0413: Import "from src.presentation.messages.message_map import MessageProvider" should be placed at the top of the module (wrong-import-position)
+scripts/create_backup.py:33:4: C0103: Variable name "EXCLUDES" doesn't conform to snake_case naming style (invalid-name)
+************* Module scripts.ft2_txt_parser
+scripts/ft2_txt_parser.py:225:4: C0103: Constant name "count" doesn't conform to UPPER_CASE naming style (invalid-name)
+************* Module scripts.verify_file
+scripts/verify_file.py:6:0: E0611: No name 'build_verify_and_record_uc' in module 'src.shared.di_container' (no-name-in-module)
+************* Module scripts.investigate_her_official
+scripts/investigate_her_official.py:12:0: C0413: Import "import json" should be placed at the top of the module (wrong-import-position)
+scripts/investigate_her_official.py:13:0: C0413: Import "from datetime import datetime" should be placed at the top of the module (wrong-import-position)
+scripts/investigate_her_official.py:15:0: C0413: Import "from src.domain.entities.temperature_reading import TemperatureReading" should be placed at the top of the module (wrong-import-position)
+scripts/investigate_her_official.py:16:0: C0413: Import "from src.domain.services.exposure_analysis_service import ExposureAnalysisService" should be placed at the top of the module (wrong-import-position)
+scripts/investigate_her_official.py:57:4: W0621: Redefining name 'results' from outer scope (line 112) (redefined-outer-name)
+scripts/investigate_her_official.py:88:22: W0621: Redefining name 'results' from outer scope (line 112) (redefined-outer-name)
+************* Module scripts.generate_pdf_report
+scripts/generate_pdf_report.py:12:0: C0413: Import "from src.infrastructure.logging import get_logger" should be placed at the top of the module (wrong-import-position)
+scripts/generate_pdf_report.py:13:0: C0413: Import "from src.presentation.messages.message_map import MessageProvider" should be placed at the top of the module (wrong-import-position)
+scripts/generate_pdf_report.py:23:12: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
+scripts/generate_pdf_report.py:63:8: W1201: Use lazy % formatting in logging functions (logging-not-lazy)
+************* Module scripts.license-gen
+scripts/license-gen.py:1:0: C0103: Module name "license-gen" doesn't conform to snake_case naming style (invalid-name)
+scripts/license-gen.py:72:4: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+************* Module scripts.verify_lifecycle
+scripts/verify_lifecycle.py:61:4: W1201: Use lazy % formatting in logging functions (logging-not-lazy)
+************* Module scripts.run_ft2_pipeline
+scripts/run_ft2_pipeline.py:13:0: C0413: Import "from scripts.create_test_data import create_test_data" should be placed at the top of the module (wrong-import-position)
+scripts/run_ft2_pipeline.py:14:0: C0413: Import "from src.application.dtos.center_dto import CenterDTO" should be placed at the top of the module (wrong-import-position)
+scripts/run_ft2_pipeline.py:15:0: C0413: Import "from src.application.dtos.evaluate_cold_chain_safety_request import EvaluateColdChainSafetyRequest, TemperatureReading" should be placed at the top of the module (wrong-import-position)
+scripts/run_ft2_pipeline.py:17:0: C0413: Import "from src.application.use_cases.evaluate_cold_chain_safety_use_case import EvaluateColdChainSafetyUseCase" should be placed at the top of the module (wrong-import-position)
+scripts/run_ft2_pipeline.py:19:0: C0413: Import "from src.domain.services.rules_engine import apply_rules, calculate_center_stats" should be placed at the top of the module (wrong-import-position)
+scripts/run_ft2_pipeline.py:21:0: C0413: Import "from src.infrastructure.adapters.ft2_reader_adapter import FT2ReaderAdapter" should be placed at the top of the module (wrong-import-position)
+scripts/run_ft2_pipeline.py:22:0: C0413: Import "from src.infrastructure.logging import get_logger" should be placed at the top of the module (wrong-import-position)
+scripts/run_ft2_pipeline.py:23:0: C0413: Import "from src.infrastructure.utils.yaml_loader import load_yaml" should be placed at the top of the module (wrong-import-position)
+scripts/run_ft2_pipeline.py:24:0: C0413: Import "from src.presentation.messages.message_map import MessageProvider" should be placed at the top of the module (wrong-import-position)
+scripts/run_ft2_pipeline.py:25:0: C0413: Import "from src.presentation.reporting.csv_reporter import generate_centers_report" should be placed at the top of the module (wrong-import-position)
+scripts/run_ft2_pipeline.py:35:14: W0622: Redefining built-in 'id' (redefined-builtin)
+scripts/run_ft2_pipeline.py:163:12: E0401: Unable to import 'src.infrastructure.ft2_reader.services.ft2_linker' (import-error)
+scripts/run_ft2_pipeline.py:163:12: E0611: No name 'ft2_reader' in module 'src.infrastructure' (no-name-in-module)
+scripts/run_ft2_pipeline.py:214:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+scripts/run_ft2_pipeline.py:280:4: E0401: Unable to import 'src.infrastructure.ft2_reader.parser.ft2_parser' (import-error)
+scripts/run_ft2_pipeline.py:280:4: E0611: No name 'ft2_reader' in module 'src.infrastructure' (no-name-in-module)
+scripts/run_ft2_pipeline.py:281:4: E0401: Unable to import 'src.infrastructure.ft2_reader.services.ft2_linker' (import-error)
+scripts/run_ft2_pipeline.py:281:4: E0611: No name 'ft2_reader' in module 'src.infrastructure' (no-name-in-module)
+scripts/run_ft2_pipeline.py:468:4: W0104: Statement seems to have no effect (pointless-statement)
+scripts/run_ft2_pipeline.py:469:4: W0104: Statement seems to have no effect (pointless-statement)
+************* Module scripts.unify_imports
+scripts/unify_imports.py:39:4: W0221: Number of parameters was 2 in 'CSTTypedVisitorFunctions.leave_ImportFrom' and is now 3 in overriding 'ImportUnifier.leave_ImportFrom' method (arguments-differ)
+scripts/unify_imports.py:86:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+************* Module scripts.investigate_her
+scripts/investigate_her.py:12:0: C0413: Import "import json" should be placed at the top of the module (wrong-import-position)
+scripts/investigate_her.py:13:0: C0413: Import "from datetime import datetime" should be placed at the top of the module (wrong-import-position)
+scripts/investigate_her.py:15:0: C0413: Import "from src.domain.entities.temperature_reading import TemperatureReading" should be placed at the top of the module (wrong-import-position)
+scripts/investigate_her.py:16:0: C0413: Import "from src.domain.services.exposure_analysis_service import ExposureAnalysisService" should be placed at the top of the module (wrong-import-position)
+scripts/investigate_her.py:56:4: W0621: Redefining name 'results' from outer scope (line 111) (redefined-outer-name)
+scripts/investigate_her.py:87:22: W0621: Redefining name 'results' from outer scope (line 111) (redefined-outer-name)
+************* Module scripts.verify_visual_reports
+scripts/verify_visual_reports.py:8:0: C0413: Import "from src.infrastructure.logging import get_logger" should be placed at the top of the module (wrong-import-position)
+scripts/verify_visual_reports.py:9:0: C0413: Import "from src.presentation.messages.message_map import MessageProvider" should be placed at the top of the module (wrong-import-position)
+scripts/verify_visual_reports.py:145:10: E1123: Unexpected keyword argument 'output_dir' in constructor call (unexpected-keyword-arg)
+scripts/verify_visual_reports.py:148:20: E1121: Too many positional arguments for method call (too-many-function-args)
+scripts/verify_visual_reports.py:154:16: E1121: Too many positional arguments for method call (too-many-function-args)
+scripts/verify_visual_reports.py:158:18: E1121: Too many positional arguments for method call (too-many-function-args)
+************* Module scripts.detect_duplicate_entities
+scripts/detect_duplicate_entities.py:19:10: E2513: Invalid unescaped character esc, use "\x1B" instead. (invalid-character-esc)
+scripts/detect_duplicate_entities.py:20:8: E2513: Invalid unescaped character esc, use "\x1B" instead. (invalid-character-esc)
+scripts/detect_duplicate_entities.py:21:11: E2513: Invalid unescaped character esc, use "\x1B" instead. (invalid-character-esc)
+scripts/detect_duplicate_entities.py:22:9: E2513: Invalid unescaped character esc, use "\x1B" instead. (invalid-character-esc)
+scripts/detect_duplicate_entities.py:23:10: E2513: Invalid unescaped character esc, use "\x1B" instead. (invalid-character-esc)
+scripts/detect_duplicate_entities.py:331:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
+************* Module scripts.cleanup_archive
+scripts/cleanup_archive.py:28:4: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+scripts/cleanup_archive.py:45:4: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+************* Module scripts.audit_ledger
+scripts/audit_ledger.py:18:0: C0413: Import "from src.domain.enums.ledger_event import LedgerEvent" should be placed at the top of the module (wrong-import-position)
+scripts/audit_ledger.py:19:0: C0413: Import "from src.shared.di_container import configure_ledger" should be placed at the top of the module (wrong-import-position)
+scripts/audit_ledger.py:75:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+scripts/audit_ledger.py:82:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+************* Module scripts.debug_berlinger
+scripts/debug_berlinger.py:11:4: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
+scripts/debug_berlinger.py:24:13: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
+************* Module scripts.check_disk_space
+scripts/check_disk_space.py:13:4: W0612: Unused variable 'total' (unused-variable)
+scripts/check_disk_space.py:13:11: W0612: Unused variable 'used' (unused-variable)
+************* Module scripts.process_ft2
+scripts/process_ft2.py:245:0: C0301: Line too long (132/120) (line-too-long)
+scripts/process_ft2.py:20:0: C0413: Import "from src.application.ports.ledger_writer_port import LedgerWriterPort" should be placed at the top of the module (wrong-import-position)
+scripts/process_ft2.py:21:0: C0413: Import "from src.domain.enums.ledger_event import LedgerEvent" should be placed at the top of the module (wrong-import-position)
+scripts/process_ft2.py:22:0: C0413: Import "from src.shared.di_container import configure_ledger" should be placed at the top of the module (wrong-import-position)
+scripts/process_ft2.py:232:4: W1201: Use lazy % formatting in logging functions (logging-not-lazy)
+scripts/process_ft2.py:244:4: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+************* Module scripts.create_test_data
+scripts/create_test_data.py:10:0: C0413: Import "from src.infrastructure.logging import get_logger" should be placed at the top of the module (wrong-import-position)
+************* Module scripts.final_evaluation
+scripts/final_evaluation.py:18:17: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+scripts/final_evaluation.py:31:36: R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
+scripts/final_evaluation.py:31:36: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+scripts/final_evaluation.py:44:17: W0612: Unused variable 'free' (unused-variable)
+************* Module scripts.check_layer_dependencies
+scripts/check_layer_dependencies.py:21:4: R1722: Consider using 'sys.exit' instead (consider-using-sys-exit)
+************* Module scripts.capture_golden_baseline
+scripts/capture_golden_baseline.py:80:4: W0603: Using the global statement (global-statement)
+scripts/capture_golden_baseline.py:145:4: C0103: Constant name "success" doesn't conform to UPPER_CASE naming style (invalid-name)
+************* Module scripts.simple_pipeline
+scripts/simple_pipeline.py:44:0: C0301: Line too long (225/120) (line-too-long)
+scripts/simple_pipeline.py:47:0: C0301: Line too long (158/120) (line-too-long)
+scripts/simple_pipeline.py:8:0: C0413: Import "from src.application.dtos.center_dto import CenterDTO" should be placed at the top of the module (wrong-import-position)
+scripts/simple_pipeline.py:9:0: C0413: Import "from src.domain.services.rules_engine import apply_rules" should be placed at the top of the module (wrong-import-position)
+scripts/simple_pipeline.py:10:0: C0413: Import "from src.infrastructure.logging import get_logger" should be placed at the top of the module (wrong-import-position)
+scripts/simple_pipeline.py:11:0: C0413: Import "from src.presentation.messages.message_map import MessageProvider" should be placed at the top of the module (wrong-import-position)
+scripts/simple_pipeline.py:12:0: C0413: Import "from src.presentation.reporting.csv_reporter import generate_centers_report" should be placed at the top of the module (wrong-import-position)
+scripts/simple_pipeline.py:105:4: C0103: Constant name "success" doesn't conform to UPPER_CASE naming style (invalid-name)
+************* Module scripts.debug_ft2
+scripts/debug_ft2.py:15:0: C0413: Import "from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser" should be placed at the top of the module (wrong-import-position)
+scripts/debug_ft2.py:16:0: C0413: Import "from src.infrastructure.logging import get_logger" should be placed at the top of the module (wrong-import-position)
+scripts/debug_ft2.py:17:0: C0413: Import "from src.presentation.messages.message_map import MessageProvider" should be placed at the top of the module (wrong-import-position)
+scripts/debug_ft2.py:121:4: R1702: Too many nested blocks (6/5) (too-many-nested-blocks)
+************* Module scripts.check_lint_score
+scripts/check_lint_score.py:34:0: C0303: Trailing whitespace (trailing-whitespace)
+scripts/check_lint_score.py:37:0: C0303: Trailing whitespace (trailing-whitespace)
+scripts/check_lint_score.py:39:0: C0303: Trailing whitespace (trailing-whitespace)
+scripts/check_lint_score.py:44:0: C0303: Trailing whitespace (trailing-whitespace)
+scripts/check_lint_score.py:49:0: C0303: Trailing whitespace (trailing-whitespace)
+scripts/check_lint_score.py:17:13: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
+scripts/check_lint_score.py:36:4: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
+scripts/check_lint_score.py:1:0: R0401: Cyclic import (src.infrastructure.adapters.reporting.new_pdf_engine -> src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper -> src.infrastructure.pdf.arabic_font_manager) (cyclic-import)
+
+------------------------------------------------------------------
+Your code has been rated at 9.34/10 (previous run: 8.79/10, +0.55)
+

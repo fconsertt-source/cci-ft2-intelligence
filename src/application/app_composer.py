@@ -9,6 +9,8 @@ from src.application.use_cases.generate_device_report_uc import \
     GenerateDeviceReportUseCase
 from src.application.use_cases.import_ft2_bundle_uc import \
     ImportFT2BundleUseCase
+from src.domain.services.exposure_analysis_service import \
+    ExposureAnalysisService
 from src.domain.services.regulatory_decision_service import \
     RegulatoryDecisionService
 from src.domain.services.thermal_degradation_estimator import \
@@ -42,16 +44,23 @@ class AppComposer:
 
         vaccine_specs = JsonVaccineSpecRepository()
         logger.info(
-            f"Vaccine Spec Repository initialized: {type(vaccine_specs).__name__}"
+            "Vaccine Spec Repository initialized: %s", type(vaccine_specs).__name__
         )
 
         regulatory_service = RegulatoryDecisionService()
         logger.info(
-            f"Regulatory Service initialized: {type(regulatory_service).__name__}"
+            "Regulatory Service initialized: %s", type(regulatory_service).__name__
         )
 
         estimator = ThermalDegradationEstimator()
         logger.info("Estimator initialized: %s", type(estimator).__name__)
+
+        # ✅ إضافة ExposureAnalysisService
+        exposure_analysis = ExposureAnalysisService()
+        logger.info(
+            "Exposure Analysis Service initialized: %s",
+            type(exposure_analysis).__name__,
+        )
 
         validator = ValidationProtocolService()
         logger.info("Validator initialized: %s", type(validator).__name__)
@@ -69,6 +78,7 @@ class AppComposer:
             vaccine_specifications=vaccine_specs,
             regulatory_decision_service=regulatory_service,
             estimator=estimator,
+            exposure_analysis=exposure_analysis,  # ✅ إضافة جديدة
             validator=validator,
             license_guard=license_guard,
         )
@@ -99,5 +109,37 @@ class AppComposer:
             logger.info("Health check passed")
             return True
         except Exception as e:
-                logger.error("Health check failed: %s", e)
+            logger.error("Health check failed: %s", e)
             return False
+
+    @staticmethod
+    def create_evaluate_cold_chain_uc():
+        """Use case create_evaluate_cold_chain_uc implemented in AppComposer"""
+        logger.info("Building EvaluateColdChainSafetyUseCase for CLI...")
+
+        license_guard = AppComposer._NoOpLicenseGuard()
+
+        from src.application.use_cases.evaluate_cold_chain_safety_use_case import \
+            EvaluateColdChainSafetyUseCase
+        from src.domain.services.regulatory_decision_service import \
+            RegulatoryDecisionService
+        from src.domain.services.thermal_degradation_estimator import \
+            ThermalDegradationEstimator
+        from src.infrastructure.adapters.json_device_repository import \
+            JsonDeviceRepository
+        from src.infrastructure.adapters.json_vaccine_spec_repository import \
+            JsonVaccineSpecRepository
+        from src.infrastructure.adapters.validation_protocol_service import \
+            ValidationProtocolService
+
+        uc = EvaluateColdChainSafetyUseCase(
+            device_repository=JsonDeviceRepository(),
+            vaccine_specifications=JsonVaccineSpecRepository(),
+            regulatory_decision_service=RegulatoryDecisionService(),
+            estimator=ThermalDegradationEstimator(),
+            validator=ValidationProtocolService(),
+            license_guard=license_guard,
+        )
+
+        logger.info("EvaluateColdChainSafetyUseCase built successfully")
+        return uc

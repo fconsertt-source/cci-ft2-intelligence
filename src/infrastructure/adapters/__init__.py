@@ -12,4 +12,4 @@ try:
 except ImportError:
     pass
 
-__all__ = ['HashChainedLedgerWriter', 'FilesystemAdapter', 'JSONLIndexAdapter']
+__all__ = ["HashChainedLedgerWriter", "FilesystemAdapter", "JSONLIndexAdapter"]

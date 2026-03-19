@@ -151,7 +151,7 @@ def check_ledger_enum(result: GateResult) -> None:
 
 def check_dto_invariants(result: GateResult) -> None:
     try:
-        from src.application.dtos.device_report_dto import DeviceReportDTO
+        from src.domain.dtos.device_report_dto import DeviceReportDTO
 
         dto = DeviceReportDTO(
             device_id="GATE-TEST",

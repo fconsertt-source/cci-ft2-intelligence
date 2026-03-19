@@ -26,10 +26,10 @@ EXCLUDE_DIRS = ["__pycache__", ".git", "venv", "env", ".pytest_cache", "dist", "
 FILE_PATTERNS = ["*.py"]
 
 # الأنماط النصية للبحث
-UTC_PATTERN = re.compile(r'datetime\.utcnow\(\)')
+UTC_PATTERN = re.compile(r"datetime\.utcnow\(\)")
 TIMESPEC_PATTERN = re.compile(r'isoformat\(\s*timespec\s*=\s*["\'](\w+)["\']\s*\)')
-ASSERT_PATTERN = re.compile(r'assert\s+.*==.*')
-IMPORT_PATTERN = re.compile(r'^(from|import)\s+datetime')
+ASSERT_PATTERN = re.compile(r"assert\s+.*==.*")
+IMPORT_PATTERN = re.compile(r"^(from|import)\s+datetime")
 
 # ==============================================
 # دوال مساعدة
@@ -77,7 +77,7 @@ def suggest_fix(line: str, timespec: Optional[str] = None) -> str:
     else:
         replacement = "utc_now_iso()"
 
-    new_line = re.sub(r'datetime\.utcnow\(\)', replacement, line)
+    new_line = re.sub(r"datetime\.utcnow\(\)", replacement, line)
 
     return new_line
 
@@ -85,7 +85,7 @@ def suggest_fix(line: str, timespec: Optional[str] = None) -> str:
 def check_import_exists(file_path: Path) -> bool:
     """التحقق من وجود استيراد datetime في الملف"""
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
             return bool(IMPORT_PATTERN.search(content))
     except Exception:
@@ -110,7 +110,7 @@ def format_report(results: List[Dict], stats: Dict) -> str:
     # تجميع النتائج حسب الملف
     by_file = defaultdict(list)
     for r in results:
-        by_file[r['file']].append(r)
+        by_file[r["file"]].append(r)
 
     # عرض النتائج حسب الملف
     for file_path, file_results in sorted(by_file.items()):
@@ -119,10 +119,10 @@ def format_report(results: List[Dict], stats: Dict) -> str:
 
         for r in file_results:
             # عرض السطر مع الترقيم
-            line_num = r['line']
-            code = r['code']
-            compare = r['compare_type']
-            suggested = r['suggested']
+            line_num = r["line"]
+            code = r["code"]
+            compare = r["compare_type"]
+            suggested = r["suggested"]
 
             lines.append(f"  {line_num:4d} │ {code}")
             if compare != "-":
@@ -131,7 +131,7 @@ def format_report(results: List[Dict], stats: Dict) -> str:
             lines.append("")
 
         # معلومات إضافية عن الملف
-        has_import = r.get('has_datetime_import', False)
+        has_import = r.get("has_datetime_import", False)
         if not has_import:
             lines.append("       ℹ️  الملف لا يستورد datetime - سيحتاج إلى استيراد")
         lines.append("")
@@ -157,7 +157,7 @@ def format_report(results: List[Dict], stats: Dict) -> str:
     lines.append("   from datetime import datetime, timezone")
     lines.append("   ")
     lines.append("   def utc_now_iso(timespec: str = 'seconds') -> str:")
-    lines.append("       \"\"\"إرجاع الوقت الحالي بصيغة ISO مع Zulu indicator\"\"\"")
+    lines.append('       """إرجاع الوقت الحالي بصيغة ISO مع Zulu indicator"""')
     lines.append(
         "       return datetime.now(timezone.utc).isoformat(timespec=timespec).replace('+00:00', 'Z')"
     )
@@ -191,11 +191,11 @@ def format_report(results: List[Dict], stats: Dict) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='تحليل استخدامات utc_now_iso() - المرحلة الأولى'
+        description="تحليل استخدامات utc_now_iso() - المرحلة الأولى"
     )
-    parser.add_argument('--output', '-o', type=str, help='حفظ التقرير في ملف')
+    parser.add_argument("--output", "-o", type=str, help="حفظ التقرير في ملف")
     parser.add_argument(
-        '--verbose', '-v', action='store_true', help='عرض تفاصيل إضافية'
+        "--verbose", "-v", action="store_true", help="عرض تفاصيل إضافية"
     )
     args = parser.parse_args()
 
@@ -204,12 +204,12 @@ def main():
 
     results = []
     stats = {
-        'total': 0,
-        'production': 0,
-        'test': 0,
-        'literal_comparisons': 0,
-        'with_timespec': 0,
-        'files_affected': 0,
+        "total": 0,
+        "production": 0,
+        "test": 0,
+        "literal_comparisons": 0,
+        "with_timespec": 0,
+        "files_affected": 0,
     }
 
     affected_files = set()
@@ -226,7 +226,7 @@ def main():
             dirs[:] = [d for d in dirs if not should_exclude(Path(root) / d)]
 
             for file in files:
-                if not file.endswith('.py'):
+                if not file.endswith(".py"):
                     continue
 
                 file_path = Path(root) / file
@@ -235,7 +235,7 @@ def main():
                     continue
 
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
+                    with open(file_path, "r", encoding="utf-8") as f:
                         lines = f.readlines()
                 except Exception as e:
                     if args.verbose:
@@ -247,13 +247,13 @@ def main():
                 for i, line in enumerate(lines):
                     if UTC_PATTERN.search(line):
                         file_has_match = True
-                        stats['total'] += 1
+                        stats["total"] += 1
 
                         # استخراج timespec إن وجد
                         timespec_match = TIMESPEC_PATTERN.search(line)
                         timespec = timespec_match.group(1) if timespec_match else None
                         if timespec:
-                            stats['with_timespec'] += 1
+                            stats["with_timespec"] += 1
 
                         # تحديد السياق ونوع المقارنة
                         next_line = lines[i + 1] if i + 1 < len(lines) else None
@@ -262,11 +262,11 @@ def main():
                         )
 
                         if compare_type != "-":
-                            stats['literal_comparisons'] += 1
+                            stats["literal_comparisons"] += 1
                         if "اختبار" in context:
-                            stats['test'] += 1
+                            stats["test"] += 1
                         else:
-                            stats['production'] += 1
+                            stats["production"] += 1
 
                         # اقتراح الإصلاح
                         suggested = suggest_fix(line, timespec)
@@ -276,14 +276,14 @@ def main():
 
                         results.append(
                             {
-                                'file': str(file_path),
-                                'line': i + 1,
-                                'code': line.strip(),
-                                'context': context,
-                                'compare_type': compare_type,
-                                'timespec': timespec,
-                                'suggested': suggested,
-                                'has_datetime_import': has_import,
+                                "file": str(file_path),
+                                "line": i + 1,
+                                "code": line.strip(),
+                                "context": context,
+                                "compare_type": compare_type,
+                                "timespec": timespec,
+                                "suggested": suggested,
+                                "has_datetime_import": has_import,
                             }
                         )
 
@@ -293,7 +293,7 @@ def main():
                 if file_has_match:
                     affected_files.add(str(file_path))
 
-    stats['files_affected'] = len(affected_files)
+    stats["files_affected"] = len(affected_files)
 
     # إنشاء التقرير
     report = format_report(results, stats)
@@ -304,21 +304,21 @@ def main():
     # حفظ في ملف إذا طُلب
     if args.output:
         try:
-            with open(args.output, 'w', encoding='utf-8') as f:
+            with open(args.output, "w", encoding="utf-8") as f:
                 f.write(report)
             print(f"✅ تم حفظ التقرير في: {args.output}")
         except Exception as e:
             print(f"❌ خطأ في حفظ التقرير: {e}")
 
     # ملاحظات ختامية
-    if stats['total'] > 0:
+    if stats["total"] > 0:
         print("\n⚠️  هذه هي المرحلة الأولى فقط (تحليل).")
         print(
             "   للمرحلة الثانية (التطبيق)، استخدم: python scripts/fix_datetime.py --apply"
         )
         print("   بعد مراجعة النتائج والموافقة عليها.")
 
-    return 0 if stats['total'] == 0 else 1
+    return 0 if stats["total"] == 0 else 1
 
 
 if __name__ == "__main__":

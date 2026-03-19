@@ -26,7 +26,7 @@ class FT2ReaderAdapter:
             return entries
 
         for f in os.listdir(self.input_dir):
-            if f.endswith(('.csv', '.tsv')):
+            if f.endswith((".csv", ".tsv")):
                 path = os.path.join(self.input_dir, f)
                 entries.extend(FT2Parser.parse_file(path))
 

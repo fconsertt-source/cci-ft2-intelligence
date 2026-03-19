@@ -40,6 +40,8 @@ class TestHERCalculator:
 
 
 def make_spec(
+    q10_factor=2.0,
+    shelf_life_days=730,
     min_temp=2.0,
     max_temp=8.0,
     freeze_sensitive=True,
@@ -47,10 +49,16 @@ def make_spec(
 ):
     return VaccineSpecification(
         vaccine_type="TestVaccine",
-        min_temp=min_temp,
-        max_temp=max_temp,
+        q10_factor=q10_factor,  # ✅ مطلوب
+        shelf_life_days=shelf_life_days,  # ✅ مطلوب
+        min_temp=min_temp,  # ✅ الآن مقبول
+        max_temp=max_temp,  # ✅ الآن مقبول
         freeze_sensitive=freeze_sensitive,
-        excursion_time_limit=excursion_time_limit,
+        excursion_time_limit=excursion_time_limit,  # ✅ الآن مقبول
+        reference_temp_c=5.0,
+        critical_temp_c=34.0,
+        critical_hours=2.0,
+        ccm_limit=600,
     )
 
 

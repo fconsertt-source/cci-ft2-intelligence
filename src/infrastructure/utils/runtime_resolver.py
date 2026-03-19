@@ -53,7 +53,7 @@ class RuntimeResolver:
         """
         import sys
 
-        is_windows = sys.platform.startswith('win')
+        is_windows = sys.platform.startswith("win")
         exe_name = "java.exe" if is_windows else "java"
 
         # مسارات محتملة داخل assets/runtime/

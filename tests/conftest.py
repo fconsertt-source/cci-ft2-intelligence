@@ -20,12 +20,16 @@ from src.domain.services.thermal_degradation_estimator import \
     ThermalDegradationEstimator
 from src.domain.services.vaccine_assessment_service import \
     VaccineAssessmentService
+from src.domain.value_objects.vaccine_specification import VaccineSpecification
 from src.infrastructure.adapters.json_device_repository import \
     JsonDeviceRepository
 from src.infrastructure.adapters.json_vaccine_spec_repository import \
     JsonVaccineSpecRepository
 from src.infrastructure.adapters.validation_protocol_service import \
     ValidationProtocolService
+from tests.builders.vaccine_spec_builder import build_spec
+
+spec = build_spec(q10_factor=3.0)
 
 # ------------------------------------------------------------------
 # Test Double
@@ -172,6 +176,26 @@ def equipment_vaccines(test_data_dir):
         vaccines.append(vaccine)
 
     return vaccines
+
+
+# ✅ لقاح اختباري بقيم مستقرة للاختبارات
+# يفصل القيم العلمية (Production) عن قيم الاختبار (Testing)
+TEST_VACCINE_SPEC = VaccineSpecification(
+    vaccine_type="TEST_VACCINE",
+    q10_factor=2.0,  # ✅ مطلوب
+    shelf_life_days=730,  # ✅ مطلوب
+    freeze_sensitive=False,
+    vvm_type="VVM2",
+    ccm_limit=600,
+    reference_temp_c=5.0,  # ✅ إضافة: درجة الحرارة المرجعية
+    critical_temp_c=34.0,  # ✅ إضافة: عتبة الحرارة الحرجة
+    critical_hours=2.0,  # ✅ إضافة: الساعات الحرجة
+)
+
+
+@pytest.fixture
+def test_vaccine_spec():
+    return TEST_VACCINE_SPEC
 
 
 # ------------------------------------------------------------------

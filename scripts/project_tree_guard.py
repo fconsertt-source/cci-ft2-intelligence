@@ -46,9 +46,16 @@ IGNORE_DIRS = {
     ".vscode",
     ".pytest_cache",
     ".mypy_cache",
+    ".ruff_cache",
     "dist",
     "build",
     ".egg-info",
+    "reports",
+    "logs",
+    ".tox",
+    "htmlcov",
+    "site-packages",
+    "pip-wheel-metadata",
 }
 IGNORE_FILES = {".DS_Store", "Thumbs.db"}
 

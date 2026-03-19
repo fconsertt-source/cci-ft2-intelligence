@@ -37,6 +37,15 @@ def mock_dependencies():
     mock_spec = Mock()
     mock_spec.vaccine_type = "Hepatitis_B"
     mock_spec.rationale = "Test rationale"
+    mock_spec.critical_temp_c = 34.0
+    mock_spec.critical_hours = 2.0
+    mock_spec.freeze_threshold_c = -0.5
+    mock_spec.freeze_sensitive = False
+    mock_spec.q10_factor = 2.0
+    mock_spec.reference_temp_c = 5.0
+    mock_spec.shelf_life_days = 730
+    mock_spec.max_temp = 8.0
+
     mock_specs = Mock()
     mock_specs.get_spec.return_value = mock_spec
 

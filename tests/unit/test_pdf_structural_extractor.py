@@ -118,5 +118,5 @@ t Acc: 0
         pdf_result = pdf_extractor.extract(pdf_path)
 
         # قراءة من TXT (للتحقق من التوافق)
-        txt_content = txt_path.read_text(encoding='utf-8')
+        txt_content = txt_path.read_text(encoding="utf-8")
         assert str(pdf_result.serial) in txt_content

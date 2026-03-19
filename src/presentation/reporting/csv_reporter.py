@@ -62,7 +62,7 @@ def generate_centers_report(centers: List[CenterDTO], output_path: str):
             # بيانات كل مركز
             for dto in centers:
                 stats = dto.stats
-                has_entries = dto.ft2_entries_count > 0
+                has_entries = dto.ft2_entries_count > 0  # noqa: F841
 
                 # استخدم الحقل الرسمي has_warning
                 decision_for_action = (
@@ -92,9 +92,9 @@ def generate_centers_report(centers: List[CenterDTO], output_path: str):
                         dto.ft2_entries_count,
                         "YES" if stats.get("has_freeze", False) else "NO",
                         "YES" if stats.get("has_ccm_violation", False) else "NO",
-                        f"{stats['avg_temp']:.2f}" if has_entries else "N/A",
-                        f"{stats['min_temp']:.2f}" if has_entries else "N/A",
-                        f"{stats['max_temp']:.2f}" if has_entries else "N/A",
+                        dto.avg_temperature,
+                        dto.min_temperature,
+                        dto.max_temperature,
                         " | ".join(dto.decision_reasons),
                     ]
                 )

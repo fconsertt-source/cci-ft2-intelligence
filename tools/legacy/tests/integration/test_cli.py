@@ -57,6 +57,7 @@ def test_cli_simple_pipeline_invokes_run(monkeypatch, caplog):
         called["ok"] = True
 
     import scripts.simple_pipeline as sp
+
     monkeypatch.setattr(sp, "run_simple_pipeline", fake_run)
 
     # محاكاة استدعاء CLI مع وسيط simple-pipeline

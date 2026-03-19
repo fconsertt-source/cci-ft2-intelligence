@@ -16,12 +16,12 @@ try:
     # لمستخدمي Windows: تغيير الترميز إلى UTF-8
     import sys
 
-    if sys.platform == 'win32':
+    if sys.platform == "win32":
         sys.stdout = io.TextIOWrapper(
-            sys.stdout.buffer, encoding='utf-8', errors='ignore'
+            sys.stdout.buffer, encoding="utf-8", errors="ignore"
         )
         sys.stderr = io.TextIOWrapper(
-            sys.stderr.buffer, encoding='utf-8', errors='ignore'
+            sys.stderr.buffer, encoding="utf-8", errors="ignore"
         )
 except Exception:
     pass
@@ -51,8 +51,8 @@ def safe_print(message):
         # إذا فشلت الطباعة، حاول بطريقة أخرى
         try:
             print(
-                message.encode('utf-8', errors='ignore').decode(
-                    'ascii', errors='ignore'
+                message.encode("utf-8", errors="ignore").decode(
+                    "ascii", errors="ignore"
                 )
             )
         except Exception:
@@ -64,33 +64,33 @@ def setup_arabic_fonts():
 
     try:
         # استخدام Arial المتوفر على Windows
-        font_path = 'C:/Windows/Fonts/arial.ttf'
+        font_path = "C:/Windows/Fonts/arial.ttf"
 
         if os.path.exists(font_path):
-            pdfmetrics.registerFont(TTFont('ArabicFont', font_path))
+            pdfmetrics.registerFont(TTFont("ArabicFont", font_path))
             safe_print("INFO: Using Arabic font from: " + font_path)
-            return 'ArabicFont'
+            return "ArabicFont"
         else:
             # حاول مع خطوط أخرى
             alt_paths = [
-                'C:/Windows/Fonts/tahoma.ttf',
-                'C:/Windows/Fonts/segoeui.ttf',
-                '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',
-                '/System/Library/Fonts/Helvetica.ttf',
+                "C:/Windows/Fonts/tahoma.ttf",
+                "C:/Windows/Fonts/segoeui.ttf",
+                "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+                "/System/Library/Fonts/Helvetica.ttf",
             ]
 
             for alt_path in alt_paths:
                 if os.path.exists(alt_path):
-                    pdfmetrics.registerFont(TTFont('ArabicFont', alt_path))
+                    pdfmetrics.registerFont(TTFont("ArabicFont", alt_path))
                     safe_print("INFO: Using alternative font from: " + alt_path)
-                    return 'ArabicFont'
+                    return "ArabicFont"
 
         safe_print("INFO: Using default Helvetica font")
-        return 'Helvetica'
+        return "Helvetica"
 
     except Exception as e:
         safe_print("WARNING: Error loading font: " + str(e))
-        return 'Helvetica'
+        return "Helvetica"
 
 
 def create_arabic_pdf():
@@ -115,7 +115,7 @@ def create_arabic_pdf():
         return None
 
     try:
-        df = pd.read_csv(input_file, sep='\t')
+        df = pd.read_csv(input_file, sep="\t")
         safe_print(f"INFO: Read {len(df)} records from data")
     except Exception as e:
         safe_print(f"ERROR: Failed to read data file: {str(e)}")
@@ -137,28 +137,28 @@ def create_arabic_pdf():
 
         # ========== إنشاء أنماط مخصصة للعربية ==========
         arabic_title_style = ParagraphStyle(
-            'ArabicTitle',
-            parent=styles['Heading1'],
+            "ArabicTitle",
+            parent=styles["Heading1"],
             fontName=arabic_font,
             fontSize=18,
             alignment=TA_CENTER,
             spaceAfter=30,
-            textColor=colors.HexColor('#2C3E50'),
+            textColor=colors.HexColor("#2C3E50"),
         )
 
         arabic_heading_style = ParagraphStyle(
-            'ArabicHeading',
-            parent=styles['Heading2'],
+            "ArabicHeading",
+            parent=styles["Heading2"],
             fontName=arabic_font,
             fontSize=14,
             alignment=TA_CENTER,
             spaceAfter=20,
-            textColor=colors.HexColor('#3498DB'),
+            textColor=colors.HexColor("#3498DB"),
         )
 
         arabic_center_style = ParagraphStyle(
-            'ArabicCenter',
-            parent=styles['Normal'],
+            "ArabicCenter",
+            parent=styles["Normal"],
             fontName=arabic_font,
             fontSize=11,
             alignment=TA_CENTER,
@@ -178,7 +178,7 @@ def create_arabic_pdf():
         report_info = "تاريخ إنشاء التقرير: " + report_date
         story.append(Paragraph(report_info, arabic_center_style))
 
-        ref_number = "CC-" + datetime.now().strftime('%Y%m%d-%H%M%S')
+        ref_number = "CC-" + datetime.now().strftime("%Y%m%d-%H%M%S")
         ref_info = "رقم المرجع: " + ref_number
         story.append(Paragraph(ref_info, arabic_center_style))
 
@@ -196,26 +196,26 @@ def create_arabic_pdf():
 
         # إضافة البيانات
         for index, row in df.iterrows():
-            decision = str(row['decision'])
-            center_name = str(row['center_name'])
+            decision = str(row["decision"])
+            center_name = str(row["center_name"])
 
             # تحديد حالة اللون والنص
-            if 'REJECTED' in decision:
+            if "REJECTED" in decision:
                 status_text = "مرفوض"
-            elif 'NO_DATA' in decision:
+            elif "NO_DATA" in decision:
                 status_text = "لا بيانات"
-            elif 'ACCEPTED' in decision:
+            elif "ACCEPTED" in decision:
                 status_text = "مقبول"
-            elif 'WARNING' in decision:
+            elif "WARNING" in decision:
                 status_text = "تحذير"
             else:
                 status_text = "غير معروف"
 
             table_row = [
-                str(row['center_id']),
+                str(row["center_id"]),
                 center_name,
                 decision,
-                str(round(row['avg_temperature'], 2)) + " °C",
+                str(round(row["avg_temperature"], 2)) + " °C",
                 status_text,
             ]
             table_data.append(table_row)
@@ -228,19 +228,19 @@ def create_arabic_pdf():
         # تنسيق الجدول الأساسي
         table_style = TableStyle(
             [
-                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2C3E50')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), arabic_font),
-                ('FONTSIZE', (0, 0), (-1, 0), 10),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
-                ('ALIGN', (1, 1), (1, -1), 'RIGHT'),
-                ('FONTNAME', (0, 1), (-1, -1), arabic_font),
-                ('FONTSIZE', (0, 1), (-1, -1), 9),
-                ('TOPPADDING', (0, 1), (-1, -1), 6),
-                ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2C3E50")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, 0), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), arabic_font),
+                ("FONTSIZE", (0, 0), (-1, 0), 10),
+                ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                ("ALIGN", (0, 1), (-1, -1), "CENTER"),
+                ("ALIGN", (1, 1), (1, -1), "RIGHT"),
+                ("FONTNAME", (0, 1), (-1, -1), arabic_font),
+                ("FONTSIZE", (0, 1), (-1, -1), 9),
+                ("TOPPADDING", (0, 1), (-1, -1), 6),
+                ("BOTTOMPADDING", (0, 1), (-1, -1), 6),
             ]
         )
 
@@ -248,13 +248,13 @@ def create_arabic_pdf():
         for i in range(1, len(table_data)):
             status = table_data[i][4]
             if "مرفوض" in status:
-                table_style.add('BACKGROUND', (0, i), (-1, i), colors.lightcoral)
+                table_style.add("BACKGROUND", (0, i), (-1, i), colors.lightcoral)
             elif "لا بيانات" in status:
-                table_style.add('BACKGROUND', (0, i), (-1, i), colors.lightgrey)
+                table_style.add("BACKGROUND", (0, i), (-1, i), colors.lightgrey)
             elif "مقبول" in status:
-                table_style.add('BACKGROUND', (0, i), (-1, i), colors.lightgreen)
+                table_style.add("BACKGROUND", (0, i), (-1, i), colors.lightgreen)
             elif "تحذير" in status:
-                table_style.add('BACKGROUND', (0, i), (-1, i), colors.lightyellow)
+                table_style.add("BACKGROUND", (0, i), (-1, i), colors.lightyellow)
 
         table.setStyle(table_style)
         story.append(table)
@@ -265,10 +265,10 @@ def create_arabic_pdf():
 
         # إحصائيات
         total = len(df)
-        rejected = len(df[df['decision'].str.contains('REJECTED', na=False)])
-        accepted = len(df[df['decision'].str.contains('ACCEPTED', na=False)])
-        warning = len(df[df['decision'].str.contains('WARNING', na=False)])
-        no_data = len(df[df['decision'].str.contains('NO_DATA', na=False)])
+        rejected = len(df[df["decision"].str.contains("REJECTED", na=False)])
+        accepted = len(df[df["decision"].str.contains("ACCEPTED", na=False)])
+        warning = len(df[df["decision"].str.contains("WARNING", na=False)])
+        no_data = len(df[df["decision"].str.contains("NO_DATA", na=False)])
 
         summary_data = [
             ["المؤشر", "العدد", "النسبة"],
@@ -299,12 +299,12 @@ def create_arabic_pdf():
         summary_table.setStyle(
             TableStyle(
                 [
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498DB')),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-                    ('FONTNAME', (0, 0), (-1, -1), arabic_font),
-                    ('FONTSIZE', (0, 0), (-1, -1), 10),
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#3498DB")),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                    ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                    ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                    ("FONTNAME", (0, 0), (-1, -1), arabic_font),
+                    ("FONTSIZE", (0, 0), (-1, -1), 10),
                 ]
             )
         )

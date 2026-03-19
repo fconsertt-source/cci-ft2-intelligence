@@ -1,5 +1,6 @@
+# src/domain/dtos/center_dto.py
 from dataclasses import dataclass, field
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -15,3 +16,52 @@ class CenterDTO:
     thaw_remaining_hours: Optional[float] = None
     category_display: Optional[str] = None
     decision_reasons: List[str] = field(default_factory=list)
+    stats: Dict[str, Any] = field(default_factory=dict)  # 🆕 إضافة هنا!
+
+    @property
+    def ft2_entries_count(self) -> int:
+        return len(self.ft2_entries)
+
+    @property
+    def has_warning(self) -> bool:
+        return self.alert_level is not None and self.alert_level.upper() not in [
+            "NONE",
+            "SAFE",
+            "",
+        ]
+
+    @property
+    def has_error(self) -> bool:
+        return self.decision.upper() in ["CRITICAL", "UNSAFE", "REJECT"]
+
+    @property
+    def has_freeze(self) -> bool:
+        return self.stats.get("has_freeze", False)
+
+    @property
+    def has_ccm_violation(self) -> bool:
+        return self.stats.get("has_ccm_violation", False)
+
+    @property
+    def her_ratio(self) -> float:
+        return float(self.stats.get("her_ratio", 0.0))
+
+    @property
+    def ccm_index(self) -> str:
+        return str(self.stats.get("ccm_index", "0"))
+
+    @property
+    def avg_temperature(self) -> str:
+        """للتقرير - يعيد N/A إذا لم تكن موجودة"""
+        avg = self.stats.get("avg_temp")
+        return f"{avg:.2f}" if avg is not None else "N/A"
+
+    @property
+    def min_temperature(self) -> str:
+        min_t = self.stats.get("min_temp")
+        return f"{min_t:.2f}" if min_t is not None else "N/A"
+
+    @property
+    def max_temperature(self) -> str:
+        max_t = self.stats.get("max_temp")
+        return f"{max_t:.2f}" if max_t is not None else "N/A"

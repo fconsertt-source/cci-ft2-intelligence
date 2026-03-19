@@ -20,17 +20,17 @@ def convert_csv_to_ft2(csv_path: str, output_path: str):
         output_path: مسار ملف FT2 المخرج
     """
     try:
-        with open(csv_path, 'r', encoding='utf-8') as f_in:
+        with open(csv_path, "r", encoding="utf-8") as f_in:
             # محاولة اكتشاف الفاصل تلقائياً
             try:
                 sample = f_in.read(2048)
                 f_in.seek(0)
-                dialect = csv.Sniffer().sniff(sample, delimiters=[',', '\t', ';'])
+                dialect = csv.Sniffer().sniff(sample, delimiters=[",", "\t", ";"])
                 delimiter = dialect.delimiter
             except csv.Error:
                 # العودة للافتراضي إذا فشل الاكتشاف
                 f_in.seek(0)
-                delimiter = '\t' if csv_path.lower().endswith('.tsv') else ','
+                delimiter = "\t" if csv_path.lower().endswith(".tsv") else ","
 
             reader = csv.DictReader(f_in, delimiter=delimiter)
             rows = list(reader)
@@ -60,7 +60,7 @@ def convert_csv_to_ft2(csv_path: str, output_path: str):
                 # تنظيف أسماء الأعمدة من المسافات الزائدة إذا وجدت
                 row = {k.strip(): v for k, v in row.items() if k}
 
-                ts_str = row.get('timestamp', '').strip().replace(' ', 'T')
+                ts_str = row.get("timestamp", "").strip().replace(" ", "T")
 
                 if not ts_str:
                     logger.warning(
@@ -68,8 +68,8 @@ def convert_csv_to_ft2(csv_path: str, output_path: str):
                     )
                     continue
 
-                date_str = datetime.fromisoformat(ts_str).strftime('%Y-%m-%d')
-                temp = float(row.get('temperature', 0))
+                date_str = datetime.fromisoformat(ts_str).strftime("%Y-%m-%d")
+                temp = float(row.get("temperature", 0))
 
                 ft2_content.append(f" {i}:")
                 ft2_content.append(f"  Date: {date_str}")
@@ -87,8 +87,8 @@ def convert_csv_to_ft2(csv_path: str, output_path: str):
                 continue
 
         # حفظ الملف
-        with open(output_path, 'w', encoding='utf-8') as f_out:
-            f_out.write('\n'.join(ft2_content))
+        with open(output_path, "w", encoding="utf-8") as f_out:
+            f_out.write("\n".join(ft2_content))
 
         logger.info("تم تحويل %s إلى %s (%d صف)", csv_path, output_path, len(rows))
 
@@ -110,13 +110,13 @@ def convert_all_files(input_dir: str, output_dir: str):
 
     for filename in os.listdir(input_dir):
         input_path = os.path.join(input_dir, filename)
-        output_filename = os.path.splitext(filename)[0] + '.txt'
+        output_filename = os.path.splitext(filename)[0] + ".txt"
         output_path = os.path.join(output_dir, output_filename)
 
         # التحقق مما إذا كان الملف هو نفسه لتجنب الكتابة فوقه وتلف البيانات
         is_same_file = os.path.abspath(input_path) == os.path.abspath(output_path)
 
-        if filename.endswith('.txt'):
+        if filename.endswith(".txt"):
             if not is_same_file:
                 try:
                     shutil.copy2(input_path, output_path)
@@ -124,7 +124,7 @@ def convert_all_files(input_dir: str, output_dir: str):
                 except Exception as e:
                     logger.error("فشل نسخ %s: %s", filename, e)
 
-        elif filename.endswith(('.csv', '.tsv')):
+        elif filename.endswith((".csv", ".tsv")):
             try:
                 convert_csv_to_ft2(input_path, output_path)
                 converted_count += 1

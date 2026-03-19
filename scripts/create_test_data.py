@@ -45,11 +45,11 @@ def create_test_data():
         filename = f"{scenario['name']}_{scenario['device_id']}.csv"
         filepath = os.path.join(output_dir, filename)
 
-        with open(filepath, 'w', newline='', encoding='utf-8') as f:
+        with open(filepath, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             # كتابة الرأس المتوافق مع FT2Parser
             writer.writerow(
-                ['device_id', 'timestamp', 'temperature', 'vaccine_type', 'batch']
+                ["device_id", "timestamp", "temperature", "vaccine_type", "batch"]
             )
 
             # توليد بيانات لمدة 24 ساعة (قراءة كل 15 دقيقة)
@@ -60,13 +60,13 @@ def create_test_data():
                 current_time = base_time + timedelta(minutes=15 * i)
 
                 # محاكاة درجة الحرارة
-                temp = scenario['base_temp'] + random.uniform(
-                    -scenario['variance'], scenario['variance']
+                temp = scenario["base_temp"] + random.uniform(
+                    -scenario["variance"], scenario["variance"]
                 )
 
                 writer.writerow(
                     [
-                        scenario['device_id'],
+                        scenario["device_id"],
                         current_time.isoformat(),
                         f"{temp:.2f}",
                         "COVID-19",

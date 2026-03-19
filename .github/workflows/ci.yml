@@ -58,6 +58,8 @@ jobs:
       - name: Install dependencies (full)
         run: |
           python3 -m pip install --upgrade pip
+          # تحديث الحزم الضعيفة أولاً
+          python3 -m pip install --upgrade sortedcontainers urllib3 requests
           python3 -m pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Run tests (full)
@@ -68,8 +70,27 @@ jobs:
         run: |
           pip check
 
-      # إضافة إلى CI/CD
-      - name: Check dependencies
+      # ✅ استخدام GitHub Action الرسمي مع إمكانية استبعاد الثغرات المعروفة
+      - name: Run pip-audit
+        uses: pypa/gh-action-pip-audit@v1.1.0
+        with:
+          # استبعاد الثغرات التي تم إصلاحها في requirements.txt
+          # قم بإزالة التعليق إذا كنت تريد استبعاد ثغرات مؤقتاً
+          # ignore-vulns: |
+          #   CVE-2024-37891
+          #   CVE-2024-47081
+          summary: true
+          format: json
+          output: vulns.json
+        # السماح بالفشل مؤقتاً حتى يتم تحديث جميع الحزم
+        continue-on-error: true
+
+      # ✅ خطوة إضافية: تحديث تلقائي للحزم الضعيفة
+      - name: Auto-fix vulnerabilities
+        if: failure()
         run: |
           pip install pip-audit
-          pip-audit --format json --output vulns.json || true
+          # محاولة إصلاح الثغرات تلقائياً
+          pip-audit --fix || echo "Some vulnerabilities could not be auto-fixed"
+          # حفظ النتائج
+          pip-audit --format=json --output=vulns-fixed.json || true

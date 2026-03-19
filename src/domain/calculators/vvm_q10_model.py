@@ -3,6 +3,7 @@
 import math
 from typing import List, Tuple
 
+
 class VVMQ10Model:
     """
     A scientific utility to model vaccine shelf-life degradation using the
@@ -19,7 +20,7 @@ class VVMQ10Model:
 
         Args:
         Initializes the model with specific vaccine characteristics.
-        
+
         Args:
             q10_value: Typically 2.0 or higher depending on vaccine sensitivity.
             ideal_temp: Reference ideal storage temperature (e.g., 5.0°C).
@@ -49,24 +50,23 @@ class VVMQ10Model:
 
         temp_diff = actual_temp - self.ideal_temp
         exponent = temp_diff / 10.0
-        
+
         try:
             factor = math.pow(self.q10_value, exponent)
         except (ValueError, OverflowError):
             # Handles cases like math domain error if base is negative,
             # or overflow if the result is too large.
-            return float('inf')
+            return float("inf")
 
         if math.isnan(factor) or math.isinf(factor):
             # Defensive check against NaN or Inf results.
             # An infinite factor means extreme and immediate degradation.
-            return float('inf')
+            return float("inf")
 
         return factor
 
     def calculate_cumulative_degradation_hours(
-        self,
-        readings: List[Tuple[float, float]]
+        self, readings: List[Tuple[float, float]]
     ) -> float:
         """
         Calculates the total cumulative degradation, expressed in equivalent
@@ -91,17 +91,17 @@ class VVMQ10Model:
         for reading in readings:
             if not isinstance(reading, tuple) or len(reading) != 2:
                 raise ValueError("Each reading must be a (temp, duration) tuple.")
-            
+
             temp, duration_hours = reading
-            
+
             if not isinstance(duration_hours, (int, float)) or duration_hours < 0:
                 raise ValueError("Duration must be a non-negative number.")
 
             # Per spec, freeze conditions are handled elsewhere and bypass this model.
             # We assume inputs to this function have been pre-filtered.
-            
+
             acceleration_factor = self.calculate_acceleration_factor(temp)
-            
+
             degradation_for_segment = duration_hours * acceleration_factor
             total_degradation_hours += degradation_for_segment
 

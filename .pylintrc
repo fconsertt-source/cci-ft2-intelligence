@@ -1,14 +1,67 @@
+# .pylintrc - CCI-FT2 Intelligence
+# Optimized for scientific/enterprise Python projects
+# Version: 1.1
+
 [MASTER]
-ignore-patterns=test_.*?,conftest.py
+persistent=yes
+jobs=0
+ignore=venv,build,dist,reports,__pycache__,.git,.pytest_cache,.mypy_cache
+ignore-patterns=^test_.*\.py$,^conftest\.py$,^.*_test\.py$,^setup\.py$
 
 [MESSAGES CONTROL]
-disable=C0114,R0903,R0913,R0914,W0511
+# Disable noise for scientific/enterprise code
+disable=
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring (DTOs don't need)
+    C0116,  # missing-function-docstring (private methods)
+    R0902,  # too-many-instance-attributes (DTOs/dataclasses)
+    R0903,  # too-few-public-methods (Value Objects)
+    R0911,  # too-many-return-statements (complex logic)
+    R0912,  # too-many-branches (scientific calculations)
+    R0913,  # too-many-arguments (dependency injection)
+    R0914,  # too-many-locals (complex algorithms)
+    R0915,  # too-many-statements (large functions)
+    C0415,  # import-outside-toplevel (CLI/GUI optimization)
+    W0718,  # broad-exception-caught (CLI error handling)
+    R0801,  # duplicate-code (false positives in large projects)
+    W0107,  # unnecessary-pass (abstract methods)
+    W2301   # unnecessary-ellipsis (protocols)
+
+[DESIGN]
+# Relaxed for scientific code
+max-args=8
+max-locals=25
+max-branches=16
+max-statements=65
+max-attributes=14
+max-parents=7
+min-public-methods=1
 
 [FORMAT]
 max-line-length=120
+max-module-lines=2000
+indent-string='    '
 
-[DESIGN]
-min-public-methods=1
+[TYPECHECK]
+ignored-modules=
+    tkinter,
+    pytest,
+    benchmark,
+    matplotlib,
+    pandas,
+    numpy,
+    reportlab,
+    arabic_reshaper,
+    bidi
 
 [IMPORTS]
 allow-any-import-level=tests.*,src.application.ports.*
+
+[BASIC]
+good-names=i,j,k,ex,Run,_,id,df,fp,logger,exc,val,dt,os,re,sys,api,ui,db
+
+[STRING]
+check-quote-consistency=no
+
+[LOGGING]
+logging-modules=logging

@@ -20,7 +20,7 @@ def test_device_repository_constructs_complete_entities(tmp_path):
         }
     ]
 
-    with open(output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         import json
 
         json.dump(imported_format_data, f)

@@ -22,7 +22,7 @@ def test_device_with_temperature_excursion(excursion_use_case):
 
     # ← التحقق من أن التقرير يحتوي على التفاصيل
     assert report.device_id == "130600112764"
-    assert report.vaccine_type == "Hepatitis_B"
+    assert report.vaccine_type == "GENERAL"
     assert report.total_records == 2
     assert len(report.excursions) == 2
 

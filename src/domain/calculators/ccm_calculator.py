@@ -4,10 +4,10 @@
 # ============================================================================
 from typing import Any, Dict, List
 
-
 from src.domain.entities.temperature_reading import TemperatureReading
 
 TIME_UNIT = "minutes"
+
 
 def calculate_delta_minutes(record: Dict[str, Any]) -> float:
     """

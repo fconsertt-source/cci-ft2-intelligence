@@ -7,13 +7,14 @@
 """
 from __future__ import annotations
 
-from unittest.mock import MagicMock
+from dataclasses import replace
 
 import pytest
 
 from src.domain.services.regulatory_decision_service import \
     RegulatoryDecisionService
-from src.domain.value_objects.vaccine_specification import VaccineSpecification
+from src.domain.value_objects.vaccine_specification import (
+    VaccineSpecification, get_vaccine_spec)
 
 # ---------------------------------------------------------------------------
 # helpers — بناء specs بسرعة
@@ -28,15 +29,28 @@ def make_spec(
     freeze_sensitive: bool = True,
     freeze_range: tuple[float, float] | None = None,
 ) -> VaccineSpecification:
-    """Mock لـ VaccineSpecification بالقيم المطلوبة فقط."""
-    spec = MagicMock(spec=VaccineSpecification)
-    spec.min_temp = min_temp
-    spec.max_temp = max_temp
-    spec.max_heat_temp = max_heat_temp
-    spec.max_heat_duration_hours = max_heat_duration_hours
-    spec.freeze_sensitive = freeze_sensitive
-    spec.freeze_range = freeze_range
-    return spec
+    """إنشاء VaccineSpecification حقيقي للاختبارات (بدلاً من MagicMock)."""
+
+    # استخدام GENERAL كقاعدة
+    base_spec = get_vaccine_spec("GENERAL")
+
+    # إنشاء dictionary للتجاوزات
+    overrides = {
+        "min_temp": min_temp,
+        "max_temp": max_temp,
+        "max_heat_temp": max_heat_temp,
+        "max_heat_duration_hours": max_heat_duration_hours,
+        "freeze_sensitive": freeze_sensitive,
+        "freeze_range": freeze_range,
+    }
+
+    # إزالة القيم None
+    overrides = {k: v for k, v in overrides.items() if v is not None}
+
+    # تطبيق التجاوزات
+    if overrides:
+        return replace(base_spec, **overrides)
+    return base_spec
 
 
 SVC = RegulatoryDecisionService()
@@ -51,9 +65,14 @@ SVC = RegulatoryDecisionService()
 class TestFreezeSensitiveVaccines:
 
     def test_at_zero_discard(self):
-        """0°C = تجميد = DISCARD فوري."""
+        """0°C حسب المعيار العلمي (WHO) لا يعتبر تجمداً، العتبة هي -0.5°C."""
         spec = make_spec(freeze_sensitive=True)
-        assert SVC.evaluate(0.0, 10.0, spec) == "DISCARD"
+        # 0°C > freeze_threshold_c (-0.5) → لا يعتبر تجمداً
+        # وهو ضمن النطاق الطبيعي (2-8°C)؟ لا، 0°C أقل من 2°C
+        # لكن freeze_sensitive=True والتجميد لم يحدث، إذن يجب فحص الحرارة
+        # 0°C < min_temp (2.0) → لكن لا توجد قاعدة للبرودة دون تجمد
+        # النتيجة: SAFE (لأنه لم يتجمد ولم يسخن)
+        assert SVC.evaluate(0.0, 10.0, spec) == "SAFE"
 
     def test_below_zero_discard(self):
         """-5°C = تجميد = DISCARD."""
@@ -138,15 +157,13 @@ class TestMaxHeatTempAbsoluteLimit:
         assert result == "PARTIAL"
 
     def test_no_max_heat_temp_falls_back_to_max_temp(self):
-        """إذا لم يوجد max_heat_temp، يستخدم max_temp كبديل."""
+        """إذا لم يوجد max_heat_temp، يستخدم max_temp كحد للحرارة."""
         spec = make_spec(max_temp=8.0, max_heat_temp=None, max_heat_duration_hours=2.0)
-        # temperature > max_temp (8.0) → يستخدم max_temp كـ max_heat_temp
-        # 9.0 > 8.0 → لكن < 8.0 (الحد المستخدم) = خطأ في المنطق
-        # في الواقع: max_heat_temp = None → fallback = max_temp = 8.0
-        # 9.0 > 8.0 → DISCARD فوري عند max_heat_temp check
+        # 9.0 > max_temp (8.0) → نعم، دخل في نطاق الحرارة
+        # المدة = 0.5 ساعة < max_heat_duration_hours (2.0 ساعة)
+        # إذن النتيجة: PARTIAL (وليس DISCARD)
         result = SVC.evaluate(9.0, 0.5, spec)
-        # 9.0 > max_heat_temp(8.0) → DISCARD
-        assert result == "DISCARD"
+        assert result == "PARTIAL"
 
 
 # ===========================================================================

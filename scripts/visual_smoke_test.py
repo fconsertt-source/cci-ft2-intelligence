@@ -7,7 +7,7 @@ contained a syntax error.
 
 import pytest
 
-from src.application.dtos.device_report_dto import DeviceReportDTO
+from src.domain.dtos.device_report_dto import DeviceReportDTO
 from src.infrastructure.pdf.unified_pdf_generator import get_pdf_generator
 from src.utils.time import utc_now_iso
 

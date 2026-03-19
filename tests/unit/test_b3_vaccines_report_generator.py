@@ -234,8 +234,8 @@ class TestVaccinesReportGenerator:
         row = content.strip().split("\n")[1]
         parts = row.split("\t")
         assert len(parts) == 9
-        assert parts[6].count('.') == 1
-        decimal_part = parts[6].split('.')[1]
+        assert parts[6].count(".") == 1
+        decimal_part = parts[6].split(".")[1]
         assert len(decimal_part) <= 6
 
     def test_multiple_equipment_same_expiry(self, tmp_path):

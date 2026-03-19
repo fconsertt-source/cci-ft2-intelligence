@@ -29,9 +29,9 @@ class DeviceReport:
     def create(
         cls,
         device_id: str,
-        status: str = 'generated',
+        status: str = "generated",
         report_data: Optional[dict] = None,
-    ) -> 'DeviceReport':
+    ) -> "DeviceReport":
         """مصنع لإنشاء تقرير جديد"""
         return cls(
             device_id=device_id,

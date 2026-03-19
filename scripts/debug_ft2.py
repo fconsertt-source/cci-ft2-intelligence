@@ -23,14 +23,14 @@ def clean_bad_files():
     """حذف الملفات الفارغة أو التالفة من data/input_ft2"""
     target_dir = "data/input_ft2"
     if not os.path.exists(target_dir):
-        logger.warning(MessageProvider.get('DEBUG_DIR_NOT_FOUND', path=target_dir))
+        logger.warning(MessageProvider.get("DEBUG_DIR_NOT_FOUND", path=target_dir))
         return
 
-    logger.info(MessageProvider.get('DEBUG_CLEANING_FILES', path=target_dir))
+    logger.info(MessageProvider.get("DEBUG_CLEANING_FILES", path=target_dir))
 
     removed_count = 0
     for file in os.listdir(target_dir):
-        if not file.endswith('.txt'):
+        if not file.endswith(".txt"):
             continue
 
         filepath = os.path.join(target_dir, file)
@@ -38,7 +38,7 @@ def clean_bad_files():
             should_remove = False
             reason = ""
 
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, "r", encoding="utf-8") as f:
                 content = f.read()
 
             # معايير الملف التالف
@@ -52,7 +52,7 @@ def clean_bad_files():
             if should_remove:
                 os.remove(filepath)
                 logger.info(
-                    MessageProvider.get('DEBUG_FILE_DELETED', file=file, reason=reason)
+                    MessageProvider.get("DEBUG_FILE_DELETED", file=file, reason=reason)
                 )
                 removed_count += 1
 
@@ -60,9 +60,9 @@ def clean_bad_files():
             logger.error("❌ خطأ في فحص %s: %s", file, e)
 
     if removed_count == 0:
-        logger.info(MessageProvider.get('DEBUG_NO_BAD_FILES'))
+        logger.info(MessageProvider.get("DEBUG_NO_BAD_FILES"))
     else:
-        logger.info(MessageProvider.get('DEBUG_CLEANED_COUNT', count=removed_count))
+        logger.info(MessageProvider.get("DEBUG_CLEANED_COUNT", count=removed_count))
 
 
 def debug_raw_files():
@@ -70,12 +70,12 @@ def debug_raw_files():
     input_dir = "data/input_raw"
 
     if not os.path.exists(input_dir):
-        logger.warning(MessageProvider.get('DEBUG_DIR_NOT_FOUND', path=input_dir))
+        logger.warning(MessageProvider.get("DEBUG_DIR_NOT_FOUND", path=input_dir))
         return
 
     logger.info("فحص الملفات الخام في: %s", input_dir)
 
-    files = [f for f in os.listdir(input_dir) if f.endswith(('.tsv', '.csv'))]
+    files = [f for f in os.listdir(input_dir) if f.endswith((".tsv", ".csv"))]
     if not files:
         logger.info("لا توجد ملفات .tsv أو .csv.")
         logger.info(
@@ -101,9 +101,9 @@ def debug_raw_files():
                 logger.info(
                     "  %d: device=%s ts=%s temp=%s",
                     i + 1,
-                    getattr(e, 'device_id', None),
-                    getattr(e, 'timestamp', None),
-                    getattr(e, 'temperature', None),
+                    getattr(e, "device_id", None),
+                    getattr(e, "timestamp", None),
+                    getattr(e, "temperature", None),
                 )
 
         except Exception as e:
@@ -115,29 +115,29 @@ def debug_ft2_files():
     input_dir = "data/input_ft2"
 
     if not os.path.exists(input_dir):
-        logger.warning(MessageProvider.get('DEBUG_DIR_NOT_FOUND', path=input_dir))
+        logger.warning(MessageProvider.get("DEBUG_DIR_NOT_FOUND", path=input_dir))
         return
 
     for file in os.listdir(input_dir):
         filepath = os.path.join(input_dir, file)
 
-        if file.endswith('.txt'):
+        if file.endswith(".txt"):
             logger.info("فحص الملف: %s", file)
 
             try:
-                with open(filepath, 'r', encoding='utf-8') as f:
+                with open(filepath, "r", encoding="utf-8") as f:
                     content = f.read()
 
                 if not content.strip():
                     logger.warning("⚠️  الملف فارغ تماماً: %s", file)
                 else:
-                    lines = content.split('\n')
+                    lines = content.split("\n")
                     logger.info("عدد الأسطر: %d", len(lines))
                     for i, line in enumerate(lines[:5]):
                         logger.debug("سطر %d: %s", i + 1, line[:100])
 
                     # البحث عن كلمات مفتاحية
-                    keywords = ['Hist:', 'Date:', 'Min T:', 'Serial:']
+                    keywords = ["Hist:", "Date:", "Min T:", "Serial:"]
                     for kw in keywords:
                         if kw in content:
                             logger.info("✅ وجد: %s", kw)
@@ -153,4 +153,4 @@ if __name__ == "__main__":
     else:
         debug_raw_files()
         debug_ft2_files()
-        logger.info(MessageProvider.get('DEBUG_CLEAN_HINT'))
+        logger.info(MessageProvider.get("DEBUG_CLEAN_HINT"))

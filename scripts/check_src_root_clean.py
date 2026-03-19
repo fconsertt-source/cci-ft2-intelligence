@@ -17,16 +17,16 @@ import os
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
-SRC_DIR = os.path.join(ROOT, 'src')
+SRC_DIR = os.path.join(ROOT, "src")
 
 ALLOWED_ITEMS = {
-    'domain',
-    'application',
-    'infrastructure',
-    'presentation',
-    'shared',
-    '__init__.py',
-    '__pycache__',
+    "domain",
+    "application",
+    "infrastructure",
+    "presentation",
+    "shared",
+    "__init__.py",
+    "__pycache__",
 }
 
 
@@ -63,5 +63,5 @@ def main():
     print("✅ OK: src/ root is clean (4 layers + shared only)")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

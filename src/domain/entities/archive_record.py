@@ -93,30 +93,30 @@ class ArchiveRecord:
     def to_dict(self) -> dict:
         """تحويل السجل إلى قاموس للتسلسل"""
         return {
-            'record_id': self.record_id,
-            'device_id': self.device_id,
-            'file_hash': self.file_hash,
-            'file_size': self.file_size,
-            'original_path': self.original_path,
-            'archive_path': self.archive_path,
-            'archived_at': self.archived_at,
-            'expires_at': self.expires_at,
-            'status': self.status.value,
-            'retention_days': self.retention_days,
+            "record_id": self.record_id,
+            "device_id": self.device_id,
+            "file_hash": self.file_hash,
+            "file_size": self.file_size,
+            "original_path": self.original_path,
+            "archive_path": self.archive_path,
+            "archived_at": self.archived_at,
+            "expires_at": self.expires_at,
+            "status": self.status.value,
+            "retention_days": self.retention_days,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> ArchiveRecord:
         """إعادة بناء السجل من قاموس"""
         return cls(
-            record_id=data['record_id'],
-            device_id=data['device_id'],
-            file_hash=data['file_hash'],
-            file_size=data['file_size'],
-            original_path=data['original_path'],
-            archive_path=data['archive_path'],
-            archived_at=data['archived_at'],
-            expires_at=data['expires_at'],
-            status=ArchiveStatus(data.get('status', 'ARCHIVED')),
-            retention_days=data.get('retention_days', 90),
+            record_id=data["record_id"],
+            device_id=data["device_id"],
+            file_hash=data["file_hash"],
+            file_size=data["file_size"],
+            original_path=data["original_path"],
+            archive_path=data["archive_path"],
+            archived_at=data["archived_at"],
+            expires_at=data["expires_at"],
+            status=ArchiveStatus(data.get("status", "ARCHIVED")),
+            retention_days=data.get("retention_days", 90),
         )

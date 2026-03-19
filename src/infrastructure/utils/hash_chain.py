@@ -11,7 +11,7 @@ def load_chain_state(state_path: Path) -> LedgerChainState:
         return LedgerChainState()
 
     try:
-        with open(state_path, 'r', encoding='utf-8') as f:
+        with open(state_path, "r", encoding="utf-8") as f:
             data = json.load(f)
         return LedgerChainState.from_dict(data)
     except (json.JSONDecodeError, KeyError) as e:
@@ -38,14 +38,14 @@ def get_last_hash_from_ledger(ledger_path: Path) -> Optional[str]:
         return None
 
     last_hash = None
-    with open(ledger_path, 'r', encoding='utf-8') as f:
+    with open(ledger_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
                 continue
             try:
                 entry = json.loads(line)
-                last_hash = entry.get('current_hash')
+                last_hash = entry.get("current_hash")
             except json.JSONDecodeError:
                 continue
 

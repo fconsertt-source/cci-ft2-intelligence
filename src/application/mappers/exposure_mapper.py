@@ -26,7 +26,7 @@ class ExposureMapper:
             sorted_readings = sorted(readings, key=lambda r: r.timestamp)
         except AttributeError:
             # Fallback for dicts if necessary
-            sorted_readings = sorted(readings, key=lambda r: r['timestamp'])
+            sorted_readings = sorted(readings, key=lambda r: r["timestamp"])
 
         exposures = []
 
@@ -35,17 +35,17 @@ class ExposureMapper:
             next_reading = sorted_readings[i + 1]
 
             # Extract values safely
-            temp = getattr(current, 'value', None)
+            temp = getattr(current, "value", None)
             if temp is None and isinstance(current, dict):
-                temp = current.get('value')
+                temp = current.get("value")
 
-            t1 = getattr(current, 'timestamp', None)
+            t1 = getattr(current, "timestamp", None)
             if t1 is None and isinstance(current, dict):
-                t1 = current.get('timestamp')
+                t1 = current.get("timestamp")
 
-            t2 = getattr(next_reading, 'timestamp', None)
+            t2 = getattr(next_reading, "timestamp", None)
             if t2 is None and isinstance(next_reading, dict):
-                t2 = next_reading.get('timestamp')
+                t2 = next_reading.get("timestamp")
 
             # Calculate duration
             if t1 and t2 and temp is not None:

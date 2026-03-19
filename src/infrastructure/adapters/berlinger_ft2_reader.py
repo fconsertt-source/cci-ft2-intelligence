@@ -1,172 +1,184 @@
 from __future__ import annotations
 
+import logging
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from src.application.ports.ft2_reader_port import Ft2ReaderPort
 from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
 
+logger = logging.getLogger(__name__)
+
 
 class BerlingerFt2Reader(Ft2ReaderPort):
-    """Adapter for Berlinger Fridge-tag® 2 E format — implements Ft2ReaderPort.
-
-    Handles both single files and directories (processes all .txt files).
-    Extracts hierarchical context:
-      - device_id: from Serial field in file content
-      - batch_id: from filename pattern (e.g., OPV_batch_123.txt)
-      - center_id: from parent directory name
-    """
+    """النسخة النهائية — تعمل مع التنسيق الحقيقي لـ Fridge-tag 2 E"""
 
     def read(self, source: str) -> List[FT2EntryDTO]:
-        """Read FT2 data from a file path or directory."""
         path = Path(source)
-
-        # ✅ Support directories: process all .txt files
         if path.is_dir():
             entries = []
             for file_path in path.glob("*.txt"):
                 entries.extend(self._parse_single_file(file_path))
             return entries
-
-        # ✅ Support single files
         return self._parse_single_file(path)
 
     def _parse_single_file(self, path: Path) -> List[FT2EntryDTO]:
-        """Parse a single Berlinger FT2 file."""
-        if not self._is_berlinger_format(path):
-            return []
-
-        try:
-            return self._parse_berlinger(path)
-        except Exception:
-            return []
-
-    def _is_berlinger_format(self, path: Path) -> bool:
-        """Detect Berlinger format by checking first 50 lines for Hist: section."""
-        try:
-            with open(path, "r", encoding="utf-8", errors="ignore") as f:
-                for i, line in enumerate(f):
-                    if i >= 50:
-                        break
-                    if "Hist:" in line:
-                        return True
-            return False
-        except Exception:
-            return False
-
-    def _parse_berlinger(self, path: Path) -> List[FT2EntryDTO]:
-        """Parse Berlinger format with line-by-line state machine."""
-        entries = []
-
         with open(path, "r", encoding="utf-8", errors="ignore") as f:
-            lines = f.readlines()
+            content = f.read()
 
-        # 1. Extract device_id from Serial field (first 30 lines)
-        device_id = "UNKNOWN"
-        for line in lines[:30]:
-            serial_match = re.search(r"Serial:\s*(\d{12})", line)
-            if serial_match:
-                device_id = serial_match.group(1)
-                break
+        device_id = re.search(r"Serial[:\s]*(\d+)", content)
+        device_id = device_id.group(1) if device_id else "UNKNOWN"
 
-        # 2. Extract batch_id from filename (e.g., OPV_batch_123.txt → OPV_batch_123)
-        batch_id = self._extract_batch_id(path.name)
+        batch_id = path.stem
+        center_id = (
+            path.parent.name if path.parent.name != "input_ft2" else "TEST_CENTER_01"
+        )
 
-        # 3. Extract center_id from parent directory name
-        center_id = path.parent.name if path.parent.name != "input_ft2" else "UNKNOWN"
+        entries = self._parse_hist_section(content, device_id, batch_id, center_id)
+        logger.info(f"✅ تم استخراج {len(entries)} إدخال من {path.name}")
+        return entries
 
-        # 4. Parse daily entries with state machine
-        in_hist_section = False
-        current_date = None
-        current_avg_temp = None
+    def _parse_hist_section(
+        self, content: str, device_id: str, batch_id: str, center_id: str
+    ) -> List[FT2EntryDTO]:
+        entries = []
+        lines = content.splitlines()
+        in_hist = False
+        current_day: Dict[str, str] = {}
 
         for line in lines:
-            stripped = line.strip()
-
-            if not stripped:
+            line = line.strip()
+            if not line:
                 continue
 
-            if "Hist:" in stripped:
-                in_hist_section = True
+            if line.startswith("Hist"):
+                in_hist = True
                 continue
 
-            if not in_hist_section:
-                continue
+            if in_hist and any(x in line.lower() for x in ["conf", "alarm", "log"]):
+                if current_day:
+                    entries.extend(
+                        self._create_entries(
+                            current_day, device_id, batch_id, center_id
+                        )
+                    )
+                break
 
-            if stripped.startswith("TS "):
-                continue
-
-            if re.match(r"^\d+:$", stripped):
-                if current_date and current_avg_temp:
-                    try:
-                        timestamp = datetime.fromisoformat(current_date)
-                        temp_clean = current_avg_temp.lstrip("+")
-                        temperature = float(temp_clean)
-
-                        entries.append(
-                            FT2EntryDTO(
-                                id=f"{device_id}_{timestamp.isoformat()}",
-                                device_id=device_id,
-                                timestamp=timestamp,
-                                temperature=temperature,
-                                vaccine_type="General",
-                                batch="BATCH_UNKNOWN",
-                                duration_minutes=1440.0,
-                                batch_id=batch_id,  # ← New field
-                                center_id=center_id,  # ← New field
+            if in_hist:
+                if line.startswith("Date:"):
+                    if current_day:
+                        entries.extend(
+                            self._create_entries(
+                                current_day, device_id, batch_id, center_id
                             )
                         )
-                    except (ValueError, TypeError):
-                        pass
-                current_date = None
-                current_avg_temp = None
-                continue
+                        current_day = {}
+                    current_day["Date"] = line.split(":", 1)[1].strip()
 
-            if "date:" in stripped.lower():
-                date_match = re.search(
-                    r"date:\s*(\d{4}-\d{2}-\d{2})", stripped, re.IGNORECASE
+                elif "Min T:" in line:
+                    m = re.search(r"Min T:\s*([+-]?\d+\.?\d*)", line)
+                    if m:
+                        current_day["Min T"] = m.group(1)
+
+                elif "Max T:" in line:
+                    m = re.search(r"Max T:\s*([+-]?\d+\.?\d*)", line)
+                    if m:
+                        current_day["Max T"] = m.group(1)
+
+                elif "Avrg T:" in line or "Avg T:" in line:
+                    m = re.search(r"Avrg?\s*T:\s*([+-]?\d+\.?\d*)", line)
+                    if m:
+                        current_day["Avg T"] = m.group(1)
+
+                elif "t Acc" in line:
+                    m = re.search(r"t Acc[^:]*:\s*(\d{2}:\d{2})", line)
+                    if m:
+                        if "below" in line.lower() or "<" in line:
+                            current_day["t Acc <"] = m.group(1)
+                        else:
+                            current_day["t Acc >"] = m.group(1)
+
+        if current_day:
+            entries.extend(
+                self._create_entries(current_day, device_id, batch_id, center_id)
+            )
+
+        return entries
+
+    def _create_entries(
+        self, day: Dict[str, str], device_id: str, batch_id: str, center_id: str
+    ) -> List[FT2EntryDTO]:
+        try:
+            date_str = day.get("Date", "")
+            dt = (
+                datetime.strptime(date_str, "%d.%m.%Y")
+                if "." in date_str
+                else datetime.fromisoformat(date_str)
+            )
+
+            min_t = float(day.get("Min T", 0))
+            max_t = float(day.get("Max T", 0))
+            avg_t = float(day.get("Avg T", 0))
+
+            t_low = self._parse_duration(day.get("t Acc <", "00:00"))
+            t_high = self._parse_duration(day.get("t Acc >", "00:00"))
+
+            status = "ALARM" if (t_low > 0 or t_high > 0) else "OK"
+
+            entries = []
+
+            entries.append(
+                FT2EntryDTO(
+                    id=f"{device_id}_{dt.date()}_MIN",
+                    device_id=device_id,
+                    timestamp=dt,
+                    temperature=min_t,
+                    duration_minutes=float(t_low),
+                    vaccine_type="General",
+                    batch=f"FT2_MIN|{status}",
+                    batch_id=batch_id,
+                    center_id=center_id,
                 )
-                if date_match:
-                    current_date = date_match.group(1)
-                continue
+            )
 
-            if "avrg t:" in stripped.lower():
-                temp_match = re.search(
-                    r"avrg\s*t:\s*([+-]?\d+\.?\d*)", stripped, re.IGNORECASE
+            entries.append(
+                FT2EntryDTO(
+                    id=f"{device_id}_{dt.date()}_MAX",
+                    device_id=device_id,
+                    timestamp=dt,
+                    temperature=max_t,
+                    duration_minutes=float(t_high),
+                    vaccine_type="General",
+                    batch=f"FT2_MAX|{status}",
+                    batch_id=batch_id,
+                    center_id=center_id,
                 )
-                if temp_match:
-                    current_avg_temp = temp_match.group(1)
-                continue
+            )
 
-        # Save last entry if complete
-        if current_date and current_avg_temp:
-            try:
-                timestamp = datetime.fromisoformat(current_date)
-                temp_clean = current_avg_temp.lstrip("+")
-                temperature = float(temp_clean)
-                entries.append(
-                    FT2EntryDTO(
-                        id=f"{device_id}_{timestamp.isoformat()}",
-                        device_id=device_id,
-                        timestamp=timestamp,
-                        temperature=temperature,
-                        vaccine_type="General",
-                        batch="BATCH_UNKNOWN",
-                        duration_minutes=1440.0,
-                        batch_id=batch_id,  # ← New field
-                        center_id=center_id,  # ← New field
-                    )
+            entries.append(
+                FT2EntryDTO(
+                    id=f"{device_id}_{dt.date()}_AVG",
+                    device_id=device_id,
+                    timestamp=dt,
+                    temperature=avg_t,
+                    duration_minutes=float(1440 - t_low - t_high),
+                    vaccine_type="General",
+                    batch=f"FT2_AVG|{status}",
+                    batch_id=batch_id,
+                    center_id=center_id,
                 )
-            except (ValueError, TypeError):
-                pass
+            )
 
-        return entries[-7:] if len(entries) > 7 else entries
+            return entries
+        except Exception as e:
+            logger.warning(f"خطأ في إنشاء إدخالات اليوم: {e}")
+            return []
 
-    def _extract_batch_id(self, filename: str) -> str:
-        """Extract batch_id from filename (e.g., OPV_batch_123.txt → OPV_batch_123)."""
-        # Simple extraction: remove extension and normalize
-        batch_id = filename.rsplit(".", 1)[0] if "." in filename else filename
-        # Optional: extract only alphanumeric parts (e.g., "OPV_batch_123" → "OPV_batch_123")
-        return batch_id
+    def _parse_duration(self, time_str: str) -> int:
+        try:
+            h, m = map(int, time_str.split(":"))
+            return h * 60 + m
+        except Exception:
+            return 0

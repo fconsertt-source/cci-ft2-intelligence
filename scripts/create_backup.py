@@ -26,32 +26,32 @@ def create_backup():
     archive_name = f"backup_{timestamp}.tar.gz"
     archive_path = backup_dir / archive_name
 
-    print(MessageProvider.get('BACKUP_CREATION_START', name=project_root.name))
-    print(MessageProvider.get('BACKUP_TARGET_PATH', path=archive_path))
+    print(MessageProvider.get("BACKUP_CREATION_START", name=project_root.name))
+    print(MessageProvider.get("BACKUP_TARGET_PATH", path=archive_path))
 
     # قائمة المجلدات والملفات المستثناة
     EXCLUDES = {
-        '.git',
-        '.venv',
-        'venv',
-        '.env',
-        '__pycache__',
-        '.pytest_cache',
-        '.qodo',
-        '.idea',
-        '.vscode',
-        'backup',
-        'dist',
-        'build',
-        '.tox',
-        'pipeline.log',
+        ".git",
+        ".venv",
+        "venv",
+        ".env",
+        "__pycache__",
+        ".pytest_cache",
+        ".qodo",
+        ".idea",
+        ".vscode",
+        "backup",
+        "dist",
+        "build",
+        ".tox",
+        "pipeline.log",
     }
 
     def filter_func(tarinfo):
-        name = os.path.basename(tarinfo.name.rstrip('/'))
+        name = os.path.basename(tarinfo.name.rstrip("/"))
         if name in EXCLUDES:
             return None
-        if name.endswith('.pyc') or name.endswith('.pyo'):
+        if name.endswith(".pyc") or name.endswith(".pyo"):
             return None
         return tarinfo
 
@@ -60,12 +60,12 @@ def create_backup():
             tar.add(project_root, arcname=project_root.name, filter=filter_func)
 
         size_mb = archive_path.stat().st_size / (1024 * 1024)
-        print(MessageProvider.get('BACKUP_CREATION_SUCCESS'))
-        print(MessageProvider.get('BACKUP_SIZE', size=size_mb))
-        print(MessageProvider.get('BACKUP_LOCATION', path=archive_path))
+        print(MessageProvider.get("BACKUP_CREATION_SUCCESS"))
+        print(MessageProvider.get("BACKUP_SIZE", size=size_mb))
+        print(MessageProvider.get("BACKUP_LOCATION", path=archive_path))
 
     except Exception as e:
-        print(MessageProvider.get('BACKUP_CREATION_FAILED', error=str(e)))
+        print(MessageProvider.get("BACKUP_CREATION_FAILED", error=str(e)))
         if archive_path.exists():
             archive_path.unlink()
 

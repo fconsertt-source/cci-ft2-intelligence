@@ -15,21 +15,21 @@ sys.path.append(str(PROJECT_ROOT))
 
 logger = get_logger(__name__)
 IGNORE_PATTERNS = [
-    '.git',
-    '__pycache__',
-    '.venv',
-    'venv',
-    '*.pyc',
-    '.pytest_cache',
-    'data/output/*',
-    'scripts/project_utility.py',
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "*.pyc",
+    ".pytest_cache",
+    "data/output/*",
+    "scripts/project_utility.py",
 ]
 
 
 def get_sha256(file_path):
     sha256 = hashlib.sha256()
-    with open(file_path, 'rb') as f:
-        for block in iter(lambda: f.read(65536), b''):
+    with open(file_path, "rb") as f:
+        for block in iter(lambda: f.read(65536), b""):
             sha256.update(block)
     return sha256.hexdigest()
 
@@ -68,11 +68,11 @@ def create_manifest():
             rel_path = file_path.relative_to(PROJECT_ROOT)
             manifest.append(
                 {
-                    "path": str(rel_path).replace('\\', '/'),
+                    "path": str(rel_path).replace("\\", "/"),
                     "sha256": get_sha256(file_path),
                 }
             )
-    return sorted(manifest, key=lambda x: x['path'])
+    return sorted(manifest, key=lambda x: x["path"])
 
 
 def main():
@@ -86,7 +86,7 @@ def main():
     # 2. إنشاء المانيفست
     manifest_data = create_manifest()
     manifest_file = PROJECT_ROOT / "docs" / "project_state_manifest.json"
-    with open(manifest_file, 'w', encoding='utf-8') as f:
+    with open(manifest_file, "w", encoding="utf-8") as f:
         json.dump(manifest_data, f, indent=4, ensure_ascii=False)
 
     logger.info("✅ Manifest updated: %s", manifest_file)

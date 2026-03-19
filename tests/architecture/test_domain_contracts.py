@@ -6,8 +6,8 @@ def test_temperature_exposure_is_pure_concept():
 
     # 🔒 الحماية ضد الانزلاق المعماري
     assert not hasattr(
-        exposure, 'start_time'
+        exposure, "start_time"
     ), "TemperatureExposure must NOT contain start_time (Domain purity violation)"
     assert not hasattr(
-        exposure, 'end_time'
+        exposure, "end_time"
     ), "TemperatureExposure must NOT contain end_time (Domain purity violation)"

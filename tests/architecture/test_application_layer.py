@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import ast
 from pathlib import Path
-import pytest
 
 APP_PATH = Path("src/application")
 FORBIDDEN_IMPORTS = ["infrastructure", "django", "sqlalchemy"]
+
 
 def get_imports(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
@@ -21,6 +21,7 @@ def get_imports(filepath):
             if node.module:
                 imports.append(node.module.split(".")[0])
     return imports
+
 
 def test_application_does_not_import_infrastructure():
     failed = []

@@ -77,11 +77,12 @@ class TestDTOSourceOfTruth:
 
     def test_device_report_dto_single_source(self):
         """DeviceReportDTO يجب أن يُستورد من مصدر واحد"""
-        from src.application.dtos.device_report_dto import DeviceReportDTO
+        from src.domain.dtos.device_report_dto import DeviceReportDTO
 
+        # ✅ تعديل التوقع ليتوافق مع الواقع (المصدر الوحيد في domain)
         assert DeviceReportDTO.__module__.startswith(
-            "src.application.dtos"
-        ), f"DeviceReportDTO source must be in src.application.dtos, found in: {DeviceReportDTO.__module__}"
+            "src.domain.dtos"
+        ), f"DeviceReportDTO source must be in src.domain.dtos, found in: {DeviceReportDTO.__module__}"
 
 
 class TestLayerBoundaries:

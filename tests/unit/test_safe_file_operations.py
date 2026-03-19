@@ -75,14 +75,14 @@ def test_atomic_move_raises_error(file_ops, test_files, monkeypatch):
 
     # Mock os.replace to fail using built-in monkeypatch
     monkeypatch.setattr(
-        'os.replace', lambda src, dst: (_ for _ in ()).throw(OSError("Mocked error"))
+        "os.replace", lambda src, dst: (_ for _ in ()).throw(OSError("Mocked error"))
     )
 
     with pytest.raises(RuntimeError, match="Atomic move failed: Mocked error"):
         file_ops.atomic_move(src_file, dst_file)
 
     # Assert that tmp file is cleaned up
-    tmp_file = dst_file.with_suffix('.tmp')
+    tmp_file = dst_file.with_suffix(".tmp")
     assert not tmp_file.exists()
     # Assert source file still exists
     assert src_file.exists()

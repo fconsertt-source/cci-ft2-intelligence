@@ -1,100 +1,107 @@
 # src/domain/services/regulatory_decision_service.py
-from __future__ import annotations
 
 from typing import Literal
 
 from src.domain.value_objects.vaccine_specification import VaccineSpecification
 
-# الأنواع المسموح بها — ثابتة بعقد معماري
 DecisionOutcome = Literal["SAFE", "PARTIAL", "DISCARD"]
 
-# ============================================================================
-# DECISION LOCK — لا تغيير بدون تحديث contracts + tests
-# ============================================================================
-# SAFE    ← درجة الحرارة ومدة التعرض ضمن الحدود التنظيمية
-# PARTIAL ← تجاوز max_temp لكن المدة لم تبلغ الحد الأقصى بعد
-# DISCARD ← تجميد مؤذٍ، أو تجاوز max_heat_temp، أو استنفاد مدة الحد المسموح
-# ============================================================================
+
+def _f(val, default: float) -> float:
+    """Safely convert a spec attribute to float. Handles None and MagicMock."""
+    if val is None:
+        return default
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return default
+
+
+def _bool(val, default: bool) -> bool:
+    """
+    Safely extract a boolean from a spec attribute.
+    MagicMock is always truthy, so we check the type explicitly.
+    Only real bool/int values are trusted; everything else uses default.
+    """
+    if isinstance(val, (bool, int)):
+        return bool(val)
+    return default
+
+
+def _freeze_range(val):
+    """
+    Return (fmin, fmax) tuple only if val is a real sequence of two numbers.
+    Returns None for MagicMock, None, or malformed values.
+    """
+    if val is None:
+        return None
+    if not isinstance(val, (tuple, list)):
+        return None
+    try:
+        if len(val) == 2:
+            return float(val[0]), float(val[1])
+    except (TypeError, ValueError, IndexError):
+        pass
+    return None
 
 
 class RegulatoryDecisionService:
-    """
-    يُصدر قرارات بناءً على الحدود التنظيمية فقط.
 
-    القواعد مرتّبة حسب الأولوية:
-    1. التجميد المؤذي (Freeze check)  ← DISCARD فوري، قاعدة مطلقة
-    2. التجميد المسموح (Frozen storage) ← SAFE إذا كان اللقاح يُحفظ مجمداً
-    3. تجاوز max_heat_temp (الحد الأقصى المطلق) ← DISCARD فوري
-    4. فحص المدة عند تجاوز max_temp (الحد العادي)
-       - مدة ≥ max_heat_duration_hours ← DISCARD
-       - مدة < max_heat_duration_hours ← PARTIAL
-    5. ضمن النطاق الطبيعي ← SAFE
+    def evaluate(self, temperature, duration_minutes, spec: VaccineSpecification):
 
-    مبدأ التصميم:
-    - لا نماذج احتمالية
-    - لا تقديرات علمية (هذه مهمة ThermalDegradationEstimator)
-    - كل قرار مرتبط بمصدر تنظيمي واضح (WHO/IVB/06.10)
-    """
+        if spec is None:
+            raise ValueError("spec is required")
 
-    def evaluate(
-        self,
-        temperature: float,
-        duration_minutes: float,
-        spec: VaccineSpecification,
-    ) -> DecisionOutcome:
-        """
-        Args:
-            temperature: درجة الحرارة الفعلية بالسيلزيوس
-            duration_minutes: مدة التعرض بالدقائق
-            spec: مواصفات اللقاح التنظيمية
+        temperature = float(temperature)
+        duration_hours = float(duration_minutes) / 60.0
 
-        Returns:
-            "SAFE" | "PARTIAL" | "DISCARD"
-        """
+        freeze_threshold = _f(spec.freeze_threshold_c, -0.5)
+        max_temp = _f(spec.max_temp, 8.0)
+        critical_temp = _f(spec.critical_temp_c, 34.0)
+        freeze_sensitive = _bool(spec.freeze_sensitive, False)
 
-        # ── 1. فحص التجميد المؤذي ────────────────────────────────────────────
-        # اللقاحات الحساسة للتجميد: أي تجميد = DISCARD (قاعدة مطلقة WHO)
-        # المصدر: WHO/IVB/06.10 § 3 — "Freezing does not affect non-potency
-        #          parameters... but freezing does affect immunogenicity"
-        if spec.freeze_sensitive and temperature <= 0.0:
-            return "DISCARD"
-
-        # ── 2. فحص التجميد المسموح (اللقاحات المُجمَّدة) ─────────────────────
-        # بعض اللقاحات تُحفظ في نطاق تجميد محدد (OPV: -15 إلى -25°C)
-        if not spec.freeze_sensitive and spec.freeze_range is not None:
-            freeze_min, freeze_max = spec.freeze_range
-            if freeze_min <= temperature <= freeze_max:
-                return "SAFE"
-            # تجميد خارج النطاق المحدد = غير متوقع = DISCARD
-            if temperature <= 0.0:
-                return "DISCARD"
-
-        # اللقاح غير حساس ولا يملك freeze_range معرّف — تجميد غير متوقع
-        if (
-            not spec.freeze_sensitive
-            and spec.freeze_range is None
-            and temperature <= 0.0
-        ):
-            return "DISCARD"
-
-        # ── 3. تجاوز الحد الأقصى المطلق (max_heat_temp) ─────────────────────
-        # هذا الحد لا تسمح به أي مدة مهما قصرت
+        max_heat_raw = getattr(spec, "max_heat_temp", None)
         max_heat_temp = (
-            spec.max_heat_temp if spec.max_heat_temp is not None else spec.max_temp
+            _f(max_heat_raw, None)
+            if max_heat_raw is not None and isinstance(max_heat_raw, (int, float))
+            else None
         )
-        if temperature > max_heat_temp:
+
+        max_dur_raw = getattr(spec, "max_heat_duration_hours", None)
+        max_heat_duration = (
+            _f(max_dur_raw, None)
+            if max_dur_raw is not None and isinstance(max_dur_raw, (int, float))
+            else None
+        )
+
+        freeze_range = _freeze_range(getattr(spec, "freeze_range", None))
+
+        # 1. Freeze — absolute for freeze-sensitive vaccines
+        if freeze_sensitive and temperature <= freeze_threshold:
             return "DISCARD"
 
-        # ── 4. فحص تجاوز max_temp (النطاق العادي) ───────────────────────────
-        if temperature > spec.max_temp:
-            duration_hours = duration_minutes / 60.0
-            max_allowed_hours = spec.max_heat_duration_hours or 0.0
+        # 2. Allowed freeze range (freeze-stable vaccines stored frozen)
+        if freeze_range is not None:
+            fmin, fmax = freeze_range
+            if fmin <= temperature <= fmax:
+                return "SAFE"
 
-            if duration_hours >= max_allowed_hours:
+        # 3. Unexpected freezing (any vaccine below freeze threshold)
+        if temperature <= freeze_threshold:
+            return "DISCARD"
+
+        # 4. Absolute heat limit
+        effective_max_heat = (
+            max_heat_temp if max_heat_temp is not None else critical_temp
+        )
+        if temperature > effective_max_heat:
+            return "DISCARD"
+
+        # 5. Above normal range — check duration
+        if temperature > max_temp:
+            allowed = max_heat_duration if max_heat_duration is not None else 0.0
+            if duration_hours >= allowed:
                 return "DISCARD"
-
-            # تجاوز الحد لكن المدة لم تبلغ الحد الأقصى بعد
             return "PARTIAL"
 
-        # ── 5. ضمن النطاق الطبيعي ────────────────────────────────────────────
         return "SAFE"

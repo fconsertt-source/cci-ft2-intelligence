@@ -14,7 +14,7 @@ class SimplePDFGenerator:
     def generate_report(self, tsv_path, output_path):
         try:
             # قراءة البيانات
-            df = pd.read_csv(tsv_path, delimiter='\t', encoding='utf-8')
+            df = pd.read_csv(tsv_path, delimiter="\t", encoding="utf-8")
 
             # إنشاء PDF
             doc = SimpleDocTemplate(
@@ -30,30 +30,30 @@ class SimplePDFGenerator:
             styles = getSampleStyleSheet()
 
             # العنوان
-            title = Paragraph("تقرير مراقبة سلسلة التبريد", styles['Title'])
+            title = Paragraph("تقرير مراقبة سلسلة التبريد", styles["Title"])
             story.append(title)
             story.append(Spacer(1, 20))
 
             # التاريخ
             date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            date_text = Paragraph(f"تاريخ التقرير: {date_str}", styles['Normal'])
+            date_text = Paragraph(f"تاريخ التقرير: {date_str}", styles["Normal"])
             story.append(date_text)
             story.append(Spacer(1, 30))
 
             # تحضير بيانات الجدول
-            table_data = [['المركز', 'القرار', 'VVM', 'الحرارة', 'التوصية']]
+            table_data = [["المركز", "القرار", "VVM", "الحرارة", "التوصية"]]
 
             for _, row in df.iterrows():
                 table_data.append(
                     [
-                        row['center_name'],
-                        row['decision'],
-                        row['vvm_stage'],
-                        row['avg_temperature'],
+                        row["center_name"],
+                        row["decision"],
+                        row["vvm_stage"],
+                        row["avg_temperature"],
                         (
-                            row['recommended_action'][:50] + '...'
-                            if len(str(row['recommended_action'])) > 50
-                            else row['recommended_action']
+                            row["recommended_action"][:50] + "..."
+                            if len(str(row["recommended_action"])) > 50
+                            else row["recommended_action"]
                         ),
                     ]
                 )
@@ -65,14 +65,14 @@ class SimplePDFGenerator:
             table.setStyle(
                 TableStyle(
                     [
-                        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498db')),
-                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                        ('FONTSIZE', (0, 0), (-1, 0), 12),
-                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fa')),
-                        ('GRID', (0, 0), (-1, -1), 1, colors.gray),
+                        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#3498db")),
+                        ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                        ("FONTSIZE", (0, 0), (-1, 0), 12),
+                        ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                        ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#f8f9fa")),
+                        ("GRID", (0, 0), (-1, -1), 1, colors.gray),
                     ]
                 )
             )
@@ -83,7 +83,7 @@ class SimplePDFGenerator:
             # التذييل
             footer = Paragraph(
                 "تم إنشاء هذا التقرير تلقائياً بواسطة نظام CCI-FT2 Intelligence",
-                styles['Normal'],
+                styles["Normal"],
             )
             story.append(footer)
 
