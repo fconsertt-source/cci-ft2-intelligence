@@ -291,5 +291,5 @@ src/application/use_cases/generate_device_report_uc.py:254:8: E0611: No name 're
 src/application/use_cases/generate_device_report_uc.py:266:8: E0611: No name '_YAML_PATH' in module 'src.domain.value_objects.vaccine_specification' (no-name-in-module)
 
 ------------------------------------------------------------------
-Your code has been rated at 9.42/10 (previous run: 9.41/10, +0.01)
+Your code has been rated at 9.42/10 (previous run: 9.42/10, +0.00)
 
