@@ -16,7 +16,7 @@ class CenterDTO:
     thaw_remaining_hours: Optional[float] = None
     category_display: Optional[str] = None
     decision_reasons: List[str] = field(default_factory=list)
-    stats: Dict[str, Any] = field(default_factory=dict)  # 🆕 إضافة هنا!
+    stats: Dict[str, Any] = field(default_factory=dict)
 
     @property
     def ft2_entries_count(self) -> int:
@@ -51,8 +51,31 @@ class CenterDTO:
         return str(self.stats.get("ccm_index", "0"))
 
     @property
+    def judgment_risk(self) -> str:
+        return self.stats.get("judgment_risk", "SAFE")
+
+    @property
+    def judgment_narrative(self) -> str:
+        return self.stats.get("judgment_narrative", "")
+
+    @property
+    def judgment_icon(self) -> str:
+        return self.stats.get("judgment_icon", "🟢")
+
+    @property
+    def confidence(self) -> float:
+        return float(self.stats.get("confidence", 0.0))
+
+    @property
+    def requires_review(self) -> bool:
+        return self.stats.get("requires_review", False)
+
+    @property
+    def her_percentage(self) -> float:
+        return float(self.stats.get("her_percentage", 0.0))
+
+    @property
     def avg_temperature(self) -> str:
-        """للتقرير - يعيد N/A إذا لم تكن موجودة"""
         avg = self.stats.get("avg_temp")
         return f"{avg:.2f}" if avg is not None else "N/A"
 

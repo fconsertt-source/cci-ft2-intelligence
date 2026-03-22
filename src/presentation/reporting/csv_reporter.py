@@ -56,6 +56,14 @@ def generate_centers_report(centers: List[CenterDTO], output_path: str):
                     "min_temperature",
                     "max_temperature",
                     "decision_reasons",
+                    # ✅ حقول JudgmentEngine
+                    "judgment_risk",
+                    "judgment_icon",
+                    "confidence",
+                    "requires_review",
+                    "her_percentage",
+                    "ccm_index",
+                    "judgment_narrative",
                 ]
             )
 
@@ -96,6 +104,14 @@ def generate_centers_report(centers: List[CenterDTO], output_path: str):
                         dto.min_temperature,
                         dto.max_temperature,
                         " | ".join(dto.decision_reasons),
+                        # ✅ حقول JudgmentEngine
+                        stats.get("judgment_risk", "SAFE"),
+                        stats.get("judgment_icon", "🟢"),
+                        f"{stats.get('confidence', 0.0):.2f}",
+                        "Yes" if stats.get("requires_review", False) else "No",
+                        f"{stats.get('her_percentage', 0.0):.1f}%",
+                        stats.get("ccm_index", "0"),
+                        stats.get("judgment_narrative", ""),
                     ]
                 )
 

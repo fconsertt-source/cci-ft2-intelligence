@@ -17,6 +17,8 @@ from src.application.dtos.evaluate_cold_chain_safety_request import (
     EvaluateColdChainSafetyRequest, TemperatureReading)
 from src.application.use_cases.evaluate_cold_chain_safety_use_case import \
     EvaluateColdChainSafetyUseCase
+from src.domain.enums.vaccine_decision import VaccineDecision
+from src.domain.services.judgment_engine import JudgmentEngine
 from src.domain.services.rules_engine import (apply_rules,
                                               calculate_center_stats)
 from src.infrastructure.adapters.ft2_reader_adapter import FT2ReaderAdapter
@@ -382,13 +384,56 @@ def run_pipeline(
             )
 
             # 2. Execute UseCase (Pure Processing)
+            # 2. Execute UseCase (Pure Processing)
             response = use_case.execute(request)
+
+            # ✅ حساب CCM و HER
+            her_ratio = getattr(response, "her_ratio", 0.0)
+            ccm_index = getattr(response, "ccm_index", "0")
+            has_freeze = getattr(response, "has_freeze", False)
+            has_critical_heat = getattr(response, "has_critical_heat", False)
+
+            # ✅ إنشاء JudgmentEngine
+            judgment_engine = JudgmentEngine()
+            decision_enum = _map_decision_to_vaccine_decision(response.decision)
+
+            judgment = judgment_engine.judge(
+                decision=decision_enum,
+                decision_reason=(
+                    " | ".join(response.decision_reasons)
+                    if response.decision_reasons
+                    else response.decision
+                ),
+                her_ratio=her_ratio,
+                ccm_index=ccm_index,
+                freeze_detected=has_freeze,
+                has_critical_heat=has_critical_heat,
+            )
+
+            # ✅ تخزين جميع البيانات في stats
             center.stats = {
                 "has_freeze": response.has_freeze,
                 "has_ccm_violation": response.has_ccm_violation,
-                "her_ratio": getattr(response, "her_ratio", 0.0),
-                "ccm_index": getattr(response, "ccm_index", "0"),
+                "her_ratio": her_ratio,
+                "ccm_index": ccm_index,
+                "judgment_risk": judgment.risk_level,
+                "judgment_narrative": judgment.narrative,
+                "judgment_icon": judgment.risk_icon,
+                "confidence": judgment.confidence,
+                "requires_review": judgment.requires_human_review,
+                "her_percentage": judgment.her_percentage,
             }
+
+            # ✅ Logging علمي
+            logger.info(
+                f"Center {center.id}: "
+                f"HER={judgment.her_percentage:.1f}% | "
+                f"CCM={ccm_index} | "
+                f"Decision={response.decision} | "
+                f"Risk={judgment.risk_level} | "
+                f"Confidence={judgment.confidence:.2f} | "
+                f"Review={'Yes' if judgment.requires_human_review else 'No'}"
+            )
 
             # 3. Update Runtime Object with Results (for reporting compatibility)
             center.decision = response.decision
@@ -516,6 +561,21 @@ def run_pipeline(
             logger.warning("  - %s: %s", file, error)
 
     logger.info(MessageProvider.get("PIPELINE_COMPLETE", output_dir=output_dir))
+
+
+def _map_decision_to_vaccine_decision(decision: str) -> VaccineDecision:
+    """تحويل القرار النصي إلى VaccineDecision Enum"""
+    mapping = {
+        "SAFE": VaccineDecision.SAFE,
+        "PARTIAL": VaccineDecision.PARTIAL,
+        "DISCARD": VaccineDecision.DISCARD,
+        "REJECTED": VaccineDecision.DISCARD,
+        "REJECTED_HEAT_C": VaccineDecision.DISCARD,
+        "REJECTED_EXPIRED": VaccineDecision.DISCARD,
+        "WARNING": VaccineDecision.PARTIAL,
+        "ACCEPTED": VaccineDecision.SAFE,
+    }
+    return mapping.get(decision, VaccineDecision.SAFE)
 
 
 def main():
