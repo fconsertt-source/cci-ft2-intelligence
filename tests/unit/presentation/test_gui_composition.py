@@ -42,7 +42,7 @@ def test_gui_generates_use_case_via_composer(monkeypatch):
         staticmethod(fake_create),
     )
 
-    gui = gui_main.GuardianGUI()  # noqa: F841
+    gui = gui_main.CCIFTSmartConsole()  # noqa: F841
     use_case = gui_main.AppComposer.create_generate_device_report_uc()
     assert called.get("called", False)
     assert isinstance(use_case, DummyUC)

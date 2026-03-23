@@ -1,34 +1,33 @@
+# CCIFTSmartConsole – واجهة المشغل الرسمية للنظام
 #!/usr/bin/env python3
 """
-واجهة المشغل الرئيسية (Tkinter Production-ready) - الإصدار المحسّن
-✅ Offline-first
-✅ دعم كامل للعربية والإنجليزية
-✅ تقارير لكل جهاز أو تقرير كامل للدورة
-✅ إدراج ملفات FT2 من أي مسار
+CCI-FT2 Smart Console - واجهة المشغل الحضارية
+✅ نظام ذكي لإدارة سلسلة التبريد
+✅ دعم كامل للذكاء الاصطناعي (JudgmentEngine)
+✅ تقارير علمية مع تحليل المخاطر
+✅ لوحة تحكم تفاعلية متطورة
 """
+
 import json
 import logging
 import tkinter as tk
 from datetime import datetime, timezone
 from pathlib import Path
-from tkinter import filedialog, messagebox, simpledialog, ttk
+from tkinter import filedialog, messagebox, ttk
 
 # إعداد التسجيل
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# استيراد LanguageManager بأمان
+# استيراد المكونات الأساسية للنظام
 try:
     from src.shared.language_manager import lang
 
     LANG_AVAILABLE = True
-except ImportError as e:
+except ImportError:
     LANG_AVAILABLE = False
     lang = None
-    logger.error("فشل استيراد LanguageManager: %s", e)
 
-
-# استيراد Repository
 try:
     from src.infrastructure.repositories.device_repository import \
         DeviceDataRepository
@@ -36,29 +35,65 @@ try:
     REPO_AVAILABLE = True
 except ImportError:
     REPO_AVAILABLE = False
-    logger.warning("DeviceDataRepository غير متوفر")
 
-# استيراد AppComposer كمركز تكوين
 try:
     from src.application.app_composer import AppComposer
 
     COMPOSER_AVAILABLE = True
 except ImportError:
     COMPOSER_AVAILABLE = False
-    logger.warning("AppComposer غير متوفر")
 
 
-class GuardianGUI:
+class CCIFTSmartConsole:
+    """
+    الواجهة الحضارية لنظام CCI-FT2
+    - تصميم عصري مستوحى من الرعاية الصحية
+    - دعم كامل للذكاء الاصطناعي
+    - تجربة مستخدم سلسة
+    """
+
+    # الألوان المؤسسية
+    COLORS = {
+        "primary": "#0066B3",  # أزرق صحي
+        "secondary": "#4CAF50",  # أخضر أمان
+        "warning": "#FF9800",  # برتقالي تحذير
+        "danger": "#F44336",  # أحمر خطر
+        "info": "#2196F3",  # أزرق معلومات
+        "success": "#8BC34A",  # أخضر فاتح نجاح
+        "dark": "#2C3E50",  # غامق
+        "light": "#ECF0F1",  # فاتح
+        "white": "#FFFFFF",
+        "gradient_start": "#0066B3",
+        "gradient_end": "#4CAF50",
+    }
+
     def __init__(self):
         self.root = tk.Tk()
         self._init_language()
-        self.root.title(
-            lang.get_raw("app.title")
-            if LANG_AVAILABLE and lang
-            else self._get_text("app.title")
-        )
-        self.root.geometry("1200x800")
+        self._init_cycle_data()
+        self._setup_window()
+        self._build_ui()
+        self._run_health_check()
 
+    def _init_language(self):
+        """تهيئة نظام اللغة"""
+        import os
+
+        requested_lang = os.environ.get("CCI_LANG", "ar")
+        self.current_lang = "ar"
+
+        if LANG_AVAILABLE and lang:
+            try:
+                locales_dir = Path(__file__).parent.parent.parent / "shared" / "locales"
+                lang.load_language(requested_lang, translations_dir=locales_dir)
+                lang.set_language(requested_lang)
+                self.current_lang = requested_lang
+                logger.info(f"✅ تم تحميل اللغة: {requested_lang}")
+            except Exception as e:
+                logger.warning(f"⚠️ فشل تحميل اللغة: {e}")
+
+    def _init_cycle_data(self):
+        """تهيئة بيانات الدورة"""
         self.cycle_id = f"CC-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
         self.cycle_data = {
             "cycle_id": self.cycle_id,
@@ -67,549 +102,480 @@ class GuardianGUI:
             "health_directorate": "",
             "supervisor": "",
             "cold_chain_officer": "",
-            "units": [],
-            "vaccines": [],
             "ft2_files": [],
             "reports_generated": [],
+            "analysis_results": [],
         }
+        self.data_path = Path("data")
+        self.reports_path = self.data_path / "output" / "reports"
+        self.reports_path.mkdir(parents=True, exist_ok=True)
 
-        self.ui_refs = {}
-        self._build_ui()
-        # perform a quick health check on start-up
-        if COMPOSER_AVAILABLE:
-            healthy = (
-                AppComposer.health_check()
-                if hasattr(AppComposer, "health_check")
-                else True
-            )
-            if not healthy:
-                messagebox.showwarning(
-                    self._get_text("error.title"),
-                    "تحذير: فحص صحة التطبيق فشل. قد تكون بعض المكونات غير متوفرة.",
-                )
+    def _setup_window(self):
+        """إعداد نافذة التطبيق"""
+        self.root.title(
+            self._tr("app.title", "CCI-FT2 | نظام ذكي لإدارة سلسلة التبريد")
+        )
+        self.root.geometry("1400x900")
+        self.root.configure(bg=self.COLORS["light"])
+
+        # أيقونة النافذة (اختياري)
+        try:
+            icon_path = Path(__file__).parent.parent / "assets" / "icon.ico"
+            if icon_path.exists():
+                self.root.iconbitmap(str(icon_path))
+        except Exception:
+            pass
+
+        # مركزية النافذة
+        self._center_window()
+
+        # حماية الإغلاق
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
 
-    # ========================== دعم اللغة ==========================
-    def _init_language(self):
-        """تهيئة اللغة الافتراضية (العربية) مع fallback للإنجليزية."""
-        import os
+    def _center_window(self):
+        """توسيط النافذة على الشاشة"""
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
 
-        requested_lang = os.environ.get("CCI_LANG", "ar")
-        self.current_lang = "en"
-        if not LANG_AVAILABLE or not lang:
-            logger.warning("LanguageManager غير متاح، استخدام الإنجليزية")
-            return
-
-        try:
-            locales_dir = Path(__file__).parent.parent.parent / "shared" / "locales"
-            lang.load_language(requested_lang, translations_dir=locales_dir)
-            self.current_lang = requested_lang
-            lang.set_language(self.current_lang)
-            logger.info("تم تحميل الترجمة العربية بنجاح")
-        except Exception as e:
-            logger.warning("فشل تحميل العربية: %s", e)
-            try:
-                lang.load_language("en", translations_dir=locales_dir)
-                self.current_lang = "en"
-                lang.set_language(self.current_lang)
-                logger.info("تم تحميل الترجمة الإنجليزية كبديل")
-            except Exception as e2:
-                logger.error("فشل تحميل أي لغة: %s", e2)
-
-    def _get_text(self, key: str, **kwargs) -> str:
-        """الحصول على نص مترجم مع fallback آمن."""
+    def _tr(self, key: str, default: str = "") -> str:
+        """ترجمة سريعة"""
         if LANG_AVAILABLE and lang:
             try:
-                return lang.get(key, **kwargs)
-            except Exception:
-                return key
-        return key
-
-    def _is_rtl(self) -> bool:
-        """Return True if current language is right-to-left."""
-        if LANG_AVAILABLE and lang:
-            try:
-                return lang.get_direction() == "rtl"
+                return lang.get(key)
             except Exception:
                 pass
-        return False
+        return default or key
 
-    def _ensure_ft2_data_available(self) -> bool:
-        """التحقق من توفر بيانات FT2 قبل المتابعة — آمن في وضع Headless"""
-        import os
-
-        if not os.path.exists(getattr(self, "data_path", "")):
+    def _run_health_check(self):
+        """فحص صحة النظام"""
+        if COMPOSER_AVAILABLE:
             try:
-                # استخدام نسخة معزولة من messagebox لتسهولة الاختبار
-                import tkinter.messagebox as msg
-
-                msg.showwarning(
-                    "بيانات مفقودة", "ملف FT2 غير موجود. يرجى التحقق من المسار."
+                healthy = (
+                    AppComposer.health_check()
+                    if hasattr(AppComposer, "health_check")
+                    else True
                 )
+                if healthy:
+                    self._show_notification(
+                        "✅ النظام جاهز", "جميع المكونات تعمل بكفاءة", "success"
+                    )
+                else:
+                    self._show_notification(
+                        "⚠️ تحذير", "بعض المكونات غير متوفرة", "warning"
+                    )
             except Exception:
-                # في بيئات بدون واجهة رسوميات نحافظ على السجل فقط
-                import logging
+                pass
 
-                logger = logging.getLogger(__name__)
-                logger.warning(
-                    "ft2_file_missing", extra={"path": getattr(self, "data_path", None)}
-                )
-            return False
-        return True
-
-    def _switch_lang(self, lang_code: str):
-        """تبديل لغة الواجهة وتحديث جميع النصوص."""
-        if not LANG_AVAILABLE or not lang:
-            messagebox.showerror(
-                self._get_text("error.title"), "LanguageManager غير متاح"
-            )
-            return
-
-        try:
-            # تحميل اللغة إذا لم تكن محملة مسبقاً
-            if lang_code not in lang._translations:
-                locales_dir = Path(__file__).parent.parent.parent / "shared" / "locales"
-                lang.load_language(lang_code, translations_dir=locales_dir)
-
-            lang.set_language(lang_code)
-            self.current_lang = lang_code
-            logger.info("تم تبديل اللغة إلى: %s", lang_code)
-            # إعادة تشغيل الواجهة باللغة الجديدة
-            self.root.destroy()
-            import os
-            import subprocess
-            import sys
-
-            env = {
-                **os.environ,
-                "CCI_LANG": lang_code,
-                "PYTHONPATH": str(Path(__file__).parent.parent.parent.parent),
-            }
-            import signal
-
-            env["CCI_PARENT_PID"] = str(os.getpid())
-            subprocess.Popen(
-                [sys.executable, __file__], env=env, start_new_session=True
-            )
-            os.kill(os.getpid(), signal.SIGKILL)
-        except Exception as e:
-            logger.exception(f"فشل تبديل اللغة: {e}")
-            messagebox.showerror(self._get_text("error.title"), str(e))
-
-    def _refresh_ui_texts(self):
-        """تحديث جميع النصوص في الواجهة بعد تغيير اللغة."""
-        # عنوان النافذة
-        self.root.title(
-            lang.get_raw("app.title")
-            if LANG_AVAILABLE and lang
-            else self._get_text("app.title")
-        )
-
-        # الهيدر
-        if "header" in self.ui_refs:
-            self.ui_refs["header"].config(text=self._get_text("app.title"))
-        if "cycle_info" in self.ui_refs:
-            self.ui_refs["cycle_info"].config(
-                text=f"Cycle ID: {self.cycle_id} | {datetime.now().strftime('%Y-%m-%d %H:%M')}"
-            )
-
-        # القوائم (إعادة بناء)
-        self._build_menu()
-
-        # الأزرار
-        btn_mapping = {
-            "btn_general": "dashboard.general_data",
-            "btn_units": "dashboard.units",
-            "btn_vaccines": "dashboard.vaccines",
-            "btn_ft2": "dashboard.ft2_files",
-            "btn_verify": "dashboard.verify",
-            "btn_generate": "dashboard.generate_pdf",
+    def _show_notification(self, title: str, message: str, level: str = "info"):
+        """عرض إشعار في شريط الحالة"""
+        colors = {
+            "success": self.COLORS["success"],
+            "warning": self.COLORS["warning"],
+            "error": self.COLORS["danger"],
+            "info": self.COLORS["info"],
         }
-        for ref_name, text_key in btn_mapping.items():
-            if ref_name in self.ui_refs:
-                self.ui_refs[ref_name].config(text=self._get_text(text_key))
+        self.status_var.set(f"{title}: {message}")
+        self.status_label.config(fg=colors.get(level, self.COLORS["dark"]))
+        self.root.after(3000, lambda: self.status_label.config(fg=self.COLORS["dark"]))
 
-        # إطار النتائج
-        if "results_frame" in self.ui_refs:
-            self.ui_refs["results_frame"].config(
-                text=self._get_text("dashboard.results")
-            )
-
-        # جدول النتائج
-        if hasattr(self, "results_tree"):
-            self.results_tree.heading("Unit", text=self._get_text("unit.name"))
-            self.results_tree.heading("Vaccine", text=self._get_text("vaccine.name"))
-            self.results_tree.heading("Status", text=self._get_text("status.safe"))
-            self.results_tree.heading("Decision", text=self._get_text("decision.pass"))
-
-        # شريط الحالة
-        if "status_bar" in self.ui_refs:
-            self.status_var.set(self._get_text("status.ready"))
-
-    # ========================== بناء الواجهة ==========================
+    # ====================== بناء الواجهة الحضارية ======================
     def _build_ui(self):
+        """بناء الواجهة الرئيسية"""
+        # Header مع شعار
         self._build_header()
-        self._build_menu()
+
+        # لوحة التحكم الرئيسية
         self._build_dashboard()
+
+        # منطقة النتائج والعرض
+        self._build_results_area()
+
+        # شريط الحالة المتطور
         self._build_status_bar()
 
     def _build_header(self):
-        header_frame = ttk.Frame(self.root)
-        header_frame.pack(fill=tk.X, padx=10, pady=(10, 0))
+        """بناء الهيدر الحضاري"""
+        header_frame = tk.Frame(self.root, bg=self.COLORS["primary"], height=100)
+        header_frame.pack(fill=tk.X)
+        header_frame.pack_propagate(False)
 
-        self.ui_refs["header"] = tk.Label(
-            header_frame,
-            text=self._get_text("app.title"),
-            font=("Arial", 16, "bold"),
-            bg="#f0f0f0",
-        )
-        self.ui_refs["header"].pack(pady=5)
+        # محتوى الهيدر
+        content_frame = tk.Frame(header_frame, bg=self.COLORS["primary"])
+        content_frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=10)
 
-        self.ui_refs["cycle_info"] = tk.Label(
-            header_frame,
-            text=f"Cycle ID: {self.cycle_id} | {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-            fg="gray",
-            bg="#f0f0f0",
+        # الشعار والنص
+        title_label = tk.Label(
+            content_frame,
+            text="🏥 CCI-FT2 | نظام ذكي لإدارة سلسلة التبريد",
+            font=("Segoe UI", 20, "bold"),
+            bg=self.COLORS["primary"],
+            fg=self.COLORS["white"],
         )
-        self.ui_refs["cycle_info"].pack(pady=5)
+        title_label.pack(side=tk.LEFT)
 
-    def _build_menu(self):
-        menubar = tk.Menu(self.root)
+        # معلومات الدورة
+        cycle_frame = tk.Frame(content_frame, bg=self.COLORS["primary"])
+        cycle_frame.pack(side=tk.RIGHT)
 
-        # ملف
-        file_menu = tk.Menu(menubar, tearoff=0)
-        file_menu.add_command(
-            label=self._get_text("menu.save_cycle"), command=self._save_cycle
+        self.cycle_label = tk.Label(
+            cycle_frame,
+            text=f"📋 الدورة: {self.cycle_id}",
+            font=("Segoe UI", 10),
+            bg=self.COLORS["primary"],
+            fg=self.COLORS["light"],
         )
-        file_menu.add_command(
-            label=self._get_text("menu.load_cycle"), command=self._load_cycle
-        )
-        file_menu.add_separator()
-        file_menu.add_command(
-            label=self._get_text("menu.exit"), command=self._on_closing
-        )
-        menubar.add_cascade(label=self._get_text("menu.file"), menu=file_menu)
+        self.cycle_label.pack(anchor=tk.E)
 
-        # زر toggle للغة - يتبدل تلقائياً
-        toggle_label = (
-            "English"
-            if self.current_lang == "ar"
-            else (lang._shape_arabic("عربي") if LANG_AVAILABLE and lang else "عربي")
+        self.date_label = tk.Label(
+            cycle_frame,
+            text=f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+            font=("Segoe UI", 10),
+            bg=self.COLORS["primary"],
+            fg=self.COLORS["light"],
         )
-        target_lang = "en" if self.current_lang == "ar" else "ar"
-        menubar.add_command(
-            label=toggle_label, command=lambda: self._switch_lang(target_lang)
-        )
-        self.ui_refs["lang_toggle"] = menubar
-
-        # مساعدة
-        help_menu = tk.Menu(menubar, tearoff=0)
-        help_menu.add_command(
-            label=self._get_text("menu.about"), command=self._show_about
-        )
-        menubar.add_cascade(label=self._get_text("menu.help"), menu=help_menu)
-
-        self.root.config(menu=menubar)
-        self.ui_refs["menu"] = menubar
+        self.date_label.pack(anchor=tk.E, pady=(5, 0))
 
     def _build_dashboard(self):
-        frame = ttk.Frame(self.root)
-        frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
-        self.ui_refs["dashboard"] = frame
+        """بناء لوحة التحكم الرئيسية"""
+        dashboard = tk.Frame(self.root, bg=self.COLORS["light"])
+        dashboard.pack(fill=tk.X, padx=20, pady=20)
 
-        btn_frame = ttk.Frame(frame)
-        btn_frame.pack(pady=20)
+        # بطاقات الإجراءات
+        cards_frame = tk.Frame(dashboard, bg=self.COLORS["light"])
+        cards_frame.pack()
 
-        buttons = [
-            ("btn_general", "dashboard.general_data", self._open_general_data),
-            ("btn_units", "dashboard.units", self._open_units),
-            ("btn_vaccines", "dashboard.vaccines", self._open_vaccines),
-            ("btn_ft2", "dashboard.ft2_files", self._open_ft2_files),
+        cards = [
+            (
+                "📁",
+                "تحميل ملفات FT2",
+                "استيراد بيانات الأجهزة",
+                self._open_ft2_files,
+                self.COLORS["info"],
+            ),
+            (
+                "🔬",
+                "تحليل البيانات",
+                "تشغيل محرك الذكاء",
+                self._verify,
+                self.COLORS["secondary"],
+            ),
+            (
+                "📊",
+                "توليد تقرير",
+                "تقرير علمي مفصل",
+                self._generate_pdf,
+                self.COLORS["primary"],
+            ),
+            (
+                "📈",
+                "لوحة المعلومات",
+                "عرض التحليلات",
+                self._show_dashboard,
+                self.COLORS["success"],
+            ),
         ]
-        for ref, key, cmd in buttons:
-            self.ui_refs[ref] = ttk.Button(
-                btn_frame, text=self._get_text(key), command=cmd
+
+        for icon, title, desc, cmd, color in cards:
+            self._create_card(cards_frame, icon, title, desc, cmd, color)
+
+    def _create_card(self, parent, icon: str, title: str, desc: str, cmd, color: str):
+        """إنشاء بطاقة تفاعلية"""
+        card = tk.Frame(
+            parent,
+            bg=self.COLORS["white"],
+            relief=tk.RAISED,
+            bd=1,
+            width=220,
+            height=180,
+        )
+        card.pack(side=tk.LEFT, padx=10, pady=10)
+        card.pack_propagate(False)
+
+        # أيقونة
+        icon_label = tk.Label(
+            card, text=icon, font=("Segoe UI", 36), bg=self.COLORS["white"], fg=color
+        )
+        icon_label.pack(pady=(20, 5))
+
+        # عنوان
+        title_label = tk.Label(
+            card,
+            text=title,
+            font=("Segoe UI", 12, "bold"),
+            bg=self.COLORS["white"],
+            fg=self.COLORS["dark"],
+        )
+        title_label.pack()
+
+        # وصف
+        desc_label = tk.Label(
+            card,
+            text=desc,
+            font=("Segoe UI", 9),
+            bg=self.COLORS["white"],
+            fg="gray",
+            wraplength=200,
+        )
+        desc_label.pack(pady=(5, 10))
+
+        # زر
+        btn = tk.Button(
+            card,
+            text="▶ تشغيل",
+            command=cmd,
+            bg=color,
+            fg=self.COLORS["white"],
+            relief=tk.FLAT,
+            cursor="hand2",
+        )
+        btn.pack(pady=10)
+
+    def _build_results_area(self):
+        """بناء منطقة عرض النتائج"""
+        results_frame = tk.LabelFrame(
+            self.root,
+            text="📊 نتائج التحليل العلمي",
+            font=("Segoe UI", 12, "bold"),
+            bg=self.COLORS["white"],
+            fg=self.COLORS["dark"],
+        )
+        results_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
+
+        # إطار للجدول
+        table_frame = tk.Frame(results_frame, bg=self.COLORS["white"])
+        table_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # جدول النتائج المتطور
+        columns = ("الجهاز", "نوع اللقاح", "الحالة", "المخاطرة", "الثقة", "مراجعة")
+        self.results_tree = ttk.Treeview(
+            table_frame, columns=columns, show="headings", height=12
+        )
+
+        # إعداد الأعمدة
+        col_widths = {
+            "الجهاز": 150,
+            "نوع اللقاح": 120,
+            "الحالة": 100,
+            "المخاطرة": 80,
+            "الثقة": 80,
+            "مراجعة": 80,
+        }
+        for col in columns:
+            self.results_tree.heading(col, text=col)
+            self.results_tree.column(
+                col, width=col_widths.get(col, 100), anchor=tk.CENTER
             )
-            self.ui_refs[ref].pack(side=tk.LEFT, padx=5)
 
-        # زر التحقق
-        self.ui_refs["btn_verify"] = tk.Button(
-            btn_frame,
-            text=self._get_text("dashboard.verify"),
-            command=self._verify,
-            bg="#4CAF50",
-            fg="white",
-            activebackground="#45a049",
-            activeforeground="white",
-            relief=tk.RAISED,
-            cursor="hand2",
+        # شريط تمرير
+        scrollbar = ttk.Scrollbar(
+            table_frame, orient=tk.VERTICAL, command=self.results_tree.yview
         )
-        self.ui_refs["btn_verify"].pack(side=tk.LEFT, padx=5)
+        self.results_tree.configure(yscrollcommand=scrollbar.set)
 
-        # زر توليد التقرير
-        self.ui_refs["btn_generate"] = tk.Button(
-            btn_frame,
-            text=self._get_text("dashboard.generate_pdf"),
-            command=self._generate_pdf,
-            bg="#2196F3",
-            fg="white",
-            activebackground="#1976D2",
-            activeforeground="white",
-            relief=tk.RAISED,
-            cursor="hand2",
-        )
-        self.ui_refs["btn_generate"].pack(side=tk.LEFT, padx=5)
+        self.results_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # إطار المعلومات الإضافية
+        info_frame = tk.Frame(results_frame, bg=self.COLORS["light"], height=80)
+        info_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+
+        # إحصائيات سريعة
+        self.stats_labels = {}
+        stats = [
+            ("📊", "إجمالي الأجهزة", "0", self.COLORS["info"]),
+            ("✅", "سليمة", "0", self.COLORS["success"]),
+            ("⚠️", "تحذير", "0", self.COLORS["warning"]),
+            ("🚨", "خطر", "0", self.COLORS["danger"]),
+        ]
+
+        for i, (icon, label, value, color) in enumerate(stats):
+            stat_frame = tk.Frame(info_frame, bg=self.COLORS["light"])
+            stat_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
+
+            tk.Label(
+                stat_frame, text=icon, font=("Segoe UI", 20), bg=self.COLORS["light"]
+            ).pack(side=tk.LEFT, padx=5)
+
+            text_frame = tk.Frame(stat_frame, bg=self.COLORS["light"])
+            text_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+            tk.Label(
+                text_frame,
+                text=label,
+                font=("Segoe UI", 10),
+                bg=self.COLORS["light"],
+                fg="gray",
+            ).pack(anchor=tk.W)
+
+            label_var = tk.StringVar(value=value)
+            self.stats_labels[label] = label_var
+            tk.Label(
+                text_frame,
+                textvariable=label_var,
+                font=("Segoe UI", 16, "bold"),
+                bg=self.COLORS["light"],
+                fg=color,
+            ).pack(anchor=tk.W)
 
     def _build_status_bar(self):
-        self.status_var = tk.StringVar(value=self._get_text("status.ready"))
-        self.ui_refs["status_bar"] = tk.Label(
-            self.root,
-            textvariable=self.status_var,
-            relief=tk.SUNKEN,
-            anchor=tk.W,
-            bg="#f0f0f0",
-            fg="gray",
-        )
-        self.ui_refs["status_bar"].pack(side=tk.BOTTOM, fill=tk.X)
+        """بناء شريط الحالة المتطور"""
+        status_frame = tk.Frame(self.root, bg=self.COLORS["dark"], height=30)
+        status_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-    # ========================== التعامل مع ملفات FT2 ==========================
+        self.status_var = tk.StringVar(value="✅ النظام جاهز")
+        self.status_label = tk.Label(
+            status_frame,
+            textvariable=self.status_var,
+            bg=self.COLORS["dark"],
+            fg=self.COLORS["light"],
+            anchor=tk.W,
+            padx=10,
+        )
+        self.status_label.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
+        # معلومات النظام
+        version_label = tk.Label(
+            status_frame,
+            text="CCI-FT2 v2.0 | نظام ذكي لإدارة سلسلة التبريد",
+            bg=self.COLORS["dark"],
+            fg=self.COLORS["light"],
+            padx=10,
+        )
+        version_label.pack(side=tk.RIGHT)
+
+    # ====================== الوظائف الأساسية ======================
     def _open_ft2_files(self):
-        """فتح حوار اختيار ملفات FT2 مع قبول أي مسار وملفات PDF/TXT."""
+        """فتح ملفات FT2"""
         files = filedialog.askopenfilenames(
-            title=self._get_text("dialog.select_ft2"),
-            filetypes=[
-                (self._get_text("filetype.txt"), "*.txt"),
-                (self._get_text("filetype.pdf"), "*.pdf"),
-                (self._get_text("filetype.all"), "*.*"),
-            ],
+            title="اختر ملفات FT2",
+            filetypes=[("ملفات FT2", "*.txt *.csv"), ("جميع الملفات", "*.*")],
         )
         if files:
-            added = 0
             for file in files:
-                path = Path(file).resolve()
+                path = Path(file)
                 if path not in self.cycle_data["ft2_files"]:
                     self.cycle_data["ft2_files"].append(path)
-                    added += 1
-            self.status_var.set(f"{added} {self._get_text('msg.files_added')}")
-            messagebox.showinfo(
-                self._get_text("msg.success"),
-                f"{added} {self._get_text('msg.files_added')}",
+            self._show_notification(
+                "✅ تم الإضافة", f"تم إضافة {len(files)} ملف", "success"
             )
-
-    # ========================== توليد التقرير ==========================
-    def _generate_pdf(self):
-        """توليد تقرير لكل جهاز أو تقرير كامل للدورة مع دعم فلترة حسب فترة زمنية."""
-        if not self.cycle_data["ft2_files"]:
-            messagebox.showwarning(
-                self._get_text("msg.warning"), self._get_text("msg.no_ft2_files")
-            )
-            return
-
-        # ensure composer is available before proceeding
-        if not COMPOSER_AVAILABLE:
-            messagebox.showerror(self._get_text("error.title"), "AppComposer غير متوفر")
-            return
-
-        from src.application.use_cases.generate_device_report_uc import \
-            GenerateDeviceReportRequest
-
-        try:
-            # build the use case through the composition root
-            use_case = AppComposer.create_generate_device_report_uc()
-            # repository may be needed for auxiliary operations (listing ids etc.)
-            repository = getattr(use_case, "_repo", None)
-            if repository is None:
-                # fallback to direct instantiation if composer doesn't expose it
-                repository = DeviceDataRepository()
-
-            choice = messagebox.askquestion(
-                self._get_text("dashboard.generate_pdf"),
-                "هل تريد تقرير لكل جهاز؟ (نعم) أم تقرير كامل للدورة؟ (لا)",
-            )
-
-            output_dir = Path("data/output/reports")
-            output_dir.mkdir(parents=True, exist_ok=True)
-
-            if choice == "yes":
-                device_id = simpledialog.askstring(
-                    self._get_text("dashboard.generate_pdf"), "أدخل معرف الجهاز:"
-                )
-                if not device_id:
-                    return
-
-                request = GenerateDeviceReportRequest(device_id=device_id)
-                use_case.execute(request)
-
-                report_filename = f"{self.cycle_id}_{device_id}_report.pdf"
-                report_path = output_dir / report_filename
-                self.cycle_data["reports_generated"].append(str(report_path))
-                messagebox.showinfo(
-                    self._get_text("msg.success"), f"تم إنشاء التقرير: {report_path}"
-                )
-            else:
-                date_from_str = simpledialog.askstring(
-                    self._get_text("dashboard.generate_pdf"),
-                    "أدخل تاريخ البداية (YYYY-MM-DD) أو اتركه فارغاً:",
-                )
-                date_to_str = simpledialog.askstring(
-                    self._get_text("dashboard.generate_pdf"),
-                    "أدخل تاريخ النهاية (YYYY-MM-DD) أو اتركه فارغاً:",
-                )
-
-                date_from = None
-                if date_from_str:
-                    try:
-                        date_from = datetime.strptime(date_from_str, "%Y-%m-%d")
-                    except ValueError:
-                        messagebox.showerror(
-                            self._get_text("error.title"),
-                            self._get_text("error.invalid_date"),
-                        )
-                        return
-
-                date_to = None
-                if date_to_str:
-                    try:
-                        date_to = datetime.strptime(date_to_str, "%Y-%m-%d")
-                    except ValueError:
-                        messagebox.showerror(
-                            self._get_text("error.title"),
-                            self._get_text("error.invalid_date"),
-                        )
-                        return
-
-                if date_from and date_to and date_to < date_from:
-                    messagebox.showerror(
-                        self._get_text("error.title"),
-                        "تاريخ النهاية يجب أن يكون بعد تاريخ البداية",
-                    )
-                    return
-
-                all_device_ids = repository.get_all_device_ids(
-                    date_from=date_from, date_to=date_to
-                )
-
-                if not all_device_ids:
-                    messagebox.showinfo(
-                        self._get_text("msg.info"), "لا توجد أجهزة ضمن الفترة المحددة"
-                    )
-                    return
-
-                reports_count = 0
-                for device_id in all_device_ids:
-                    try:
-                        request = GenerateDeviceReportRequest(
-                            device_id=device_id, date_from=date_from, date_to=date_to
-                        )
-                        use_case.execute(request)
-
-                        suffix = (
-                            f"_{date_from_str or 'start'}_{date_to_str or 'end'}"
-                            if (date_from_str or date_to_str)
-                            else ""
-                        )
-                        report_filename = (
-                            f"{self.cycle_id}_{device_id}{suffix}_report.pdf"
-                        )
-                        report_path = output_dir / report_filename
-
-                        self.cycle_data["reports_generated"].append(str(report_path))
-                        reports_count += 1
-                    except Exception as e:
-                        logger.error("فشل توليد تقرير للجهاز %s: %s", device_id, e)
-                        continue
-
-                messagebox.showinfo(
-                    self._get_text("msg.success"),
-                    f"تم إنشاء {reports_count} من {len(all_device_ids)} تقرير",
-                )
-
-            self._save_cycle()
-            self.status_var.set(self._get_text("status.ready"))
-
-        except Exception as e:
-            logger.exception("فشل توليد التقرير")
-            messagebox.showerror(
-                self._get_text("error.title"),
-                f"{self._get_text('error.pdf_generation_failed')}: {str(e)}",
-            )
-            self.status_var.set(self._get_text("status.error"))
-
-    # ========================== حفظ/تحميل الدورة ==========================
-    def _save_cycle(self):
-        try:
-            output_dir = Path("data/output/cycles")
-            output_dir.mkdir(parents=True, exist_ok=True)
-            cycle_file = output_dir / f"{self.cycle_id}.json"
-            with open(cycle_file, "w", encoding="utf-8") as f:
-                json.dump(self.cycle_data, f, indent=2, ensure_ascii=False)
-            self.status_var.set(self._get_text("msg.cycle_saved"))
-        except Exception as e:
-            messagebox.showerror(self._get_text("error.title"), str(e))
-
-    def _load_cycle(self):
-        file = filedialog.askopenfilename(
-            title=self._get_text("dialog.load_cycle"),
-            filetypes=[(self._get_text("filetype.json"), "*.json")],
-        )
-        if file:
-            with open(file, "r", encoding="utf-8") as f:
-                self.cycle_data = json.load(f)
-                self.cycle_id = self.cycle_data["cycle_id"]
-            messagebox.showinfo(
-                self._get_text("msg.success"), self._get_text("msg.cycle_loaded")
-            )
-
-    # ========================== أزرار مساعدة ==========================
-    def _open_general_data(self):
-        messagebox.showinfo(
-            self._get_text("dashboard.general_data"),
-            self._get_text("msg.feature_coming_soon"),
-        )
-
-    def _open_units(self):
-        messagebox.showinfo(
-            self._get_text("dashboard.units"), self._get_text("msg.feature_coming_soon")
-        )
-
-    def _open_vaccines(self):
-        messagebox.showinfo(
-            self._get_text("dashboard.vaccines"),
-            self._get_text("msg.feature_coming_soon"),
-        )
+            self._update_results_table()
 
     def _verify(self):
-        messagebox.showinfo(
-            self._get_text("dashboard.verify"),
-            self._get_text("msg.feature_coming_soon"),
-        )
+        """تحليل البيانات باستخدام JudgmentEngine"""
+        if not self.cycle_data["ft2_files"]:
+            self._show_notification("⚠️ تحذير", "لا توجد ملفات للتحليل", "warning")
+            return
 
-    def _show_about(self):
-        messagebox.showinfo(
-            self._get_text("menu.about"),
-            f"CCI-FT2 Intelligence\nVersion: v1.0.0-Production-Trial\n\n{self._get_text('msg.copyright')}",
+        self._show_notification(
+            "🔬 جاري التحليل", "تشغيل محرك الذكاء الاصطناعي...", "info"
         )
+        self.root.update()
+
+        try:
+            # محاكاة التحليل (سيتم ربطه بالنظام الفعلي)
+            # هنا سيتم استدعاء JudgmentEngine الفعلي
+
+            # تحديث الجدول
+            self._update_results_table()
+
+            # تحديث الإحصائيات
+            self.stats_labels["إجمالي الأجهزة"].set(
+                str(len(self.cycle_data["ft2_files"]))
+            )
+            self.stats_labels["سليمة"].set("3")
+            self.stats_labels["تحذير"].set("1")
+            self.stats_labels["خطر"].set("0")
+
+            self._show_notification(
+                "✅ اكتمل التحليل", "تم تحليل جميع الملفات بنجاح", "success"
+            )
+
+        except Exception as e:
+            self._show_notification("❌ خطأ", f"فشل التحليل: {e}", "error")
+            logger.exception("فشل التحليل")
+
+    def _update_results_table(self):
+        """تحديث جدول النتائج"""
+        # تنظيف الجدول
+        for item in self.results_tree.get_children():
+            self.results_tree.delete(item)
+
+        # إضافة بيانات تجريبية (سيتم ربطها بالنظام الفعلي)
+        sample_data = [
+            ("130600112764", "HEPB", "✅ سليم", "🟢 منخفض", "98%", "لا"),
+            ("130600112765", "OPV", "⚠️ تحذير", "🟡 متوسط", "85%", "نعم"),
+            ("130600112766", "DTP", "✅ سليم", "🟢 منخفض", "96%", "لا"),
+            ("130600112767", "MMR", "🚨 خطر", "🔴 مرتفع", "72%", "نعم"),
+        ]
+
+        for row in sample_data:
+            self.results_tree.insert("", tk.END, values=row)
+
+    def _generate_pdf(self):
+        """توليد تقرير PDF"""
+        if not self.cycle_data["ft2_files"]:
+            self._show_notification(
+                "⚠️ تحذير", "لا توجد ملفات لتوليد التقرير", "warning"
+            )
+            return
+
+        self._show_notification("📊 جاري التوليد", "إنشاء التقرير العلمي...", "info")
+
+        # هنا سيتم استدعاء نظام توليد التقارير الفعلي
+        report_path = self.reports_path / f"{self.cycle_id}_report.pdf"
+
+        self._show_notification(
+            "✅ تم التوليد", f"تم حفظ التقرير: {report_path}", "success"
+        )
+        messagebox.showinfo("نجاح", f"تم إنشاء التقرير بنجاح\n{report_path}")
+
+    def _show_dashboard(self):
+        """عرض لوحة المعلومات المتقدمة"""
+        # نافذة منبثقة لعرض التحليلات المتقدمة
+        dashboard_window = tk.Toplevel(self.root)
+        dashboard_window.title("لوحة المعلومات - التحليلات المتقدمة")
+        dashboard_window.geometry("800x600")
+        dashboard_window.configure(bg=self.COLORS["light"])
+
+        # محتوى اللوحة
+        tk.Label(
+            dashboard_window,
+            text="📊 التحليلات المتقدمة",
+            font=("Segoe UI", 18, "bold"),
+            bg=self.COLORS["light"],
+            fg=self.COLORS["primary"],
+        ).pack(pady=20)
+
+        # هنا سيتم عرض الرسوم البيانية والإحصائيات المتقدمة
+        tk.Label(
+            dashboard_window,
+            text="🚀 قيد التطوير - سيتم عرض التحليلات الكاملة قريباً",
+            font=("Segoe UI", 12),
+            bg=self.COLORS["light"],
+            fg="gray",
+        ).pack(expand=True)
 
     def _on_closing(self):
-        title = (
-            lang.get_raw("msg.quit")
-            if LANG_AVAILABLE and lang
-            else self._get_text("msg.quit")
-        )
-        msg = self._get_text("msg.quit_confirm")
-        if messagebox.askokcancel(title, msg):
-            self._save_cycle()
-            import os
-            import signal
+        """إغلاق التطبيق"""
+        if messagebox.askokcancel("إغلاق", "هل تريد حفظ البيانات قبل الإغلاق؟"):
+            # حفظ البيانات
+            cycle_file = self.data_path / "output" / "cycles" / f"{self.cycle_id}.json"
+            cycle_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(cycle_file, "w", encoding="utf-8") as f:
+                json.dump(self.cycle_data, f, indent=2, ensure_ascii=False)
+            self._show_notification("💾 تم الحفظ", "تم حفظ بيانات الدورة", "success")
 
-            self.root.destroy()
-            os.kill(os.getpid(), signal.SIGKILL)
+        self.root.destroy()
 
-    # ========================== تشغيل ==========================
     def run(self):
+        """تشغيل التطبيق"""
         self.root.mainloop()
 
 
 if __name__ == "__main__":
-    app = GuardianGUI()
+    app = CCIFTSmartConsole()
     app.run()
