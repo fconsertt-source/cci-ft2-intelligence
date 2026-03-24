@@ -1,12 +1,22 @@
 """
 Application Composer - الحارس الرقمي
 مركز تكوين التبعيات للتطبيق
+
+Security Enhanced v2.2:
+- Integrated security components
+- Optional authorization (offline/online mode)
+- Audit logging support
 """
 
+from __future__ import annotations
+
 import logging
+import os
+from typing import Any, Optional
 
 from src.application.use_cases.generate_device_report_uc import \
     GenerateDeviceReportUseCase
+from src.application.use_cases.generate_report_uc import GenerateReportUseCase
 from src.application.use_cases.import_ft2_bundle_uc import \
     ImportFT2BundleUseCase
 from src.domain.services.exposure_analysis_service import \
@@ -17,6 +27,7 @@ from src.domain.services.thermal_degradation_estimator import \
     ThermalDegradationEstimator
 from src.infrastructure.adapters.json_vaccine_spec_repository import \
     JsonVaccineSpecRepository
+from src.infrastructure.adapters.pdf_report_generator import PdfReportGenerator
 from src.infrastructure.adapters.validation_protocol_service import \
     ValidationProtocolService
 from src.infrastructure.repositories.device_repository import \
@@ -34,6 +45,15 @@ class AppComposer:
         def ensure_active(self):
             # intentionally does nothing - always considered active
             pass
+
+    # helper stub for offline mode authorization
+    class _NoOpAuthorizer:
+        def authorize(self, action: str, context: dict) -> bool:
+            # Offline mode: always authorize (online mode will use real authorizer)
+            return True
+
+        def get_user_permissions(self, user_id: str) -> list:
+            return ["read_reports", "write_reports"]
 
     @staticmethod
     def create_generate_device_report_uc() -> GenerateDeviceReportUseCase:
@@ -71,14 +91,12 @@ class AppComposer:
         license_guard = AppComposer._NoOpLicenseGuard()
         logger.info("LicenseGuard initialized: %s", type(license_guard).__name__)
 
-        # ملاحظة: سيتم إضافة التبعيات الأخرى (مثل مولد PDF) هنا تدريجياً
-        # حسب الخطة الموضوعة.
         uc = GenerateDeviceReportUseCase(
             device_repository=repository,
             vaccine_specifications=vaccine_specs,
             regulatory_decision_service=regulatory_service,
             estimator=estimator,
-            exposure_analysis=exposure_analysis,  # ✅ إضافة جديدة
+            exposure_analysis=exposure_analysis,
             validator=validator,
             license_guard=license_guard,
         )
@@ -96,6 +114,70 @@ class AppComposer:
         return uc
 
     @staticmethod
+    def create_generate_report_uc(
+        authorizer: Optional[Any] = None, output_dir: Optional[str] = None
+    ) -> GenerateReportUseCase:
+        """
+        Build secure report generation use case.
+
+        Args:
+            authorizer: Authorization service (uses NoOp for offline mode)
+            output_dir: Directory for report output
+
+        Returns:
+            GenerateReportUseCase: Configured use case instance
+
+        Security:
+        - Integrates authorization (optional for offline)
+        - Includes audit logging
+        - Secure path handling
+        """
+        logger.info("Building GenerateReportUseCase...")
+
+        # Create PDF generator
+        output_dir = output_dir or os.getenv("CCIF_REPORT_OUTPUT_DIR", "reports")
+        generator = PdfReportGenerator(output_dir=output_dir)
+        logger.info("PdfReportGenerator initialized: %s", type(generator).__name__)
+
+        # Create authorizer (NoOp for offline, real for online)
+        if authorizer is None:
+            env = os.getenv("CCIF_ENVIRONMENT", "development")
+            if env == "production":
+                # In production, try to import real authorizer
+                try:
+                    from src.application.security.local_authorizer import \
+                        LocalAuthorizer
+
+                    authorizer = LocalAuthorizer()
+                    logger.info("LocalAuthorizer initialized for production")
+                except ImportError:
+                    authorizer = AppComposer._NoOpAuthorizer()
+                    logger.warning(
+                        "Using NoOpAuthorizer (LocalAuthorizer not available)"
+                    )
+            else:
+                authorizer = AppComposer._NoOpAuthorizer()
+                logger.info("NoOpAuthorizer initialized for development/offline")
+
+        # Create audit logger
+        from src.application.security.secure_logger import SecureAuditLogger
+
+        log_file = os.getenv("CCIF_AUDIT_LOG_FILE", "logs/security_audit.log")
+        audit_logger = SecureAuditLogger(log_file=log_file)
+        logger.info("SecureAuditLogger initialized: %s", type(audit_logger).__name__)
+
+        # Build use case
+        uc = GenerateReportUseCase(
+            generator=generator,
+            authorizer=authorizer,
+            audit_logger=audit_logger,
+            output_dir=output_dir,
+        )
+
+        logger.info("GenerateReportUseCase built successfully")
+        return uc
+
+    @staticmethod
     def health_check() -> bool:
         """
         فحص صحي سريع للتأكد من أن التبعيات قابلة للإنشاء.
@@ -106,6 +188,7 @@ class AppComposer:
         try:
             AppComposer.create_generate_device_report_uc()
             AppComposer.create_import_ft2_bundle_uc()
+            AppComposer.create_generate_report_uc()
             logger.info("Health check passed")
             return True
         except Exception as e:

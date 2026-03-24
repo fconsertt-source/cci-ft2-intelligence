@@ -33,6 +33,7 @@ class GenerateVaccinesReportUseCase:
     def execute(
         self, request: GenerateVaccinesReportRequest
     ) -> GenerateVaccinesReportResponse:
+        """تنفيذ توليد تقرير اللقاحات مع دعم JudgmentEngine"""
         report_path = self.report_generator.generate(
             assessments=request.assessments,
             output_path=request.output_path,
@@ -47,6 +48,16 @@ class GenerateVaccinesReportUseCase:
         )
         expired = sum(
             1 for a in request.assessments if a.decision == VaccineDecision.EXPIRED
+        )
+
+        # Logging علمي مفصل
+        logger.info(
+            "تقرير اللقاحات مكتمل | Total=%d | SAFE=%d | PARTIAL=%d | DISCARD=%d | EXPIRED=%d",
+            len(request.assessments),
+            safe,
+            partial,
+            discard,
+            expired,
         )
 
         return GenerateVaccinesReportResponse(

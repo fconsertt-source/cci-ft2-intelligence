@@ -527,40 +527,65 @@ def run_pipeline(
 
     logger.info("📊 إجمالي المراكز المحولة: %d", len(center_dtos))
 
-    # --- Phase 3: Report Generation ---
-    # تقرير المراكز
-    centers_report_path = os.path.join(output_dir, "centers_report.tsv")
+    # ──────────────────────────────────────────────────────────────
+    # Phase 3: Report Generation — الهيكل النهائي المطلوب
+    # ──────────────────────────────────────────────────────────────
+    logger.info("📊 بدء توليد التقارير...")
+
+    # حذف أي مجلدات قديمة للتنظيف
+    for old in ["pdf_reports", "detailed_reports"]:
+        p = os.path.join(output_dir, old)
+        if os.path.exists(p):
+            import shutil
+
+            shutil.rmtree(p, ignore_errors=True)
+
+    # 1. تقرير المراكز العام (مجلد مخصص)
+    centers_dir = os.path.join(output_dir, "centers")
+    os.makedirs(centers_dir, exist_ok=True)
+    centers_report_path = os.path.join(centers_dir, "centers_report.tsv")
     generate_centers_report(center_dtos, centers_report_path)
+    logger.info("✅ تقرير المراكز العام: %s", centers_report_path)
 
-    # التقارير التفصيلية
-    reports_dir = os.path.join(output_dir, "detailed_reports")
-    os.makedirs(reports_dir, exist_ok=True)
+    # 2. تقرير اللقاحات (مجلد مخصص)
+    vaccines_dir = os.path.join(output_dir, "vaccines")
+    os.makedirs(vaccines_dir, exist_ok=True)
+    vaccines_report_path = os.path.join(vaccines_dir, "vaccines_report.tsv")
+    # (سيتم تفعيله لاحقًا عند جمع vaccine_assessments)
 
-    # 6. عرض الملخص
-    logger.info("%s", "\n" + ("=" * 70))
-    logger.info(MessageProvider.get("PIPELINE_SUMMARY_TITLE"))
-    logger.info("%s", "=" * 70)
-    logger.info(
-        MessageProvider.get(
-            "FILES_PROCESSED",
-            processed_count=len([c for c in center_dtos if c.ft2_entries_count > 0]),
-            total_count=len(ft2_files),
-        )
-    )
-    logger.info(MessageProvider.get("FILES_FAILED", failed_count=len(failed_files)))
-    logger.info(
-        MessageProvider.get("CENTER_REPORT_GENERATED", path=centers_report_path)
-    )
-    logger.info(
-        MessageProvider.get("DETAILED_REPORTS_GENERATED", path=f"{reports_dir}/")
-    )
+    # 3. تقارير PDF (مجلدات منفصلة حسب النوع)
+    pdf_base = os.path.join(output_dir, "pdf")
+    os.makedirs(pdf_base, exist_ok=True)
 
-    if failed_files:
-        logger.warning(MessageProvider.get("FAILED_FILES_LIST_TITLE"))
-        for file, error in failed_files:
-            logger.warning("  - %s: %s", file, error)
+    try:
+        from src.presentation.reporting.unified_pdf_generator import (
+            ReportType, UnifiedPDFGenerator)
 
-    logger.info(MessageProvider.get("PIPELINE_COMPLETE", output_dir=output_dir))
+        pdf_gen = UnifiedPDFGenerator(language="ar")
+
+        for rtype, folder in [
+            (ReportType.OFFICIAL, "official"),
+            (ReportType.TECHNICAL, "technical"),
+            (ReportType.ARABIC, "arabic"),
+        ]:
+            subdir = os.path.join(pdf_base, folder)
+            os.makedirs(subdir, exist_ok=True)
+            pdf_path = os.path.join(subdir, f"{folder}_report.pdf")
+
+            pdf_bytes = pdf_gen.generate(rtype, centers_report_path)
+            if isinstance(pdf_bytes, (bytes, bytearray)):
+                Path(pdf_path).write_bytes(pdf_bytes)
+                logger.info("✅ PDF %s: %s", folder.upper(), pdf_path)
+    except Exception as e:
+        logger.warning("⚠️ فشل توليد PDF: %s", e)
+
+    # الملخص النهائي
+    logger.info("%s", "\n" + ("=" * 85))
+    logger.info("📋 ملخص تشغيل خط المعالجة النهائي")
+    logger.info("تقرير المراكز     : %s", centers_report_path)
+    logger.info("تقرير اللقاحات    : %s", vaccines_report_path)
+    logger.info("تقارير PDF        : %s", pdf_base)
+    logger.info("🏁 اكتمل خط المعالجة بنجاح.")
 
 
 def _map_decision_to_vaccine_decision(decision: str) -> VaccineDecision:

@@ -1,32 +1,37 @@
 # ═══════════════════════════════════════════════════════════
 # CCI-FT2-Intelligence — Development & Test Dependencies
 # ═══════════════════════════════════════════════════════════
-# تحديث: مارس 2026 — Phase 4 Production Hardening
+# تحديث: v2.2 — Security Hardening Phase
 # ───────────────────────────────────────────────────────────
 # الاستخدام:
 #   pip install -r requirements.txt -r requirements-dev.txt
 # ═══════════════════════════════════════════════════════════
 
-# ── Base ─────────────────────────────────────────────────────
+# ── Base Production Dependencies ───────────────────────────
 -r requirements.txt
 
-# ── Testing ──────────────────────────────────────────────────
+# ── Testing Enhanced ───────────────────────────────────────
 pytest==9.0.2
 pytest-mock==3.15.1
 pytest-env==1.5.0
 pytest-benchmark==5.2.3
 pytest-snapshot==0.9.0
+pytest-xdist==3.5.0
 freezegun==1.5.5
 
-# ── PDF Testing ──────────────────────────────────────────────
+# ── PDF Testing & Validation ───────────────────────────────
 PyMuPDF==1.27.1
+pypdf==6.7.4
 
-# ── Code Quality ─────────────────────────────────────────────
-black==26.1.0
-isort==8.0.0
-pre_commit==4.5.1
+# ── Code Quality & Formatting ──────────────────────────────
+black==24.3.0
+isort==5.13.2
+pre-commit==3.6.0
+mypy_extensions==1.1.0
+pathspec==1.0.4
+pytokens==0.4.1
 
-# ── Pre-commit internals ─────────────────────────────────────
+# ── Pre-commit Internals ───────────────────────────────────
 cfgv==3.5.0
 identify==2.6.16
 nodeenv==1.10.0
@@ -34,14 +39,30 @@ virtualenv==21.0.0
 filelock==3.24.3
 distlib==0.4.0
 platformdirs==4.9.2
-pathspec==1.0.4
-mypy_extensions==1.1.0
 
-# ── Misc Dev ─────────────────────────────────────────────────
+# ── Security Scanning (Development) ────────────────────────
+# Run before every commit: pip-audit && safety check
+pip-audit==2.7.3
+safety==3.2.0
+bandit==1.7.8
+
+# ── Linting & Analysis ─────────────────────────────────────
+pylint==3.0.3
+astroid==3.0.3
+dill==0.3.8
+mccabe==0.7.0
+tomlkit==0.14.0
+ruff==0.3.5
+libcst==1.8.6
+
+# ── Misc Development Tools ─────────────────────────────────
 Pygments==2.19.2
 py-cpuinfo==9.0.0
 python-discovery==1.1.0
-pytokens==0.4.1
-pluggy==1.6.0
-iniconfig==2.3.0
 setuptools==82.0.0
+iniconfig==2.3.0
+pluggy==1.6.0
+
+# ── Type Checking (Optional) ───────────────────────────────
+# mypy>=1.8.0
+# typing_extensions==4.15.0

@@ -16,6 +16,10 @@ src/domain/services/rules_engine.py:104:12: R1705: Unnecessary "else" after "ret
 src/domain/services/rules_engine.py:250:8: R1705: Unnecessary "elif" after "return", remove the leading "el" from "elif" (no-else-return)
 ************* Module src.domain.engines.__init__
 src/domain/engines/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.domain.value_objects.secure_value_objects
+src/domain/value_objects/secure_value_objects.py:24:4: C0103: Attribute name "MAX_LENGTH" doesn't conform to snake_case naming style (invalid-name)
+src/domain/value_objects/secure_value_objects.py:25:4: C0103: Attribute name "MIN_LENGTH" doesn't conform to snake_case naming style (invalid-name)
+src/domain/value_objects/secure_value_objects.py:26:4: C0103: Attribute name "PATTERN" doesn't conform to snake_case naming style (invalid-name)
 ************* Module src.domain.value_objects.CHANGES_DIFF
 src/domain/value_objects/CHANGES_DIFF.py:1:0: C0103: Module name "CHANGES_DIFF" doesn't conform to snake_case naming style (invalid-name)
 ************* Module src.domain.value_objects.__init__
@@ -65,7 +69,6 @@ src/presentation/cli/cli.py:78:4: E1120: No value for argument 'request' in meth
 src/presentation/cli/cli.py:102:15: E1101: Class 'MessageProvider' has no 'get_decision_message' member (no-member)
 src/presentation/cli/cli.py:85:4: W0613: Unused argument 'center_id' (unused-argument)
 src/presentation/cli/cli.py:100:4: W0612: Unused variable 'uc' (unused-variable)
-src/presentation/cli/cli.py:124:9: E1101: Class 'AppComposer' has no 'create_generate_report_uc' member (no-member)
 src/presentation/cli/cli.py:124:4: W0612: Unused variable 'uc' (unused-variable)
 src/presentation/cli/cli.py:155:8: W0621: Redefining name 'report' from outer scope (line 106) (redefined-outer-name)
 src/presentation/cli/cli.py:170:8: W0707: Consider explicitly re-raising using 'except ValueError as exc' and 'raise typer.Exit(code=1) from exc' (raise-missing-from)
@@ -74,20 +77,16 @@ src/presentation/cli/cli.py:209:19: E1101: Class 'AppComposer' has no 'create_of
 ************* Module src.presentation.cli.__init__
 src/presentation/cli/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
 ************* Module src.presentation.cli.gui_main
-src/presentation/cli/gui_main.py:92:16: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
-src/presentation/cli/gui_main.py:94:16: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
-src/presentation/cli/gui_main.py:127:8: W0702: No exception type(s) specified (bare-except)
-src/presentation/cli/gui_main.py:150:12: W0702: No exception type(s) specified (bare-except)
-src/presentation/cli/gui_main.py:171:12: W0702: No exception type(s) specified (bare-except)
-src/presentation/cli/gui_main.py:396:12: W0612: Unused variable 'i' (unused-variable)
-src/presentation/cli/gui_main.py:225:8: W0201: Attribute 'cycle_label' defined outside __init__ (attribute-defined-outside-init)
-src/presentation/cli/gui_main.py:234:8: W0201: Attribute 'date_label' defined outside __init__ (attribute-defined-outside-init)
-src/presentation/cli/gui_main.py:355:8: W0201: Attribute 'results_tree' defined outside __init__ (attribute-defined-outside-init)
-src/presentation/cli/gui_main.py:388:8: W0201: Attribute 'stats_labels' defined outside __init__ (attribute-defined-outside-init)
-src/presentation/cli/gui_main.py:430:8: W0201: Attribute 'status_var' defined outside __init__ (attribute-defined-outside-init)
-src/presentation/cli/gui_main.py:431:8: W0201: Attribute 'status_label' defined outside __init__ (attribute-defined-outside-init)
+src/presentation/cli/gui_main.py:91:16: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/presentation/cli/gui_main.py:93:16: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/presentation/cli/gui_main.py:395:12: W0612: Unused variable 'i' (unused-variable)
+src/presentation/cli/gui_main.py:224:8: W0201: Attribute 'cycle_label' defined outside __init__ (attribute-defined-outside-init)
+src/presentation/cli/gui_main.py:233:8: W0201: Attribute 'date_label' defined outside __init__ (attribute-defined-outside-init)
+src/presentation/cli/gui_main.py:354:8: W0201: Attribute 'results_tree' defined outside __init__ (attribute-defined-outside-init)
+src/presentation/cli/gui_main.py:387:8: W0201: Attribute 'stats_labels' defined outside __init__ (attribute-defined-outside-init)
+src/presentation/cli/gui_main.py:429:8: W0201: Attribute 'status_var' defined outside __init__ (attribute-defined-outside-init)
+src/presentation/cli/gui_main.py:430:8: W0201: Attribute 'status_label' defined outside __init__ (attribute-defined-outside-init)
 src/presentation/cli/gui_main.py:32:4: W0611: Unused DeviceDataRepository imported from src.infrastructure.repositories.device_repository (unused-import)
-src/presentation/cli/gui_main.py:41:4: W0611: Unused JudgmentEngine imported from src.domain.services.judgment_engine (unused-import)
 ************* Module src.presentation.messages.__init__
 src/presentation/messages/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
 ************* Module src.presentation.reporting.pdf_generator
@@ -96,7 +95,6 @@ src/presentation/reporting/pdf_generator.py:46:0: W0104: Statement seems to have
 src/presentation/reporting/pdf_generator.py:47:0: W0104: Statement seems to have no effect (pointless-statement)
 ************* Module src.presentation.reporting.csv_reporter
 src/presentation/reporting/csv_reporter.py:17:0: C0301: Line too long (125/120) (line-too-long)
-src/presentation/reporting/csv_reporter.py:73:16: W0612: Unused variable 'has_entries' (unused-variable)
 ************* Module src.presentation.reporting.arabic_pdf_generator
 src/presentation/reporting/arabic_pdf_generator.py:17:4: W0404: Reimport 'sys' (imported line 9) (reimported)
 src/presentation/reporting/arabic_pdf_generator.py:69:8: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
@@ -146,6 +144,9 @@ src/infrastructure/adapters/equipment_vaccine_repository.py:95:8: W0621: Redefin
 src/infrastructure/adapters/equipment_vaccine_repository.py:95:8: W0404: Reimport 'EquipmentVaccine' (imported line 16) (reimported)
 ************* Module src.infrastructure.adapters.json_vaccine_repository
 src/infrastructure/adapters/json_vaccine_repository.py:57:19: E1101: Class 'VaccineBatch' has no 'from_dict' member (no-member)
+************* Module src.infrastructure.adapters.pdf_report_generator
+src/infrastructure/adapters/pdf_report_generator.py:80:4: W0237: Parameter 'result' has been renamed to 'data' in overriding 'PdfReportGenerator.generate' method (arguments-renamed)
+src/infrastructure/adapters/pdf_report_generator.py:122:16: W0707: Consider explicitly re-raising using 'except ValueError as exc' and 'raise PermissionError(f"Output path '{output_path}' is outside allowed directory '{self._output_dir}'") from exc' (raise-missing-from)
 ************* Module src.infrastructure.adapters.ft2_reader.__init__
 src/infrastructure/adapters/ft2_reader/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
 ************* Module src.infrastructure.adapters.ft2_reader.services.__init__
@@ -249,26 +250,52 @@ src/shared/language_manager.py:48:8: W1203: Use lazy % formatting in logging fun
 src/shared/language_manager.py:63:12: W0621: Redefining name 'lang' from outer scope (line 120) (redefined-outer-name)
 src/shared/language_manager.py:78:12: W0621: Redefining name 'lang' from outer scope (line 120) (redefined-outer-name)
 ************* Module src.application.app_composer
-src/application/app_composer.py:124:8: W0621: Redefining name 'RegulatoryDecisionService' from outer scope (line 14) (redefined-outer-name)
-src/application/app_composer.py:126:8: W0621: Redefining name 'ThermalDegradationEstimator' from outer scope (line 16) (redefined-outer-name)
-src/application/app_composer.py:130:8: W0621: Redefining name 'JsonVaccineSpecRepository' from outer scope (line 18) (redefined-outer-name)
-src/application/app_composer.py:132:8: W0621: Redefining name 'ValidationProtocolService' from outer scope (line 20) (redefined-outer-name)
-src/application/app_composer.py:124:8: W0404: Reimport 'RegulatoryDecisionService' (imported line 14) (reimported)
-src/application/app_composer.py:126:8: W0404: Reimport 'ThermalDegradationEstimator' (imported line 16) (reimported)
-src/application/app_composer.py:130:8: W0404: Reimport 'JsonVaccineSpecRepository' (imported line 18) (reimported)
-src/application/app_composer.py:132:8: W0404: Reimport 'ValidationProtocolService' (imported line 20) (reimported)
-src/application/app_composer.py:136:30: E1120: No value for argument 'json_path' in constructor call (no-value-for-parameter)
+src/application/app_composer.py:51:28: W0613: Unused argument 'action' (unused-argument)
+src/application/app_composer.py:51:41: W0613: Unused argument 'context' (unused-argument)
+src/application/app_composer.py:55:39: W0613: Unused argument 'user_id' (unused-argument)
+src/application/app_composer.py:207:8: W0621: Redefining name 'RegulatoryDecisionService' from outer scope (line 24) (redefined-outer-name)
+src/application/app_composer.py:209:8: W0621: Redefining name 'ThermalDegradationEstimator' from outer scope (line 26) (redefined-outer-name)
+src/application/app_composer.py:213:8: W0621: Redefining name 'JsonVaccineSpecRepository' from outer scope (line 28) (redefined-outer-name)
+src/application/app_composer.py:215:8: W0621: Redefining name 'ValidationProtocolService' from outer scope (line 31) (redefined-outer-name)
+src/application/app_composer.py:207:8: W0404: Reimport 'RegulatoryDecisionService' (imported line 24) (reimported)
+src/application/app_composer.py:209:8: W0404: Reimport 'ThermalDegradationEstimator' (imported line 26) (reimported)
+src/application/app_composer.py:213:8: W0404: Reimport 'JsonVaccineSpecRepository' (imported line 28) (reimported)
+src/application/app_composer.py:215:8: W0404: Reimport 'ValidationProtocolService' (imported line 31) (reimported)
+src/application/app_composer.py:219:30: E1120: No value for argument 'json_path' in constructor call (no-value-for-parameter)
 ************* Module src.application.__init__
 src/application/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.application.services.__init__
+src/application/services/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
 ************* Module src.application.dtos.__init__
 src/application/dtos/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.application.security.secure_logger
+src/application/security/secure_logger.py:75:12: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+************* Module src.application.security.error_handler
+src/application/security/error_handler.py:64:8: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
+src/application/security/error_handler.py:94:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/application/security/error_handler.py:112:4: W0603: Using the global statement (global-statement)
 ************* Module src.application.security.license_guard
 src/application/security/license_guard.py:87:8: R1720: Unnecessary "elif" after "raise", remove the leading "el" from "elif" (no-else-raise)
+************* Module src.application.security.local_authorizer
+src/application/security/local_authorizer.py:56:12: R1720: Unnecessary "else" after "raise", remove the "else" and de-indent the code inside it (no-else-raise)
+src/application/security/local_authorizer.py:73:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/application/security/local_authorizer.py:76:12: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/application/security/local_authorizer.py:80:12: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/application/security/local_authorizer.py:85:12: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/application/security/local_authorizer.py:90:12: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/application/security/local_authorizer.py:96:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
 ************* Module src.application.security.__init__
 src/application/security/__init__.py:1:0: C0305: Trailing newlines (trailing-newlines)
+************* Module src.application.use_cases.generate_vaccines_report_uc
+src/application/use_cases/generate_vaccines_report_uc.py:54:8: E0602: Undefined variable 'logger' (undefined-variable)
 ************* Module src.application.use_cases.import_ft2_data_uc
 src/application/use_cases/import_ft2_data_uc.py:94:20: E1136: Value 'context' is unsubscriptable (unsubscriptable-object)
 src/application/use_cases/import_ft2_data_uc.py:106:30: E1136: Value 'context' is unsubscriptable (unsubscriptable-object)
+************* Module src.application.use_cases.generate_report_uc
+src/application/use_cases/generate_report_uc.py:45:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/application/use_cases/generate_report_uc.py:60:16: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
+src/application/use_cases/generate_report_uc.py:86:12: W0707: Consider explicitly re-raising using 'except ValueError as exc' and 'raise ValueError('Invalid output path detected') from exc' (raise-missing-from)
+src/application/use_cases/generate_report_uc.py:104:8: W1203: Use lazy % formatting in logging functions (logging-fstring-interpolation)
 ************* Module src.application.use_cases.track_batch_exposure_uc
 src/application/use_cases/track_batch_exposure_uc.py:3:0: E0401: Unable to import 'src.domain.value_objects.cumulative_exposure_result' (import-error)
 src/application/use_cases/track_batch_exposure_uc.py:3:0: E0611: No name 'cumulative_exposure_result' in module 'src.domain.value_objects' (no-name-in-module)
@@ -290,5 +317,5 @@ src/application/use_cases/generate_device_report_uc.py:254:8: E0611: No name 're
 src/application/use_cases/generate_device_report_uc.py:266:8: E0611: No name '_YAML_PATH' in module 'src.domain.value_objects.vaccine_specification' (no-name-in-module)
 
 ------------------------------------------------------------------
-Your code has been rated at 9.42/10 (previous run: 9.42/10, +0.00)
+Your code has been rated at 9.43/10 (previous run: 9.43/10, +0.01)
 

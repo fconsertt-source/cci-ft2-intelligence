@@ -31,12 +31,11 @@ def get_recommended_action(decision: str) -> str:
 
 
 def generate_centers_report(centers: List[CenterDTO], output_path: str):
-    """إنشاء تقرير TSV للمراكز اعتماداً على CenterDTO"""
+    """إنشاء تقرير TSV للمراكز مع دعم كامل وآمن لـ JudgmentEngine"""
     try:
         with open(output_path, "w", newline="", encoding="utf-8") as f_out:
             writer = csv.writer(f_out, delimiter="\t")
 
-            # رأس التقرير المطور (v2.0.0)
             writer.writerow(
                 [
                     "center_id",
@@ -56,7 +55,6 @@ def generate_centers_report(centers: List[CenterDTO], output_path: str):
                     "min_temperature",
                     "max_temperature",
                     "decision_reasons",
-                    # ✅ حقول JudgmentEngine
                     "judgment_risk",
                     "judgment_icon",
                     "confidence",
@@ -67,55 +65,66 @@ def generate_centers_report(centers: List[CenterDTO], output_path: str):
                 ]
             )
 
-            # بيانات كل مركز
             for dto in centers:
-                stats = dto.stats
-                has_entries = dto.ft2_entries_count > 0  # noqa: F841
+                stats = getattr(dto, "stats", {}) or {}
 
-                # استخدم الحقل الرسمي has_warning
                 decision_for_action = (
                     "WARNING_EXCURSION"
-                    if dto.decision == "ACCEPTED" and dto.has_warning
-                    else dto.decision
+                    if getattr(dto, "decision", "") == "ACCEPTED"
+                    and getattr(dto, "has_warning", False)
+                    else getattr(dto, "decision", "UNKNOWN")
                 )
-
                 action = get_recommended_action(decision_for_action)
+
+                # معالجة آمنة للحقول الحرارية (قد تكون str أو None)
+                def safe_float(value, default=0.0):
+                    try:
+                        return float(value) if value is not None else default
+                    except (ValueError, TypeError):
+                        return default
+
+                avg_temp = safe_float(getattr(dto, "avg_temperature", None))
+                min_temp = safe_float(getattr(dto, "min_temperature", None))
+                max_temp = safe_float(getattr(dto, "max_temperature", None))
 
                 writer.writerow(
                     [
-                        dto.id,
-                        dto.name,
-                        dto.decision,
-                        "YES" if dto.has_warning else "NO",
-                        dto.alert_level or "GREEN",
-                        dto.vvm_stage,
-                        f"{dto.stability_budget_consumed_pct:.2f}",
+                        getattr(dto, "id", ""),
+                        getattr(dto, "name", ""),
+                        getattr(dto, "decision", "UNKNOWN"),
+                        "YES" if getattr(dto, "has_warning", False) else "NO",
+                        getattr(dto, "alert_level", "GREEN") or "GREEN",
+                        getattr(dto, "vvm_stage", "NONE"),
+                        f"{getattr(dto, 'stability_budget_consumed_pct', 0):.2f}",
                         (
-                            f"{dto.thaw_remaining_hours:.2f}"
-                            if dto.thaw_remaining_hours is not None
+                            f"{getattr(dto, 'thaw_remaining_hours', None):.1f}"
+                            if getattr(dto, "thaw_remaining_hours", None) is not None
                             else "N/A"
                         ),
-                        dto.category_display or "General",
+                        getattr(dto, "category_display", "General"),
                         action,
-                        dto.ft2_entries_count,
+                        getattr(dto, "ft2_entries_count", 0),
                         "YES" if stats.get("has_freeze", False) else "NO",
                         "YES" if stats.get("has_ccm_violation", False) else "NO",
-                        dto.avg_temperature,
-                        dto.min_temperature,
-                        dto.max_temperature,
-                        " | ".join(dto.decision_reasons),
-                        # ✅ حقول JudgmentEngine
+                        f"{avg_temp:.2f}",
+                        f"{min_temp:.2f}",
+                        f"{max_temp:.2f}",
+                        " | ".join(getattr(dto, "decision_reasons", [])),
+                        # JudgmentEngine fields
                         stats.get("judgment_risk", "SAFE"),
                         stats.get("judgment_icon", "🟢"),
-                        f"{stats.get('confidence', 0.0):.2f}",
+                        f"{float(stats.get('confidence', 0.0)):.2f}",
                         "Yes" if stats.get("requires_review", False) else "No",
-                        f"{stats.get('her_percentage', 0.0):.1f}%",
-                        stats.get("ccm_index", "0"),
-                        stats.get("judgment_narrative", ""),
+                        f"{float(stats.get('her_percentage', 0.0)):.1f}%",
+                        str(stats.get("ccm_index", "")),
+                        str(stats.get("judgment_narrative", ""))
+                        .replace("\n", " ")
+                        .strip(),
                     ]
                 )
 
-        logger.info("✅ تم إنشاء تقرير المراكز: %s", output_path)
+        logger.info("✅ تم إنشاء تقرير المراكز بنجاح: %s", output_path)
 
     except Exception as e:
         logger.error("❌ خطأ في إنشاء تقرير المراكز: %s", e)
+        raise

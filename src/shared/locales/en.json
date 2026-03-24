@@ -211,5 +211,16 @@
   "help.content.steps": "Steps: 1) Enter general data, 2) Register cooling units, 3) Add vaccines, 4) Import FT2 files, 5) Verify digitally, 6) Generate report",
   "help.content.support_email": "Support Email: support@cci-ft2.example.com",
   "help.content.support_phone": "Support Phone: +XXX-XXX-XXXX",
-  "filetype.all": "All Files"
+  "filetype.all": "All Files",
+  "guard.report_title": "Guard Report",
+  "guard.start": "Start",
+  "guard.end": "End",
+  "guard.tracked_files": "Tracked files",
+  "guard.dtos": "DTOs",
+  "guard.errors": "Errors",
+  "cli.tree_guard.description": "Generate an immutable Project‑Tree DTO (Guard‑compatible).",
+  "cli.tree_guard.root_help": "Root directory to scan (default = current working dir).",
+  "cli.tree_guard.md_help": "Emit Markdown (fenced‑code) instead of plain text.",
+  "cli.tree_guard.depth_help": "Maximum depth to display (default = unlimited).",
+  "cli.tree_guard.plain_help": "Print the plain‑text version (ignores --md)."
 }

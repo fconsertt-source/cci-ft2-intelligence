@@ -56,7 +56,6 @@ class TestVaccinesReportGenerator:
     def test_generator_initialization(self):
         """اختبار أن المولد يمكن تهيئته بشكل صحيح."""
         generator = VaccinesReportGenerator()
-        assert generator is not None
         assert generator.HEADER == [
             "equipment_id",
             "vaccine_type",
@@ -67,6 +66,11 @@ class TestVaccinesReportGenerator:
             "her_ratio",
             "ccm_index",
             "decision_detail",
+            "judgment_risk",
+            "judgment_icon",
+            "confidence",
+            "requires_review",
+            "judgment_narrative",
         ]
 
     def test_generate_with_single_result(self, tmp_path):
@@ -305,4 +309,4 @@ class TestVaccinesReportGenerator:
             row = output_path.read_text(encoding="utf-8").strip().split("\n")[1]
             parts = row.split("\t")
             assert parts[4] == decision.value.upper()  # UPPERCASE
-            assert parts[5] == reason.value.lower()  # lowercase
+            assert parts[5] == reason.value.lower()
