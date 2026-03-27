@@ -2,7 +2,6 @@ from src.shared.config import get_config
 from src.domain.ports.feature_flag_port import FeatureFlagPort
 
 class FeatureFlagService(FeatureFlagPort):
-    """تنفيذ FeatureFlagPort باستخدام Config من طبقة Shared."""
     def __init__(self):
         self._config = get_config()
 

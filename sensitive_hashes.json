@@ -9,5 +9,6 @@
   "src/domain/value_objects/ccm_result.py": "82c6998d959cb4612720e2f04162a7cc2e44654995dfd11e2976c282fda7d232",
   "src/domain/services/rules_engine.py": "c685af9aa5c46ec49f704c37aec8cf5a9b0586503990b6721ba500ddd505d07e",
   "src/domain/dtos/evaluate_cold_chain_safety_request.py": "66618bbac5a81b692f1e369f178bd248200bd01f1dee87de7d06b452888815fa",
-  "src/application/use_cases/evaluate_cold_chain_safety_use_case.py": "e562b4565450bf4f5a6ac77edc133f47c4851080749a9b57a9723cb15d0241fb"
+  "src/application/use_cases/evaluate_cold_chain_safety_use_case.py": "e562b4565450bf4f5a6ac77edc133f47c4851080749a9b57a9723cb15d0241fb",
+  "src/shared/config.py": "7ffec8fdf12fc86e9b543c838a36797b002780dc3b6247e48d94c339e6ae9349"
 }
