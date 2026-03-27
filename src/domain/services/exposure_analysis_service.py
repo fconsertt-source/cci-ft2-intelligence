@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import logging
 from typing import Dict, List, Optional, TYPE_CHECKING
+from datetime import datetime
 
 if TYPE_CHECKING:
     from src.domain.entities.temperature_reading import TemperatureReading
@@ -67,6 +68,7 @@ class ExposureAnalysisService:
         self,
         readings: List["TemperatureReading"],
         spec: Optional["VaccineSpecification"] = None,
+        supply_date: Optional[datetime] = None,   # ← أضف هذا
     ) -> Dict:
         """
         تحليل السجل الحراري الكامل.
@@ -111,7 +113,7 @@ class ExposureAnalysisService:
         circuit_breaker = self._check_circuit_breakers(readings, spec)
 
         # ── 2. إحصاءات أساسية ───────────────────────────────────
-        temps = [r.value for r in readings]
+        temps = [self._get_temperature(r) for r in readings]
         max_temp = max(temps)
         min_temp = min(temps)
 
@@ -166,7 +168,7 @@ class ExposureAnalysisService:
         """
         # تجمد — فقط للقاحات الحساسة (ألومنيوم)
         if spec.freeze_sensitive:
-            min_temp = min(r.value for r in readings)
+            min_temp = min(self._get_temperature(r) for r in readings)
             if min_temp < _FREEZE_THRESHOLD:
                 logger.warning(
                     "CIRCUIT_BREAKER: FREEZE detected (min=%.2f°C) "
@@ -220,7 +222,7 @@ class ExposureAnalysisService:
                 duration_hours = self._get_duration_hours(reading)
                 if duration_hours <= 0:
                     continue
-                exponent = (reading.value - spec.reference_temp_c) / 10.0
+                exponent = (self._get_temperature(reading) - spec.reference_temp_c) / 10.0
                 factor = spec.q10_factor ** exponent
                 cumulative_degradation_hours += duration_hours * factor
         else:
@@ -241,7 +243,7 @@ class ExposureAnalysisService:
                 delta_hours = (curr_at - prev_at).total_seconds() / 3600.0
                 if delta_hours <= 0:
                     continue
-                avg_temp = (prev.value + curr.value) / 2.0
+                avg_temp = (self._get_temperature(prev) + self._get_temperature(curr)) / 2.0
                 exponent = (avg_temp - spec.reference_temp_c) / 10.0
                 try:
                     factor = math.pow(spec.q10_factor, exponent)
@@ -336,7 +338,7 @@ class ExposureAnalysisService:
         """
         total_hours: float = 0.0
         for i, reading in enumerate(readings):
-            if reading.value > threshold:
+            if self._get_temperature(reading) > threshold:
                 next_reading = readings[i + 1] if i + 1 < len(readings) else None
                 minutes = getattr(reading, "duration_minutes", None)
                 if minutes is not None:
