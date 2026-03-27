@@ -20,6 +20,7 @@ class EvaluateColdChainSafetyRequest(BaseDTO):
     center_name: Optional[str] = None
     readings: Tuple[TemperatureReading, ...] = field(default_factory=tuple)
     vaccines: Tuple[Any, ...] = field(default_factory=tuple)
+    vaccine_inventory: Optional[Dict[str, Any]] = None
     vaccine_spec: Optional[VaccineSpecification] = None
     temperature_ranges: dict = field(default_factory=dict)
     decision_thresholds: dict = field(default_factory=dict)
