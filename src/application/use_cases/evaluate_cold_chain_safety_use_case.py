@@ -68,6 +68,7 @@ class EvaluateColdChainSafetyUseCase:
             apply_rules(ctx)
             stats = calculate_center_stats(ctx)
         else:
+            ctx.decision = "NO_DATA"
             stats = {"has_freeze": False, "has_ccm_violation": False}
 
         return EvaluateColdChainSafetyResponse.from_context(ctx, stats)
