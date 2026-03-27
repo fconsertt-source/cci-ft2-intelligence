@@ -76,27 +76,43 @@ class ExposureAnalysisService:
         self,
         readings: List["TemperatureReading"],
         spec: Optional["VaccineSpecification"] = None,
-        supply_date: Optional[datetime] = None,   # ← أضف هذا
+        supply_date: Optional[datetime] = None,
+        enable_supply_date: bool = False,
     ) -> Dict:
-        """
-        تحليل السجل الحراري الكامل.
+        if spec is None:
+            from src.domain.value_objects.vaccine_specification import (
+                VACCINE_CATALOGUE,
+                VaccineSpecification,
+            )
+            if self._shelf_life_hours > 0:
+                spec = VaccineSpecification(
+                    vaccine_type="CUSTOM",
+                    q10_factor=self._q10_value,
+                    shelf_life_days=self._shelf_life_hours / 24.0,
+                    reference_temp_c=self._reference_temp,
+                )
+            else:
+                spec = VACCINE_CATALOGUE["GENERAL"]
 
-        Args:
-            readings: قائمة القراءات الحرارية مرتبة زمنياً
-            spec:     مواصفات اللقاح (اختيارية — يستخدم الافتراضي عند غيابها)
+        # Apply supply_date filtering if enabled
+        if enable_supply_date and supply_date:
+            # Ensure supply_date is timezone-aware (UTC)
+            if supply_date.tzinfo is None:
+                supply_date = supply_date.replace(tzinfo=timezone.utc)
 
-        Returns:
-            dict يحتوي على:
-              - her_ratio:          نسبة استهلاك العمر الافتراضي (0.0 → ∞)
-              - ccm_index:          مؤشر CCM (0/A/B/C/D)
-              - has_freeze:         هل حدث تجمد؟
-              - has_critical_heat:  هل تجاوز 34°C لأكثر من ساعتين؟
-              - max_temp:           أعلى درجة مسجلة
-              - min_temp:           أدنى درجة مسجلة
-              - total_hours_above_10: إجمالي ساعات فوق 10°C
-              - total_hours_above_34: إجمالي ساعات فوق 34°C
-              - circuit_breaker:    سبب الوقف الفوري (None إن لم يوجد)
-        """
+            filtered_readings = []
+            for r in readings:
+                reading_time = getattr(r, 'timestamp', None)
+                if reading_time:
+                    if reading_time.tzinfo is None:
+                        reading_time = reading_time.replace(tzinfo=timezone.utc)
+                    if reading_time >= supply_date:
+                        filtered_readings.append(r)
+                else:
+                    # If no timestamp, keep the reading for backward compatibility
+                    filtered_readings.append(r)
+            readings = filtered_readings
+
         if not readings:
             return self._empty_analysis()
 

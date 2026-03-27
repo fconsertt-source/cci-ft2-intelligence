@@ -1,0 +1,18 @@
+centers:
+  TEST_CENTER_01:
+    name: "مركز التطعيم التجريبي"
+    device_ids:
+      - "130600113437"
+    temperature_ranges:
+      min: 2.0
+      max: 8.0
+  CENTER_TRIPOLI_01:
+    name: "مركز طرابلس الرئيسي"
+    device_ids: []
+  CENTER_BENGHAZI_01:
+    name: "مركز بنغازي"
+    device_ids: []
+  OPV_TEST_CENTER:
+    name: "مركز اختبار OPV"
+    device_ids:
+      - "OPV_TEST_001"

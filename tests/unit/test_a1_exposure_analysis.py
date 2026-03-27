@@ -55,8 +55,8 @@ class TestVaccineSpecification:
         assert spec.vaccine_type == "OPV"
         assert spec.freeze_sensitive is False
         assert spec.vvm_type == "VVM2"
-        assert spec.shelf_life_days == 225
-        assert spec.q10_factor == 2.0
+        assert spec.shelf_life_days == 126
+        assert spec.q10_factor == 3.6
 
     def test_hepb_freeze_sensitive(self):
         spec = get_vaccine_spec("HEPB")
@@ -73,7 +73,7 @@ class TestVaccineSpecification:
 
     def test_shelf_life_hours(self):
         spec = get_vaccine_spec("OPV")
-        assert spec.shelf_life_hours == 225 * 24
+        assert spec.shelf_life_hours == 126 * 24
 
     def test_unknown_type_returns_general(self):
         spec = get_vaccine_spec("UNKNOWN_VACCINE_XYZ")

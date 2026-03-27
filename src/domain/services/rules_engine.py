@@ -242,6 +242,41 @@ class VVMStageRule(DecisionRule):
 
         return None
 
+class HeatDurationRule(DecisionRule):
+    """قاعدة مدة الحرارة فوق max_temp باستخدام max_heat_duration_hours"""
+
+    def __init__(self, enable_heat_duration: bool = False):
+        self._enable = enable_heat_duration
+
+class HeatDurationRule(DecisionRule):
+    def __init__(self, enable_heat_duration: bool = False):
+        self._enable = enable_heat_duration
+
+    def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
+        if not self._enable:
+            return None
+
+        vaccine_spec = getattr(center, 'vaccine_spec', None)
+        if not vaccine_spec:
+            return None
+
+        max_allowed_hours = getattr(vaccine_spec, 'max_heat_duration_hours', None)
+        if max_allowed_hours is None:
+            return None
+
+        heat_duration_minutes = stats.get('heat_duration', 0)
+        duration_hours = heat_duration_minutes / 60.0
+
+        if duration_hours > max_allowed_hours:
+            center.decision_reasons.append(
+                f"تجاوز المدة المسموحة: {duration_hours:.1f} ساعة > {max_allowed_hours} ساعة"
+            )
+            return "REJECTED_HEAT_C"
+        elif duration_hours > 0:
+            center.decision_reasons.append(
+                f"تجاوز درجة الحرارة الموصى بها لمدة {duration_hours:.1f} ساعة (مسموح {max_allowed_hours} ساعة)"
+            )
+        return None
 
 class DefaultRule(DecisionRule):
     """القاعدة الافتراضية: القبول"""
@@ -266,16 +301,18 @@ class RulesEngine:
     6. DefaultRule (Last resort - Accept)
     """
 
-    def __init__(self):
-        # The order in this list defines the precedence.
+class RulesEngine:
+    def __init__(self, enable_heat_duration: bool = False):
+        # ترتيب القواعد يحدد الأولوية
         self.rules: List[DecisionRule] = [
-            ExpiryRule(),  # Priority 0: Biological Expiry
-            VVMStageRule(),  # Priority 1: Scientific Degradation (Q10)
-            ThawRule(),  # Priority 2: Ultra-Cold Countdown (v1.1.0)
-            FreezeRule(),  # Priority 3: Physical Damage (Freeze)
-            HeatCriticalRule(),  # Priority 4: Threshold Breaches
-            TemperatureWarningRule(),  # Priority 5: Warnings
-            DefaultRule(),  # Priority 6: Fallback Accept
+            ExpiryRule(),
+            VVMStageRule(),
+            ThawRule(),
+            FreezeRule(),
+            HeatCriticalRule(),
+            HeatDurationRule(enable_heat_duration=enable_heat_duration),
+            TemperatureWarningRule(),
+            DefaultRule(),
         ]
 
     def run(self, center, stats: Dict[str, Any]):
@@ -286,7 +323,7 @@ class RulesEngine:
                 return
 
 
-def apply_rules(center, extra_stats: Optional[Dict[str, Any]] = None):
+def apply_rules(center, extra_stats: Optional[Dict[str, Any]] = None, enable_heat_duration: bool = False):
     """واجهة التطبيق المتوافقة مع الكود القديم"""
     # تهيئة قائمة الأسباب للتدقيق (Explainability)
     center.decision_reasons = []
@@ -301,5 +338,5 @@ def apply_rules(center, extra_stats: Optional[Dict[str, Any]] = None):
         return
 
     # استخدام المحرك الجديد
-    engine = RulesEngine()
+    engine = RulesEngine(enable_heat_duration=enable_heat_duration)
     engine.run(center, stats)

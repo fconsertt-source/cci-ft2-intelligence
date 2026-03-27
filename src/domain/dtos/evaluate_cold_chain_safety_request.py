@@ -42,6 +42,14 @@ class EvaluateColdChainSafetyResponse:
     decision_reasons: Tuple[str, ...]
     has_freeze: bool = False
     has_ccm_violation: bool = False
+    her_ratio: float = 0.0
+    ccm_index: str = "0"
+    judgment_risk: str = "SAFE"
+    judgment_icon: str = "🟢"
+    confidence: float = 0.0
+    requires_review: bool = False
+    her_percentage: float = 0.0
+    judgment_narrative: str = ""
 
     @classmethod
     def from_context(cls, ctx, stats: dict):
@@ -56,4 +64,12 @@ class EvaluateColdChainSafetyResponse:
             decision_reasons=tuple(ctx.decision_reasons),
             has_freeze=stats.get("has_freeze", False),
             has_ccm_violation=stats.get("has_ccm_violation", False),
+            her_ratio=stats.get("her_ratio", 0.0),
+            ccm_index=stats.get("ccm_index", "0"),
+            judgment_risk=stats.get("judgment_risk", "SAFE"),
+            judgment_icon=stats.get("judgment_icon", "🟢"),
+            confidence=stats.get("confidence", 0.0),
+            requires_review=stats.get("requires_review", False),
+            her_percentage=stats.get("her_percentage", 0.0),
+            judgment_narrative=stats.get("judgment_narrative", ""),
         )

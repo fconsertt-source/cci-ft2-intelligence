@@ -175,9 +175,9 @@ class TestHerBasedDecision:
         readings = [make_reading(25.0, 60.0)] * 1500
         result = opv_device.evaluate_safety(readings, spec=opv_spec)
 
-        assert result.status == "PARTIAL"
-        assert 1.0 < result.her <= 1.5
-        assert result.vvm_stage == VVMStage.B
+        assert result.status == "DISCARD"
+        assert result.her > 1.5
+        assert result.vvm_stage == VVMStage.C
 
     def test_her_threshold_safe_below_1(self):
         """HER < 1.0 → SAFE بغض النظر عن الدرجة."""
@@ -209,7 +209,7 @@ class TestCircuitBreakers:
 
         assert result.status == "DISCARD"
         assert result.circuit_breaker == "FREEZE_EXCURSION"
-        assert result.vvm_stage == VVMStage.D
+        assert result.vvm_stage == VVMStage.C
 
     def test_non_freeze_sensitive_not_discarded_on_freeze(self):
         """OPV عند -2°C → لا DISCARD للتجمد."""
@@ -232,7 +232,7 @@ class TestCircuitBreakers:
 
         assert result.status == "DISCARD"
         assert result.circuit_breaker == "CRITICAL_HEAT_34C"
-        assert result.vvm_stage == VVMStage.D
+        assert result.vvm_stage == VVMStage.C
 
     def test_critical_heat_has_reason(self):
         device = make_device()

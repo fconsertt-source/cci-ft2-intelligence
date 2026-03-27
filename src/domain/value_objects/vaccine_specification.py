@@ -80,8 +80,8 @@ class VaccineSpecification:
 VACCINE_CATALOGUE: dict[str, VaccineSpecification] = {
     "OPV": VaccineSpecification(
         vaccine_type="OPV",
-        q10_factor=2.0,
-        shelf_life_days=225,
+        q10_factor=3.6,
+        shelf_life_days=126,
         freeze_sensitive=False,
         vvm_type="VVM2",
         rationale="الأكثر حساسية للحرارة — VVM2 ينتهي بعد يومين عند 37°C",

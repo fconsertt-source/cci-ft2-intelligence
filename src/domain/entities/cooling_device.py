@@ -155,14 +155,14 @@ class CoolingDevice:
         if circuit_breaker == "FREEZE_EXCURSION":
             return (
                 "DISCARD",
-                VVMStage.D,
+                VVMStage.C,
                 f"تجمد مكتشف — لقاح {spec.vaccine_type} حساس للتجمد",
             )
 
         if circuit_breaker == "CRITICAL_HEAT_34C":
             return (
                 "DISCARD",
-                VVMStage.D,
+                VVMStage.C,
                 f"حرارة حرجة فوق 34°C لأكثر من {spec.critical_hours:.0f} ساعات",
             )
 

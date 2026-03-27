@@ -3,12 +3,12 @@
   "src/domain/calculators/time_weighted_ccm_calculator.py": "93469454fd8432c08abe79e536b678c11e31e5140445635f9d6bd364e6619171",
   "src/domain/calculators/her_calculator.py": "74be142807bb896460b7aea9296db00652cd7f74f5b1ce7644b703f88208feef",
   "src/domain/calculators/ccm_calculator.py": "49630d72eeddaaf2dee8336d20469df51ecae0fba90724145e264cbfd43c74a6",
-  "src/domain/services/exposure_analysis_service.py": "194851e48dd37c69c525e03ce9b7aaab73fe700584669e9868fb7f2181d8e93b",
+  "src/domain/services/exposure_analysis_service.py": "405250560e92d6fb6a757a5483f2c55f6b051ce136a04be5e7fa5a8f0ddabc20",
   "src/domain/services/her_calculator_service.py": "ac06502f51a229fa4eac642c599b188a4a15f385d79db3c44a9f15e446ec4580",
   "src/domain/value_objects/her_result.py": "ebfa9830edca0463efbfff02ebbb564bdf608a324accbe6f158fc7e09ee19da7",
   "src/domain/value_objects/ccm_result.py": "82c6998d959cb4612720e2f04162a7cc2e44654995dfd11e2976c282fda7d232",
-  "src/domain/services/rules_engine.py": "c685af9aa5c46ec49f704c37aec8cf5a9b0586503990b6721ba500ddd505d07e",
-  "src/domain/dtos/evaluate_cold_chain_safety_request.py": "66618bbac5a81b692f1e369f178bd248200bd01f1dee87de7d06b452888815fa",
-  "src/application/use_cases/evaluate_cold_chain_safety_use_case.py": "e562b4565450bf4f5a6ac77edc133f47c4851080749a9b57a9723cb15d0241fb",
+  "src/domain/services/rules_engine.py": "fab1f68384783adca36102b7bc4016b185df05f4b781cd1ff9f9ad9ef20b4774",
+  "src/domain/dtos/evaluate_cold_chain_safety_request.py": "36cd386d2dc4747357710f862c82bf12b9852daf2a705ea2c47e64f6d2348fb6",
+  "src/application/use_cases/evaluate_cold_chain_safety_use_case.py": "e52ef2c5cf3d3fe89833b650a63f51218336a5d64ba8db9deea49ce7452bd16d",
   "src/shared/config.py": "7ffec8fdf12fc86e9b543c838a36797b002780dc3b6247e48d94c339e6ae9349"
 }
