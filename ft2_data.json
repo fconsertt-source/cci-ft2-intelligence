@@ -1,0 +1,156 @@
+[
+  {
+    "id": "130600112764_2021-12-02T00:00:00",
+    "device_id": "130600112764",
+    "timestamp": "2021-12-02 00:00:00",
+    "temperature": 1.5,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600112764_202201241939",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600112764_2021-12-01T00:00:00",
+    "device_id": "130600112764",
+    "timestamp": "2021-12-01 00:00:00",
+    "temperature": 0.6,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600112764_202201241939",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600112764_2021-11-30T00:00:00",
+    "device_id": "130600112764",
+    "timestamp": "2021-11-30 00:00:00",
+    "temperature": 1.4,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600112764_202201241939",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600112764_2021-11-29T00:00:00",
+    "device_id": "130600112764",
+    "timestamp": "2021-11-29 00:00:00",
+    "temperature": -1.4,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600112764_202201241939",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600112764_2021-11-28T00:00:00",
+    "device_id": "130600112764",
+    "timestamp": "2021-11-28 00:00:00",
+    "temperature": -13.5,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600112764_202201241939",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600112764_2021-11-27T00:00:00",
+    "device_id": "130600112764",
+    "timestamp": "2021-11-27 00:00:00",
+    "temperature": -19.0,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600112764_202201241939",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600112764_2021-11-26T00:00:00",
+    "device_id": "130600112764",
+    "timestamp": "2021-11-26 00:00:00",
+    "temperature": -19.0,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600112764_202201241939",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600113438_2024-05-30T00:00:00",
+    "device_id": "130600113438",
+    "timestamp": "2024-05-30 00:00:00",
+    "temperature": 4.1,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600113438_202407221216",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600113438_2024-05-29T00:00:00",
+    "device_id": "130600113438",
+    "timestamp": "2024-05-29 00:00:00",
+    "temperature": 4.1,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600113438_202407221216",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600113438_2024-05-28T00:00:00",
+    "device_id": "130600113438",
+    "timestamp": "2024-05-28 00:00:00",
+    "temperature": 4.3,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600113438_202407221216",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600113438_2024-05-27T00:00:00",
+    "device_id": "130600113438",
+    "timestamp": "2024-05-27 00:00:00",
+    "temperature": 4.5,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600113438_202407221216",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600113438_2024-05-26T00:00:00",
+    "device_id": "130600113438",
+    "timestamp": "2024-05-26 00:00:00",
+    "temperature": 4.6,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600113438_202407221216",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600113438_2024-05-25T00:00:00",
+    "device_id": "130600113438",
+    "timestamp": "2024-05-25 00:00:00",
+    "temperature": 4.6,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600113438_202407221216",
+    "center_id": "UNKNOWN"
+  },
+  {
+    "id": "130600113438_2024-05-24T00:00:00",
+    "device_id": "130600113438",
+    "timestamp": "2024-05-24 00:00:00",
+    "temperature": 4.5,
+    "vaccine_type": "General",
+    "batch": "BATCH_UNKNOWN",
+    "duration_minutes": 1440.0,
+    "batch_id": "130600113438_202407221216",
+    "center_id": "UNKNOWN"
+  }
+]

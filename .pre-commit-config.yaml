@@ -1,0 +1,67 @@
+# ═══════════════════════════════════════════════════════════════
+# Pre-commit Configuration — CCI-FT2-Intelligence
+# يمنع الأخطاء الشائعة قبل الالتزام (commit)
+# ═══════════════════════════════════════════════════════════════
+
+repos:
+  # ───────────────────────────────────────────────────────────────
+  # فحص المسافات الزائدة في ملفات JSON
+  # ───────────────────────────────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: check-json-trailing-spaces
+        name: Check JSON trailing spaces
+        entry: python scripts/check_json_spaces.py
+        language: system
+        types: [json]
+        description: "يمنع المسافات الزائدة في مفاتيح وقيم JSON"
+
+  # ───────────────────────────────────────────────────────────────
+  # فحص صحة ملفات JSON
+  # ───────────────────────────────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: check-json-valid
+        name: Validate JSON syntax
+        entry: python -m json.tool
+        language: system
+        types: [json]
+        pass_filenames: true
+
+  # ───────────────────────────────────────────────────────────────
+  # فحص المسافات الزائدة عامة (Python, YAML, etc.)
+  # ───────────────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        files: \.(py|yaml|yml|json|md|txt)$
+      - id: end-of-file-fixer
+        files: \.(py|yaml|yml|json|md|txt)$
+      - id: check-yaml
+      - id: check-merge-conflict
+
+  # ───────────────────────────────────────────────────────────────
+  # فحص تنسيق Python (Black)
+  # ───────────────────────────────────────────────────────────────
+  - repo: https://github.com/psf/black
+    rev: 24.1.0
+    hooks:
+      - id: black
+        language_version: python3.12
+
+  # ───────────────────────────────────────────────────────────────
+  # فحص استيرادات Python (isort)
+  # ───────────────────────────────────────────────────────────────
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.0
+    hooks:
+      - id: bandit
+        args: ["-r", "src/", "-ll", "--exclude", "venv/,__pycache__/"]

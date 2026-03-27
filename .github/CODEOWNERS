@@ -1,0 +1,14 @@
+# .github/CODEOWNERS
+# Architecture guardians - require review for critical paths
+
+# Domain layer (immutable)
+/src/domain/ @fconsertt-source
+
+# Application ports (contract changes)
+/src/application/ports/ @fconsertt-source
+
+# ADRs (architectural decisions)
+/docs/adr/ @fconsertt-source
+
+# Guards (enforcement mechanism)
+/scripts/check_*.py @fconsertt-source

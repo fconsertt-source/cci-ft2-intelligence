@@ -1,0 +1,96 @@
+# مكتبة تعريف اللقاحات - مشروع CCI-FT2
+# المصدر المرجعي: WHO/IVB/06.10 & Manufacturers Data
+# (متوافق مع خطة التحديث v1.1.0)
+
+vaccines:
+  # ---------------------------------------------------------
+  # القسم الأول: لقاحات حساسة للتجميد (Freeze-Sensitive)
+  # القاعدة: التجميد ممنوع نهائياً (Zero Tolerance)
+  # ---------------------------------------------------------
+  hepatitis_b:
+    id: "hepb"
+    name: "Hepatitis B"
+    category: "freeze_sensitive"
+    is_freeze_stable: false
+    vvm_type: "VVM30"  # ثبات عالي للحرارة، حساس للتجميد
+    temp_requirements:
+      min_safe: 2.0
+      max_safe: 8.0
+      critical_freeze: 0.0
+    stability_budget:
+      at_37c_days: 30  # الميزانية الحرارية القصوى
+    actions:
+      on_freeze: "تلف فوري محتمل. اعزل اللقاح وقم بإجراء اختبار الرج (Shake Test)."
+      on_heat: "تحقق من مؤشر VVM. اللقاح يتمتع بثبات حراري جيد."
+
+  pentavalent:
+    id: "penta"
+    name: "Pentavalent (DTP-HepB-Hib)"
+    category: "freeze_sensitive"
+    is_freeze_stable: false
+    vvm_type: "VVM14"
+    temp_requirements:
+      min_safe: 2.0
+      max_safe: 8.0
+      critical_freeze: 0.0
+    stability_budget:
+      at_37c_days: 14
+    actions:
+      on_freeze: "خطر شديد! يحتوي على مساعدات الألمنيوم. تخلص منه إذا تأكد التجميد."
+
+  # ---------------------------------------------------------
+  # القسم الثاني: لقاحات تتحمل التجميد (Freeze-Stable)
+  # القاعدة: يسمح بالتجميد، ولكن يجب مراقبة الحرارة العالية بدقة
+  # ---------------------------------------------------------
+  opv:
+    id: "opv"
+    name: "Oral Polio Vaccine (OPV)"
+    category: "freeze_stable"
+    is_freeze_stable: true
+    vvm_type: "VVM2"  # حساس جداً للحرارة
+    temp_requirements:
+      min_safe: -25.0
+      max_safe: 8.0  # يمكن حفظه مجمداً أو مبرداً
+    stability_budget:
+      at_37c_days: 2  # يومان فقط!
+    actions:
+      on_freeze: "آمن. اللقاح يتحمل التجميد."
+      on_heat: "خطر حرج! اللقاح يتلف بسرعة عند الحرارة العالية. افحص VVM فوراً."
+
+  measles:
+    id: "measles"
+    name: "Measles (Lyophilized)"
+    category: "freeze_stable"
+    is_freeze_stable: true
+    vvm_type: "VVM7"
+    temp_requirements:
+      min_safe: -20.0  # يمكن تجميده طالما هو بودرة
+      max_safe: 8.0
+    stability_budget:
+      at_37c_days: 7
+    after_open:
+      duration_hours: 6
+      condition: "يجب التخلص منه بعد 6 ساعات من الحل."
+
+  # ---------------------------------------------------------
+  # القسم الثالث: لقاحات كوفيد-19 وسلسلة التبريد الفائق (Ultra-Cold)
+  # القاعدة: منطق الذوبان (Thawing Logic)
+  # ---------------------------------------------------------
+  pfizer_comirnaty:
+    id: "pfizer"
+    name: "Pfizer-BioNTech (Comirnaty)"
+    category: "ultra_cold"
+    is_freeze_stable: true # في مرحلة التخزين الطويل
+    ultra_cold_chain_required: true
+    temp_requirements:
+      ultra_low_min: -90.0
+      ultra_low_max: -60.0
+      fridge_min: 2.0
+      fridge_max: 8.0
+    thaw_logic:
+      thaw_duration_days: 70 # (10 أسابيع - تحديث 2024)
+      trigger_temp: -15.0 # درجة بداية احتساب الذوبان
+    stability_budget:
+      at_25c_hours: 12 # بعد الفتح/الإخراج للحرارة العادية
+    actions:
+      on_thaw: "بدأ العد التنازلي لصلاحية الثلاجة (10 أسابيع). سجل تاريخ النقل."

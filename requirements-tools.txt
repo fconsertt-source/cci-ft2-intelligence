@@ -1,0 +1,6 @@
+black==24.3.0
+ruff==0.3.5
+isort==5.13.2
+pylint==3.0.3
+pydeps==1.12.20
+pytest==8.0.0

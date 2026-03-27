@@ -1,0 +1,29 @@
+name: Architecture Guards
+
+on:
+  push:
+    branches: ["main", "master", "feature/*"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  architecture-check:
+    name: Architecture Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run architecture contract tests
+        run: |
+          pytest tests/contracts/ -v

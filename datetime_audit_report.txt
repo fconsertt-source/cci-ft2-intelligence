@@ -1,0 +1,115 @@
+================================================================================
+📋 تقرير تحليل استخدامات datetime.utcnow() - 2026-03-13 01:22:48
+================================================================================
+
+📄 scripts/audit_datetime_utcnow.py
+--------------------------------------------------------------------------------
+     3 │ 🔍 أداة تحليل استخدامات datetime.utcnow() - المرحلة الأولى (قراءة فقط)
+       💡 → 🔍 أداة تحليل استخدامات utc_now_iso() - المرحلة الأولى (قراءة فقط)
+
+
+    93 │ lines.append(f"📋 تقرير تحليل استخدامات datetime.utcnow() - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+       💡 →     lines.append(f"📋 تقرير تحليل استخدامات utc_now_iso() - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+
+    98 │ lines.append("✅ لم يتم العثور على أي استخدام لـ datetime.utcnow()!")
+       💡 →         lines.append("✅ لم يتم العثور على أي استخدام لـ utc_now_iso()!")
+
+
+   182 │ parser = argparse.ArgumentParser(description='تحليل استخدامات datetime.utcnow() - المرحلة الأولى')
+       💡 →     parser = argparse.ArgumentParser(description='تحليل استخدامات utc_now_iso() - المرحلة الأولى')
+
+
+   187 │ print("🔍 المرحلة الأولى: تحليل استخدامات datetime.utcnow()")
+       💡 →     print("🔍 المرحلة الأولى: تحليل استخدامات utc_now_iso()")
+
+
+       ℹ️  الملف لا يستورد datetime - سيحتاج إلى استيراد
+
+📄 scripts/visual_smoke_test.py
+--------------------------------------------------------------------------------
+    24 │ generated_at=datetime.utcnow().isoformat(),
+       💡 →         generated_at=utc_now_iso(),
+
+
+       ℹ️  الملف لا يستورد datetime - سيحتاج إلى استيراد
+
+📄 src/infrastructure/security/pdf_structural_extractor.py
+--------------------------------------------------------------------------------
+   131 │ extraction_timestamp=datetime.utcnow(),
+       💡 →             extraction_timestamp=utc_now_iso(),
+
+
+       ℹ️  الملف لا يستورد datetime - سيحتاج إلى استيراد
+
+📄 src/presentation/reporting/guard.py
+--------------------------------------------------------------------------------
+    79 │ ts = datetime.datetime.utcnow().isoformat(timespec="seconds")
+       💡 →         ts = datetime.utc_now_iso(timespec="seconds").isoformat(timespec="seconds")
+
+
+   101 │ f.write(f"End:   {datetime.datetime.utcnow().isoformat()}\n")
+       💡 →             f.write(f"End:   {datetime.utc_now_iso().isoformat()}\n")
+
+
+   137 │ start = datetime.datetime.utcnow()
+       💡 →     start = datetime.utc_now_iso()
+
+
+       ℹ️  الملف لا يستورد datetime - سيحتاج إلى استيراد
+
+📄 tests/unit/test_new_pdf_engine.py
+--------------------------------------------------------------------------------
+    34 │ generated_at=datetime.utcnow().isoformat(),
+       💡 →         generated_at=utc_now_iso(),
+
+
+       ℹ️  الملف لا يستورد datetime - سيحتاج إلى استيراد
+
+📄 tests/unit/test_pdf_strategies_generation.py
+--------------------------------------------------------------------------------
+    21 │ generated_at=datetime.utcnow().isoformat(),
+       💡 →         generated_at=utc_now_iso(),
+
+
+       ℹ️  الملف لا يستورد datetime - سيحتاج إلى استيراد
+
+================================================================================
+📊 الملخص الإحصائي
+--------------------------------------------------------------------------------
+إجمالي الاستخدامات: 12
+  • في ملفات الإنتاج: 10
+  • في ملفات الاختبار: 2
+  • مع مقارنات حرفية: 0
+  • مع معامل timespec: 1
+
+الملفات المتأثرة: 6
+
+💡 التوصيات
+--------------------------------------------------------------------------------
+1. أنشئ دالة مساعدة في src/utils/time.py:
+   ```python
+   from datetime import datetime, timezone
+   
+   def utc_now_iso(timespec: str = 'seconds') -> str:
+       """إرجاع الوقت الحالي بصيغة ISO مع Zulu indicator"""
+       return datetime.now(timezone.utc).isoformat(timespec=timespec).replace('+00:00', 'Z')
+   ```
+
+2. للاختبارات ذات المقارنات الحرفية، استخدم:
+   ```python
+   from freezegun import freeze_time
+   
+   @freeze_time('2025-01-01 12:00:00')
+   def test_with_fixed_time():
+       ...
+   ```
+
+3. أو تجاهل المنطقة الزمنية في المقارنة:
+   ```python
+   assert result.split('+')[0] == expected.split('+')[0]
+   ```
+
+================================================================================
+🔧 للتطبيق الفعلي، استخدم الخيار --apply في المرحلة الثانية
+================================================================================

@@ -1,0 +1,95 @@
+{
+  "timestamp": "2026-02-25T00:48:17.841808+00:00",
+  "total_checks": 10,
+  "passed": 9,
+  "failed": 1,
+  "success_rate": 90.0,
+  "status": "BLOCKED",
+  "checks": [
+    {
+      "description": "Check for no direct imports from core entities",
+      "category": "architecture",
+      "passed": true,
+      "command": "python scripts/check_no_core_entity_imports.py",
+      "stdout": "OK: No forbidden imports found in guarded paths.\n",
+      "stderr": null
+    },
+    {
+      "description": "Check DI container usage",
+      "category": "architecture",
+      "passed": true,
+      "command": "python scripts/check_di_container_usage.py",
+      "stdout": "✅ OK: All Use Cases created via DI Container\n",
+      "stderr": null
+    },
+    {
+      "description": "Check layer dependencies",
+      "category": "architecture",
+      "passed": true,
+      "command": "python scripts/check_layer_dependencies.py",
+      "stdout": "✅ No reverse dependencies found\n",
+      "stderr": null
+    },
+    {
+      "description": "Check Ledger integrity",
+      "category": "system",
+      "passed": true,
+      "command": "python -m scripts.audit_ledger",
+      "stdout": null,
+      "stderr": null
+    },
+    {
+      "description": "Verify archive structure",
+      "category": "system",
+      "passed": true,
+      "command": "python -m scripts.verify_lifecycle",
+      "stdout": null,
+      "stderr": null
+    },
+    {
+      "description": "Check src root clean",
+      "category": "architecture",
+      "passed": true,
+      "command": "python scripts/check_src_root_clean.py",
+      "stdout": "✅ OK: src/ root is clean (4 layers + shared only)\n",
+      "stderr": null
+    },
+    {
+      "description": "Run all unit and integration tests",
+      "category": "tests",
+      "passed": false,
+      "command": "pytest -q --tb=short",
+      "stdout": "...........FFs...................................F...................... [ 41%]\n........................EEEEEEE.......ss........................FE...... [ 82%]\n..............................                                           [100%]\n==================================== ERRORS ====================================\n____ ERROR at setup of TestHybridEvidenceValidator.test_validate_all_pairs _____\ntests/unit/test_hybrid_evidence_validator.py:38: in validator\n    return HybridEvidenceValidator()\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\nE   TypeError: HybridEvidenceValidator.__init__() missing 2 required positional arguments: 'text_verifier' and 'pdf_extractor'\n____ ERROR at setup of TestHybridEvidenceValidator.test_txt_only_validation ____\ntests/unit/test_hybrid_evidence_validator.py:38: in validator\n    return HybridEvidenceValidator()\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\nE   TypeError: HybridEvidenceValidator.__init__() missing 2 required positional arguments: 'text_verifier' and 'pdf_ex",
+      "stderr": null
+    },
+    {
+      "description": "Run BDD tests",
+      "category": "tests",
+      "passed": true,
+      "command": "pytest tests/bdd/ -v",
+      "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0\nrootdir: /home/amer11974/projects/cci-ft2-intelligence\nconfigfile: pytest.ini\nplugins: syrupy-5.1.0, env-1.5.0, cov-5.0.0\ncollected 2 items\n\ntests/bdd/test_excursion_device_scenario.py .                            [ 50%]\ntests/bdd/test_safe_device_scenario.py .                                 [100%]\n\n============================== 2 passed in 0.03s ===============================\n",
+      "stderr": null
+    },
+    {
+      "description": "Check Python dependencies",
+      "category": "dependencies",
+      "passed": true,
+      "command": "pip check",
+      "stdout": "No broken requirements found.\n",
+      "stderr": null
+    },
+    {
+      "description": "Check disk space (min 10GB free)",
+      "category": "system",
+      "passed": true,
+      "command": "python scripts/check_disk_space.py --min-gb 10",
+      "stdout": "📊 Disk Space: 926.88 GB free (min: 10.0 GB)\n✅ Disk space OK\n",
+      "stderr": null
+    }
+  ],
+  "trial_period": {
+    "start_date": "2026-02-25",
+    "end_date": "2026-05-26",
+    "duration_days": 90
+  }
+}

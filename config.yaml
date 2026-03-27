@@ -1,0 +1,134 @@
+# --------------------------------------------------------------
+# Continue – إعداد Groq + (اختياري) Ollama
+# --------------------------------------------------------------
+name: Local Config
+version: 1.0.0
+schema: v1
+
+models:
+  # ==== نموذج Groq (افتراضي) ====
+  - name: Llama‑3.1‑8B Instant (Groq)
+    provider: groq
+    model: llama-3.1-8b-instant          # احرص على أن يكون هذا الاسم موجودًا في القائمة
+    apiBase: https://api.groq.com/openai/v1/
+    temperature: 0.7
+    max_output_tokens: 4096
+    description: |
+      نموذج Llama‑3.1 بحجم 8 B يدعم العربية.
+    tags:
+      - groq
+      - llama-3.1
+      - arabic
+
+  # ==== نموذج Ollama المحلي (اختياري) ====
+  - name: Autodetect (Ollama)
+    provider: ollama
+    model: AUTODETECT
+    apiBase: http://127.0.0.1:11434
+    temperature: 0.7
+    max_output_tokens: 4096
+    description: |
+      يكتشف تلقائيًا أفضل نموذج من خادم Ollama المحلي.
+    tags:
+      - local
+      - ollama
+
+# --------------------------------------------------------------
+# إعدادات عامة
+# --------------------------------------------------------------
+defaultModel: Llama‑3.1‑8B Instant (Groq)   # أو Autodetect (Ollama) إذا تفضّل المحلي
+debug: false
+telemetry: true
+# path configuration for PDF generator fonts
+paths:
+  fonts_dir: assets/fonts
+# ... existing configuration ...
+
+available_models:
+  # النماذج المجانية المتاحة للاستفادة منها في مرحلة التطور الذاتي
+  - name: "meta-llama/llama-4-maverick-17b-128e-instruct"
+    description: "LLaMA 4 Maverick 17B (إرشادي) – مفتوح المصدر"
+    source: "Meta"
+    free: true
+
+  - name: "meta-llama/llama-prompt-guard-2-86m"
+    description: "LLaMA Prompt Guard 2 (86 M) – أمان مفتوح المصدر"
+    source: "Meta"
+    free: true
+
+  - name: "meta-llama/llama-prompt-guard-2-22m"
+    description: "LLaMA Prompt Guard 2 (22 M) – أمان مفتوح المصدر"
+    source: "Meta"
+    free: true
+
+  - name: "meta-llama/llama-guard-4-12b"
+    description: "LLaMA Guard 4 (12 B) – أمان مفتوح المصدر"
+    source: "Meta"
+    free: true
+
+  - name: "meta-llama/llama-4-scout-17b-16e-instruct"
+    description: "LLaMA 4 Scout 17B (إرشادي) – مفتوح المصدر"
+    source: "Meta"
+    free: true
+
+  - name: "llama-3.1-8b-instant"
+    description: "LLaMA 3.1 8B – نموذج إرشادي صغير"
+    source: "Meta"
+    free: true
+
+  - name: "llama-3.3-70b-versatile"
+    description: "LLaMA 3.3 70B – نموذج كبير مفتوح المصدر (يتطلب موارد GPU قوية)"
+    source: "Meta"
+    free: true
+
+  - name: "allam-2-7b"
+    description: "Allam 2 7B – نموذج مفتوح المصدر"
+    source: "Community"
+    free: true
+
+  - name: "whisper-large-v3"
+    description: "Whisper Large V3 – تحويل كلام إلى نص"
+    source: "OpenAI"
+    free: true
+
+  - name: "whisper-large-v3-turbo"
+    description: "Whisper Large V3 Turbo – نسخة محسنة"
+    source: "OpenAI"
+    free: true
+
+  - name: "canopylabs/orpheus-v1-english"
+    description: "Orpheus V1 (إنجليزي) – نموذج لغوي مفتوح المصدر"
+    source: "Canopy Labs"
+    free: true
+
+  - name: "canopylabs/orpheus-arabic-saudi"
+    description: "Orpheus Arabic Saudi – نموذج عربي مفتوح المصدر"
+    source: "Canopy Labs"
+    free: true
+
+  - name: "groq/compound-mini"
+    description: "Groq Compound Mini – ضمن الحصة المجانية على منصة Groq"
+    source: "Groq"
+    free: true
+
+  - name: "moonshotai/kimi-k2-instruct"
+    description: "Moonshot Kimi K2 Instruct – ضمن الحصة المجانية على Moonshot AI"
+    source: "Moonshot AI"
+    free: true
+
+  - name: "qwen/qwen3-32b"
+    description: "Qwen 3 32B – نموذج مفتوح المصدر من Alibaba"
+    source: "Alibaba"
+    free: true
+
+  - name: "openai/gpt-oss-20b"
+    description: "OpenAI GPT‑OSS 20B – نسخة مفتوحة المصدر"
+    source: "OpenAI"
+    free: true
+
+  - name: "openai/gpt-oss-safeguard-20b"
+    description: "OpenAI GPT‑OSS Safeguard 20B – نسخة أمان مفتوحة المصدر"
+    source: "OpenAI"
+    free: true
+
+# ... rest of configuration ...

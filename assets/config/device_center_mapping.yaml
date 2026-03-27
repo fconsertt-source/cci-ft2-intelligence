@@ -1,0 +1,17 @@
+# Administrative context mapping — PHYSICAL DEVICE → ADMINISTRATIVE CENTER
+# This file is OPTIONAL. System works without it (center_id = UNKNOWN).
+device_center_map:
+  "130600112764":
+    center_id: "TRIPOLI_COLD_STORE"
+    room: "MAIN_STORAGE"
+    fridge_label: "Fridge-2"
+
+  "130600113438":
+    center_id: "BENGHAZI_CLINIC"
+    room: "VACCINATION_ROOM"
+    fridge_label: "Point-of-Use-1"
+
+  "130600205168":
+    center_id: "SABRATHA_MOBILE"
+    room: "MOBILE_UNIT"
+    fridge_label: "Portable-Cooler"

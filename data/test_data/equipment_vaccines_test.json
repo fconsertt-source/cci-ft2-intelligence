@@ -1,0 +1,65 @@
+[
+  {
+    "equipment_id": "EQ001",
+    "entry_id": "ENT001",
+    "vaccine_type": "OPV",
+    "batch_number": "B2023-EXP",
+    "expiry_date": "2023-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true
+  },
+  {
+    "equipment_id": "EQ001",
+    "entry_id": "ENT002",
+    "vaccine_type": "HepB",
+    "batch_number": "B2024-VVM3",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 4,
+    "has_vvm": true
+  },
+  {
+    "equipment_id": "EQ002",
+    "entry_id": "ENT003",
+    "vaccine_type": "BCG",
+    "batch_number": "B2024-CCMD",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true
+  },
+  {
+    "equipment_id": "EQ003",
+    "entry_id": "ENT004",
+    "vaccine_type": "OPV",
+    "batch_number": "B2024-HER15",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true
+  },
+  {
+    "equipment_id": "EQ004",
+    "entry_id": "ENT005",
+    "vaccine_type": "HepB",
+    "batch_number": "B2024-FREEZE",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true
+  },
+  {
+    "equipment_id": "EQ005",
+    "entry_id": "ENT006",
+    "vaccine_type": "OPV",
+    "batch_number": "B2024-PARTIAL",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true
+  },
+  {
+    "equipment_id": "EQ006",
+    "entry_id": "ENT007",
+    "vaccine_type": "BCG",
+    "batch_number": "B2024-SAFE",
+    "expiry_date": "2025-12-31",
+    "vvm_stage": 1,
+    "has_vvm": true
+  }
+]

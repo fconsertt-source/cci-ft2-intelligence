@@ -1,0 +1,88 @@
+# ═══════════════════════════════════════════════════════════════
+# CCI-FT2-Intelligence - Production .gitignore
+# Last Updated: 2026-02-27
+# ═══════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════
+# Large Binary Files (>100MB GitHub Limit) - CRITICAL
+# ═══════════════════════════════════════════════════════════════
+*.msi
+*.exe
+*.jar
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.iso
+*.dmg
+*.pkg
+
+# ═══════════════════════════════════════════════════════════════
+# Runtime & Verifiers (Download Separately)
+# ═══════════════════════════════════════════════════════════════
+assets/runtime/
+!assets/runtime/.gitkeep
+!assets/runtime/runtime_manifest.json
+assets/verifiers/
+!assets/verifiers/.gitkeep
+!assets/verifiers/berlinger/LICENSE.txt
+
+# ═══════════════════════════════════════════════════════════════
+# Data (Production Data - Never Commit)
+# ═══════════════════════════════════════════════════════════════
+data/archive/
+data/input_ft2/
+data/input_raw/
+data/ledger/
+data/output/
+logs/
+backups/
+
+# ═══════════════════════════════════════════════════════════════
+# Python
+# ═══════════════════════════════════════════════════════════════
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ═══════════════════════════════════════════════════════════════
+# IDE & Editor
+# ═══════════════════════════════════════════════════════════════
+.vscode/
+.idea/
+*.swp
+*.swo
+.continue/
+.qodo/
+
+# ═══════════════════════════════════════════════════════════════
+# OS Generated
+# ═══════════════════════════════════════════════════════════════
+.DS_Store
+Thumbs.db
+desktop.ini
+-H
+-v
+
+# Allow baseline files but warn on change
+!tests/golden/baselines/*.pdf
+!tests/golden/baselines/*.json
+
+# Build artifacts
+dist/
+build/
+*.log
+*.pyc
+.pytest_cache/
+.mypy_cache/
+pipeline.log
+changelog_temp.txt
+test_env/
+*.bak

@@ -1,0 +1,6 @@
+# .github/workflows/security.yml
+- name: Bandit Security Scan
+  run: |
+    bandit -r src/ -ll -f json -o bandit-report.json
+    bandit -r tests/ -ll
+  # ✅ استبعاد venv
