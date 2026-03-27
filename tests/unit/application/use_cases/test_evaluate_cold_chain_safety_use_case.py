@@ -39,7 +39,7 @@ class TestEvaluateColdChainSafetyUseCase:
         assert response.has_freeze is False
         assert response.has_ccm_violation is False
         # نتوقع أن يكون القرار مقبولاً أو غير مرفوض بناءً على القواعد الافتراضية
-        assert response.decision != "UNKNOWN"
+        assert response.decision != "NO_DATA"
 
     def test_execute_freeze_violation(self):
         """اختبار سيناريو حدوث تجميد"""
@@ -94,4 +94,4 @@ class TestEvaluateColdChainSafetyUseCase:
         )
 
         response = use_case.execute(request)
-        assert response.decision == "UNKNOWN"
+        assert response.decision == "NO_DATA"

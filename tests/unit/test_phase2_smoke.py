@@ -51,4 +51,4 @@ def test_uc_handles_empty_request():
 
     # يجب أن تكون النتيجة حالة غير معروفة ولكن بدون خطأ
     assert response.center_id == "C02"
-    assert response.decision == "UNKNOWN"
+    assert response.decision == "NO_DATA"

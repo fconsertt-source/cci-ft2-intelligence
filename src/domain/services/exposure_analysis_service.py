@@ -64,6 +64,14 @@ class ExposureAnalysisService:
         self._q10_value = q10_value
         self._shelf_life_hours = shelf_life_hours
 
+    def _get_temperature(self, reading) -> float:
+        """استخراج درجة الحرارة من القراءة (يدعم value أو temperature)."""
+        if hasattr(reading, 'value'):
+            return reading.value
+        if hasattr(reading, 'temperature'):
+            return reading.temperature
+        return 0.0
+
     def analyze(
         self,
         readings: List["TemperatureReading"],
@@ -327,8 +335,8 @@ class ExposureAnalysisService:
 
         return 24.0
 
-    @staticmethod
     def _cumulative_hours_above(
+        self,
         readings: List["TemperatureReading"],
         threshold: float,
     ) -> float:
