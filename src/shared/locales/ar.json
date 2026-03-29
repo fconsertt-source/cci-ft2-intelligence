@@ -58,5 +58,8 @@
     "filetype.txt": "ملفات نصية",
     "filetype.pdf": "ملفات PDF",
     "filetype.json": "ملفات JSON",
-    "filetype.all": "جميع الملفات"
+    "filetype.all": "جميع الملفات",
+    "VISUAL_REPORT_OFFICIAL": "بدء توليد التقرير البصري الرسمي...",
+    "VISUAL_REPORT_TECHNICAL": "بدء توليد التقرير البصري الفني...",
+    "VISUAL_REPORT_ARABIC": "بدء توليد التقرير البصري العربي (تجريبي)..."
 }

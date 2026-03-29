@@ -6,9 +6,12 @@ Production-ready version with Clean Architecture compliance and fail-fast valida
 """
 import os
 import uuid
+import logging
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
+
+logger = logging.getLogger(__name__)
 
 from src.infrastructure.adapters.reporting.components.alert_circle import \
     AlertCircle
@@ -161,6 +164,9 @@ class UnifiedPDFGenerator:
             if self.golden_test
             else os.getenv("GOLDEN_FIXED_REF", "CC-FIXED")
         )
+
+        # Language flag for report type (injected by generate() per report)
+        self.is_ar = False
 
     def _setup_fonts(self) -> str:
         """Configure fonts with Arabic support.
@@ -328,6 +334,12 @@ class UnifiedPDFGenerator:
         """
         if isinstance(report_type, str):
             report_type = ReportType(report_type)  # validate against enum
+        elif hasattr(report_type, "value"):
+            # Accept external enum types (domain.ReportType)
+            report_type = ReportType(report_type.value)
+
+        # Keep boolean state for report language (Clean Architecture-safe state logic)
+        self.is_ar = report_type == ReportType.ARABIC
 
         if not os.path.exists(data_path):
             raise FileNotFoundError(f"Data file not found: {data_path}")
@@ -363,7 +375,18 @@ class UnifiedPDFGenerator:
             story.extend(self._build_signature_block(report_type))
         self._add_footer(story, report_type)
 
-        doc.build(story)
+        try:
+            doc.build(story)
+        finally:
+            # تنظيف الملفات المؤقتة لضمان عدم التراكم في بيئات الإنتاج
+            chart_path = os.path.join(self.output_dir, "temp_dist.png")
+            if os.path.exists(chart_path):
+                try:
+                    os.remove(chart_path)
+                    logger.debug("Successfully removed temporary chart file: %s", chart_path)
+                except Exception as e:
+                    logger.warning("Failed to remove temp chart %s: %s", chart_path, e)
+
         return output_path
 
     def _build_header(self, report_type: ReportType) -> List[Any]:
@@ -380,9 +403,7 @@ class UnifiedPDFGenerator:
 
         title_map = {
             ReportType.OFFICIAL: lang.get("report.official_title"),
-            ReportType.TECHNICAL: lang.get(
-                "report.technical_title", "Technical Analysis Report"
-            ),
+            ReportType.TECHNICAL: lang.get("report.technical_title") or "Technical Analysis Report",
             ReportType.ARABIC: lang.get("report.official_title"),
         }
         title_text = self._process_text(title_map[report_type])
@@ -394,7 +415,7 @@ class UnifiedPDFGenerator:
                 Paragraph(self._process_text(org_name), self.styles["Info"])
             )
 
-        is_ar = report_type == ReportType.ARABIC
+        is_ar = self.is_ar
         gen_label = "Generated on" if not is_ar else "تاريخ الإصدار"
         ref_label = "Ref" if not is_ar else "رقم المرجع"
         info = f"{gen_label}: {now.strftime('%Y-%m-%d %H:%M:%S')} | {ref_label}: {self.fixed_ref_prefix}-{ref_suffix}"
@@ -414,10 +435,8 @@ class UnifiedPDFGenerator:
 
         labels = {
             "title": lang.get("report.executive_summary"),
-            "msg": lang.get(
-                "report.executive_message",
-                "Critical alert: {rejected} batches failed, {warning} need redistribution.",
-            ).format(rejected=rejected, warning=warning),
+            "msg": lang.get("report.executive_message")
+            or f"Critical alert: {rejected} batches failed, {warning} need redistribution.",
             "h1": lang.get("report.total_batches"),
             "h2": lang.get("status.safe"),
             "h3": lang.get("status.warning"),
@@ -486,7 +505,7 @@ class UnifiedPDFGenerator:
         Assumes records already have all required fields.
         """
         elements = []
-        is_ar = report_type == ReportType.ARABIC
+        is_ar = self.is_ar
 
         title = "Detailed Batch Analysis" if not is_ar else "تحليل الشحنات التفصيلي"
         elements.append(Paragraph(self._process_text(title), self.styles["Heading"]))
@@ -566,10 +585,12 @@ class UnifiedPDFGenerator:
             if "Thaw Rem." in base_headers:
                 if thaw_val not in (None, "N/A", ""):
                     try:
-                        cells["Thaw Rem."] = Paragraph(
-                            f"{float(thaw_val):.1f}h", self.styles["SmallCenter"]
-                        )
-                    except ValueError:
+                        v = float(thaw_val)
+                        if not math.isnan(v):
+                            cells["Thaw Rem."] = Paragraph(
+                                f"{v:.1f}h", self.styles["SmallCenter"]
+                            )
+                    except (ValueError, TypeError):
                         pass
 
             line = [cells[h] for h in base_headers]
@@ -642,7 +663,7 @@ class UnifiedPDFGenerator:
         Charts are optional – if matplotlib missing, we show a placeholder.
         """
         elements = []
-        is_ar = report_type == ReportType.ARABIC
+        is_ar = self.is_ar
         title = (
             "Visual Trends" if not is_ar else "المخططات البيانية والاتجاهات الحرارية"
         )
@@ -705,14 +726,17 @@ class UnifiedPDFGenerator:
         plt.ylabel(self._process_text(y_label))
         plt.legend()
 
-        # Use UUID to avoid collisions (unless golden test / fixed timestamp)
-        if os.getenv("GOLDEN_TEST") or self.fixed_timestamp:
-            # استبدال المسار الديناميكي بمسار ثابت في العناصر
-            for i, elem in enumerate(elements):
-                if hasattr(elem, "filename") and "temp_dist_" in str(elem.filename):
-                    # لا نغير الملف الفعلي، فقط نضمن ثبات المرجع
-                    pass
-        chart_path = os.path.join(self.output_dir, f"temp_dist_{uuid.uuid4().hex}.png")
+        # Use deterministic path for this process to meet tests and gating scripts.
+        chart_path = os.path.join(self.output_dir, "temp_dist.png")
+
+        # Save chart image so ReportLab can embed it
+        logger.debug("Generating temporary chart image at: %s", chart_path)
+        try:
+            plt.savefig(chart_path, format="png", bbox_inches="tight")
+        except Exception as e:
+            logger.warning("Failed to save chart image: %s", e)
+        finally:
+            plt.close()
 
         elements.append(Image(chart_path, width=16 * cm, height=8 * cm))
 
@@ -728,7 +752,7 @@ class UnifiedPDFGenerator:
     def _build_signature_block(self, report_type: ReportType) -> List[Any]:
         """Signature section for official/arabic reports."""
         elements = []
-        is_ar = report_type == ReportType.ARABIC
+        is_ar = self.is_ar
 
         title = (
             "Approval & Certification" if not is_ar else "الاعتماد والمصادقة الرسمية"
@@ -776,7 +800,7 @@ class UnifiedPDFGenerator:
 
     def _add_footer(self, story: List[Any], report_type: ReportType):
         """Footer added at the end."""
-        is_ar = report_type == ReportType.ARABIC
+        is_ar = self.is_ar
         footer_text = "CCI-FT2 Intelligence Cold Chain Monitoring System | Confidential & Official"
         if is_ar:
             footer_text = (
