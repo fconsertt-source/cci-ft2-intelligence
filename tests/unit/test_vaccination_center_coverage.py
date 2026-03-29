@@ -3,6 +3,7 @@
 
 from src.domain.entities.ft2_entry import FT2Entry
 from src.domain.entities.vaccination_center import VaccinationCenter
+from src.domain.adapters.vaccination_center_factory import make_vaccination_center
 
 
 def make_center(**kwargs):
@@ -14,7 +15,7 @@ def make_center(**kwargs):
         decision_thresholds={"freeze_threshold": 0.0, "ccm_limit": 600},
     )
     defaults.update(kwargs)
-    return VaccinationCenter(**defaults)
+    return make_vaccination_center(**defaults)
 
 
 def make_entry(temp_min=3.0, temp_max=7.0, alarm0=0, alarm1=0):

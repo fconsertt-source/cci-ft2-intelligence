@@ -8,27 +8,24 @@ from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import \
     FT2Reading as FT2Entry
 from src.infrastructure.adapters.ft2_reader.services.ft2_linker import \
     FT2Linker
+from src.domain.adapters.vaccination_center_factory import \
+    make_vaccination_center
 
 # Fixtures for test data
 
 
 @pytest.fixture
 def sample_centers():
-    """Provides a list of sample vaccination centers."""
     return [
-        VaccinationCenter(
+        make_vaccination_center(
             id="center1",
             name="Center A",
             device_ids=["device_A1", "device_A2"],
-            temperature_ranges={"min": 2, "max": 8},
-            decision_thresholds={},
         ),
-        VaccinationCenter(
+        make_vaccination_center(
             id="center2",
             name="Center B",
             device_ids=["device_B1"],
-            temperature_ranges={"min": 2, "max": 8},
-            decision_thresholds={},
         ),
     ]
 

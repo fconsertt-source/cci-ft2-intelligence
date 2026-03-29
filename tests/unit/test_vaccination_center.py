@@ -7,17 +7,16 @@ from src.domain.entities.vaccination_center import (FreezeTolerance,
                                                     VaccinationCenter)
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import \
     FT2Reading as FT2Entry  # kept alias for readability
+from src.domain.adapters.vaccination_center_factory import \
+    make_vaccination_center
 
 
 @pytest.fixture
 def zero_tolerance_center():
-    """Provides a center with zero tolerance for freezing."""
-    return VaccinationCenter(
+    return make_vaccination_center(
         id="center_zt",
         name="Zero Tolerance Center",
         device_ids=["device_zt1"],
-        temperature_ranges={"min": 2, "max": 8},
-        decision_thresholds={},
         freeze_tolerance=FreezeTolerance.ZERO_TOLERANCE,
     )
 

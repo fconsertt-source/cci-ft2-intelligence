@@ -10,9 +10,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
+from pdfminer.pdfcolor import name
+
+
 # إضافة المسار الجذري للمشروع للوصول إلى الكود المصدري
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from src.infrastructure.logging import get_logger
+from src.domain.adapters.vaccination_center_factory import make_vaccination_center
+
 
 logger = get_logger(__name__)
 
@@ -30,14 +35,13 @@ def simulate_scenario(name: str, entries: List[MockEntry]):
     # إعداد مركز افتراضي للمحاكاة باستخدام الكيان داخليًا
     from src.domain.entities.vaccination_center import VaccinationCenter
 
-    center = VaccinationCenter(
+    center = make_vaccination_center(
         id="SIM",
         name="Simulation",
         device_ids=["SIM001"],
         temperature_ranges={"min": 2, "max": 8},
         decision_thresholds={},
     )
-
     # إضافة الإدخالات للمركز (كيان داخلي) ثم تحويله إلى DTO للعرض
     for entry in entries:
         center.add_ft2_entry(entry)
@@ -48,10 +52,7 @@ def simulate_scenario(name: str, entries: List[MockEntry]):
     )
     days = total_heat_duration / (24 * 60)
 
-    # تحويل الكيان إلى DTO للعرض
-    from src.application.mappers.center_mapper import to_center_dto
-
-    dto = to_center_dto(center)
+    dto = center
 
     # تنسيق وصف المدخلات
     input_desc = " + ".join(

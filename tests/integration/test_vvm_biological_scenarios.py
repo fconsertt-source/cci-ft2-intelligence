@@ -8,6 +8,7 @@ import pytest
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
+from src.domain.adapters.vaccination_center_factory import make_vaccination_center
 from src.domain.entities.vaccination_center import VaccinationCenter
 from src.domain.enums.vvm_stage import VVMStage
 from src.domain.services.rules_engine import apply_rules
@@ -21,16 +22,11 @@ class MockEntry:
     duration_minutes: float
 
 
-def run_vvm_simulation(
-    entries: List[MockEntry], her: float = 0.0, critical_limit: float = 50.0
-) -> VaccinationCenter:
-    """Helper to run a simulation and return the center after rule application"""
-    center = VaccinationCenter(
+def run_vvm_simulation(entries, her=0.0, critical_limit=50.0):
+    center = make_vaccination_center(
         id="SIM-TEST",
         name="VVM Test Center",
         device_ids=["D1"],
-        temperature_ranges={"min": 2, "max": 8},
-        # نرفع الحدود هنا للسماح برؤية مراحل VVM دون رفض فوري بسبب القواعد القديمة
         decision_thresholds={"ccm_limit": 100000},
     )
     # تعيين حد حراري حرج للمحاكاة (افتراضي 50 لتجنب التداخل مع VVM)

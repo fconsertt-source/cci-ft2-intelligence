@@ -1,13 +1,18 @@
-# Lightweight container for running tests and develop PDF engine
 FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt requirements-dev.txt ./
-RUN pip install --no-cache-dir -r requirements-dev.txt
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    libc6-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# copy source
-COPY . /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir --default-timeout=100 --retries 5 -r requirements.txt
 
-# entrypoint for convenience
-ENTRYPOINT ["/bin/bash"]
+COPY . .
+
+RUN python -c "import pytest; print('pytest installed successfully')"
+
+CMD ["python", "-m", "pytest", "-q"]

@@ -29,11 +29,10 @@ def test_generate_pdf_report_calls_generator(monkeypatch, tmp_path):
 
     fake_path = '/fake/report.pdf'
     FakeGen = MagicMock()
-    FakeGen.generate_report.return_value = fake_path
+    FakeGen.generate.return_value = fake_path
 
-    with patch(
-        'src.presentation.reporting.pdf_generator.PDFReportGenerator',
-        return_value=FakeGen,
-    ):
+    # Patch the symbol where the script looks it up
+    with patch('scripts.generate_pdf_report.UnifiedPDFGenerator', return_value=FakeGen):
         generate_pdf_report.main()
-        FakeGen.generate_report.assert_called()
+
+    FakeGen.generate.assert_called_once()

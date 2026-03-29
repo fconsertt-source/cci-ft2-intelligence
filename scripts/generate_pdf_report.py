@@ -11,6 +11,13 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from src.infrastructure.logging import get_logger
 from src.presentation.messages.message_map import MessageProvider
+from src.infrastructure.pdf.unified_pdf_generator import UnifiedPDFGenerator
+from src.shared.language_manager import lang
+
+# تحميل اللغة من ملفات الترجمة
+translations_dir = Path(__file__).parent.parent / "src" / "shared" / "locales"
+lang.load_language("ar", translations_dir)   # أو "en" حسب الحاجة
+lang.set_language("ar")
 
 logger = get_logger(__name__)
 
@@ -19,7 +26,6 @@ def open_pdf(report_path: str):
     """فتح ملف PDF باستخدام التطبيق الافتراضي للنظام"""
     try:
         if sys.platform == "win32":
-            # Windows - استخدام cmd /c start بدون shell=True
             subprocess.run(["cmd", "/c", "start", report_path])
         elif sys.platform == "darwin":  # macOS
             subprocess.run(["open", report_path], check=True)
@@ -46,18 +52,12 @@ def main():
 
     logger.info(MessageProvider.get('PDF_READING_DATA', path=str(tsv_path)))
 
-    # إنشاء مولد التقارير (تحميل لاحق لتجنب استيراد ثقيل أثناء الاختبارات)
-    try:
-        from src.presentation.reporting.pdf_generator import PDFReportGenerator
-    except Exception as e:
-        logger.error("لا يمكن استيراد مولد PDF: %s", e)
-        return
-
-    generator = PDFReportGenerator()
+    # إنشاء مولد التقارير
+    generator = UnifiedPDFGenerator(language="ar")
 
     # إنشاء التقرير
     logger.info(MessageProvider.get('PDF_GENERATION_IN_PROGRESS'))
-    report_path = generator.generate_report(str(tsv_path))
+    report_path = generator.generate("arabic", str(tsv_path))
 
     if report_path:
         logger.info("\n" + MessageProvider.get('PDF_GENERATION_SUCCESS'))

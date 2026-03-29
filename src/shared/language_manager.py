@@ -55,11 +55,14 @@ class LanguageManager:
         self._fallback_chain.insert(0, lang_code)
         self._current_lang = lang_code
 
-    def get(self, key: str, **kwargs) -> str:
-        """الحصول على النص المترجم مع إمكانية استبدال المتغيرات"""
-        # ✅ تنظيف المفتاح من المسافات الزائدة
+    def get(self, key: str, default=None, **kwargs) -> str:
+        """
+        الحصول على النص المترجم.
+        - key: مفتاح النص
+        - default: قيمة افتراضية في حال عدم وجود المفتاح
+        - **kwargs: متغيرات للاستبدال في النص
+        """
         key = key.strip()
-
         for lang in self._fallback_chain:
             lang_dict = self._translations.get(lang, {})
             if key in lang_dict:
@@ -69,8 +72,8 @@ class LanguageManager:
                     text = self._shape_arabic(text)
                 return text
 
-        # Fallback to key itself
-        return key
+        # Fallback: القيمة الافتراضية أو المفتاح نفسه
+        return default if default is not None else key
 
     def get_raw(self, key: str, **kwargs) -> str:
         """الحصول على النص المترجم بدون Arabic shaping - للاستخدام في title bar."""

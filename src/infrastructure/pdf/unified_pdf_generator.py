@@ -9,6 +9,7 @@ import uuid
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
+from pathlib import Path
 
 from src.infrastructure.adapters.reporting.components.alert_circle import \
     AlertCircle
@@ -20,6 +21,18 @@ from src.infrastructure.adapters.reporting.components.stability_bar import \
 from src.infrastructure.adapters.reporting.components.vvm_icon import VVMIcon
 from src.infrastructure.utils.config_loader import ConfigLoader
 from src.shared.language_manager import lang
+from src.infrastructure.logging import get_logger
+
+logger = get_logger(__name__)
+
+
+translations_dir = Path(__file__).parent.parent.parent / "shared" / "locales"
+
+# اجعل اللغة قابلة للتغيير عبر متغير بيئة أو إعداد
+language = os.getenv("REPORT_LANGUAGE", "ar")  # الافتراضي "ar"
+lang.load_language(language, translations_dir)
+lang.set_language(language)
+
 
 # ----------------------------------------------------------------------
 # Dependency validation – fail-fast if required libraries are missing
@@ -169,8 +182,8 @@ class UnifiedPDFGenerator:
         fonts_dir = ConfigLoader.get("paths.fonts_dir", "src/shared/fonts")
         # candidate paths (ordered preference)
         font_paths = [
-            os.path.join(fonts_dir, "Tajawal-Regular.ttf"),
-            os.path.join(fonts_dir, "Tajawal-Bold.ttf"),
+            os.path.join(fonts_dir, "Amiri-Bold.ttf"),
+            os.path.join(fonts_dir, "Amiri-Bold.ttf"),
             os.path.join(fonts_dir, "arabic.ttf"),
             os.path.join(fonts_dir, "arabic-bold.ttf"),
             os.path.join(fonts_dir, "arial.ttf"),
@@ -664,6 +677,11 @@ class UnifiedPDFGenerator:
             data = {k: [r.get(k) for r in records] for k in records[0].keys()}
             df = pd.DataFrame(data)
 
+        # التحقق من وجود العمود المطلوب
+        if "avg_temperature" not in df.columns:
+            logger.debug("Skipping charts: 'avg_temperature' column missing in input data")
+            return elements
+
         # Filter out rows with invalid temperatures
         df_plot = df[df["avg_temperature"].notna()].copy()
         if df_plot.empty:
@@ -713,6 +731,9 @@ class UnifiedPDFGenerator:
                     # لا نغير الملف الفعلي، فقط نضمن ثبات المرجع
                     pass
         chart_path = os.path.join(self.output_dir, f"temp_dist_{uuid.uuid4().hex}.png")
+        plt.tight_layout()
+        plt.savefig(chart_path, dpi=150, bbox_inches="tight")
+        plt.close()
 
         elements.append(Image(chart_path, width=16 * cm, height=8 * cm))
 

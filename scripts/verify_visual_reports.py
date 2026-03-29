@@ -1,167 +1,170 @@
+#!/usr/bin/env python3
+"""
+Visual Reports Verification Script
+Generates test PDF reports and charts for QA/visual inspection.
+"""
+
 import os
 import sys
 from pathlib import Path
+from typing import Optional
 
-# Add src to path
+# إضافة مسار src للمشروع الحالي
 sys.path.append(str(Path(__file__).parent.parent))
 
+import pandas as pd
 from src.infrastructure.logging import get_logger
+from src.infrastructure.pdf.unified_pdf_generator import UnifiedPDFGenerator, ReportType
 from src.presentation.messages.message_map import MessageProvider
 
 logger = get_logger(__name__)
 
 
-def create_mock_data(path: str):
-    """Creates a TSV with diverse v1.1.0 scenarios for visual testing.
-
-    This writes a simple TSV without pandas so tests can run in minimal
-    environments where pandas is not installed.
+def create_mock_data(output_path: str) -> None:
     """
-    headers = [
-        'center_id',
-        'center_name',
-        'decision',
-        'alert_level',
-        'vvm_stage',
-        'stability_budget_consumed_pct',
-        'thaw_remaining_hours',
-        'category_display',
-        'avg_temperature',
-        'min_temperature',
-        'max_temperature',
-        'num_ft2_entries',
-        'decision_reasons',
-    ]
+    Create a mock TSV file for testing visual reports.
+    """
+    data = {
+        "center_id": ["C001", "C002", "C003", "C004"],
+        "center_name": [
+            "Health Center A (Safe)",
+            "Warehouse Stage 3",
+            "Mobile Unit Stage 4",
+            "Ultra Cold Hub",
+        ],
+        "category_display": ["General", "General", "General", "General"],
+        "alert_level": ["GREEN", "RED", "RED", "YELLOW"],
+        "stability_budget_consumed_pct": [12.5, 82.3, 95.0, 72.5],
+        "thaw_remaining_hours": [None, None, None, None],
+        "avg_temperature": [5.2, 9.1, 10.5, -2.3],
+        "has_freeze": [False, False, False, True],
+        "has_ccm_violation": [False, True, True, False],
+        "decision_reasons": [
+            "Normal",
+            "Heat critical; discard",
+            "Heat critical; discard",
+            "Freeze violation",
+        ],
+    }
+    df = pd.DataFrame(data)
+    df.to_csv(output_path, sep="\t", index=False)
+    logger.info("Mock data created at: %s", output_path)
 
-    rows = [
-        [
-            'C001',
-            'Health Center A (Safe)',
-            'ACCEPTED',
-            'GREEN',
-            'NONE',
-            '5.2',
-            'N/A',
-            'Fridge Vaccine',
-            '4.5',
-            '2.1',
-            '6.8',
-            '100',
-            'Safe',
-        ],
-        [
-            'C002',
-            'Warehouse Stage 3',
-            'ACCEPTED',
-            'YELLOW',
-            'STAGE_B',
-            '100.0',
-            'N/A',
-            'Heat Sensitive',
-            '7.2',
-            '4.0',
-            '9.5',
-            '150',
-            'Warning: HER=82%',
-        ],
-        [
-            'C003',
-            'Mobile Unit Stage 4',
-            'REJECTED',
-            'RED',
-            'STAGE_D',
-            '150.0',
-            'N/A',
-            'Highly Sensitive',
-            '12.5',
-            '5.5',
-            '15.0',
-            '200',
-            'Critical: HER=150%',
-        ],
-        [
-            'C004',
-            'Ultra Cold Hub',
-            'ACCEPTED',
-            'YELLOW',
-            'NONE',
-            '65.0',
-            '72.5',
-            'mRNA Vaccine',
-            '3.8',
-            '2.0',
-            '5.2',
-            '80',
-            'Warning: Stage 2',
-        ],
-        [
-            'C005',
-            'Critical Alert',
-            'REJECTED',
-            'RED',
-            'STAGE_D',
-            '200.0',
-            'N/A',
-            'Heat Sensitive',
-            '15.0',
-            '10.0',
-            '20.0',
-            '50',
-            'Absolute Discard',
-        ],
-    ]
 
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, 'w', encoding='utf-8') as fh:
-        fh.write('\t'.join(headers) + '\n')
-        for r in rows:
-            fh.write('\t'.join(map(str, r)) + '\n')
+def _create_placeholder_chart(path: Path) -> None:
+    """
+    Create a simple placeholder chart (PNG) using matplotlib.
+    """
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        logger.warning("matplotlib not available, skipping chart generation")
+        return
 
-    logger.info("Mock data created at: %s", path)
+    plt.figure(figsize=(8, 4))
+    plt.text(
+        0.5,
+        0.5,
+        "Temperature Chart\n(Placeholder)",
+        ha="center",
+        va="center",
+        fontsize=14,
+    )
+    plt.axis("off")
+    plt.savefig(path, bbox_inches="tight")
+    plt.close()
 
 
 def generate_visual_reports(
     output_dir: str = "data/output/visual_tests", language: str = "ar"
 ) -> None:
-    """Helper used by scripts and tests to create all visual test files.
-
-    Args:
-        output_dir: directory where files will be written.
-        language: language code to pass to the PDF generator.
     """
-    os.makedirs(output_dir, exist_ok=True)
+    Generate all visual test reports and charts.
+    This is the main function called by the script.
+    """
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
 
-    data_path = os.path.join(output_dir, "mock_visual_data.tsv")
-    create_mock_data(data_path)
+    data_path = output_path / "mock_visual_data.tsv"
+    create_mock_data(str(data_path))
 
-    # Import heavy generator lazily
+    # ==================== Generate PDF Reports ====================
     try:
-        from src.presentation.reporting.unified_pdf_generator import (
-            ReportType, UnifiedPDFGenerator)
+        # Use the real generator (now that dependencies are installed)
+        gen = UnifiedPDFGenerator(language=language, output_dir=str(output_path))
     except Exception as e:
-        logger.error("Could not import UnifiedPDFGenerator: %s", e)
+        logger.error("Could not initialize UnifiedPDFGenerator: %s", e)
         return
 
-    gen = UnifiedPDFGenerator(output_dir=output_dir, language=language)
+    def save_pdf(report_type: ReportType, filename: str) -> Optional[Path]:
+        try:
+            pdf_path = gen.generate(report_type, str(data_path), filename=filename)
+            if pdf_path and isinstance(pdf_path, (str, Path)):
+                pdf_path = Path(pdf_path)
+                logger.info("Done: %s (size: %d bytes)", pdf_path, pdf_path.stat().st_size)
+                return pdf_path
+            else:
+                logger.error("Unexpected return type from generate(): %s", type(pdf_path))
+        except Exception as e:
+            logger.error("Failed to generate %s: %s", filename, e)
+        return None
 
-    logger.info(MessageProvider.get('VISUAL_REPORT_OFFICIAL'))
-    official_path = gen.generate(
-        ReportType.OFFICIAL, data_path, "visual_test_official.pdf"
+    # Log the report header text safely (if generator has _process_text, use it)
+    try:
+        if hasattr(gen, "_process_text"):
+            logger.info(gen._process_text(MessageProvider.get("VISUAL_REPORT_OFFICIAL")))
+        else:
+            logger.info(MessageProvider.get("VISUAL_REPORT_OFFICIAL"))
+    except Exception:
+        logger.info("Official Visual Report")
+
+    save_pdf(ReportType.OFFICIAL, "visual_test_official.pdf")
+
+    try:
+        if hasattr(gen, "_process_text"):
+            logger.info(gen._process_text(MessageProvider.get("VISUAL_REPORT_TECHNICAL")))
+        else:
+            logger.info(MessageProvider.get("VISUAL_REPORT_TECHNICAL"))
+    except Exception:
+        logger.info("Technical Visual Report")
+    save_pdf(ReportType.TECHNICAL, "visual_test_tech.pdf")
+
+    try:
+        if hasattr(gen, "_process_text"):
+            logger.info(gen._process_text(MessageProvider.get("VISUAL_REPORT_ARABIC")))
+        else:
+            logger.info(MessageProvider.get("VISUAL_REPORT_ARABIC"))
+    except Exception:
+        logger.info("Arabic Visual Report")
+    save_pdf(ReportType.ARABIC, "visual_test_arabic.pdf")
+
+    # ==================== Generate Placeholder Chart ====================
+    chart_path = output_path / "temp_dist.png"
+    _create_placeholder_chart(chart_path)
+    logger.info("Created placeholder chart: %s", chart_path)
+
+
+def main() -> None:
+    """Entry point for command-line execution."""
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Generate visual test reports")
+    parser.add_argument(
+        "--language",
+        "-l",
+        default="ar",
+        choices=["ar", "en"],
+        help="Language for reports (default: ar)",
     )
-    logger.info("Done: %s", official_path)
+    parser.add_argument(
+        "--output",
+        "-o",
+        default="data/output/visual_tests",
+        help="Output directory for reports (default: data/output/visual_tests)",
+    )
+    args = parser.parse_args()
 
-    logger.info(MessageProvider.get('VISUAL_REPORT_TECHNICAL'))
-    tech_path = gen.generate(ReportType.TECHNICAL, data_path, "visual_test_tech.pdf")
-    logger.info("Done: %s", tech_path)
-
-    logger.info(MessageProvider.get('VISUAL_REPORT_ARABIC'))
-    arabic_path = gen.generate(ReportType.ARABIC, data_path, "visual_test_arabic.pdf")
-    logger.info("Done: %s", arabic_path)
-
-
-def main():
-    # preserve existing entrypoint signature
-    generate_visual_reports()
+    generate_visual_reports(output_dir=args.output, language=args.language)
 
 
 if __name__ == "__main__":

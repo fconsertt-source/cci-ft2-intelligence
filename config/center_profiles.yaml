@@ -1,18 +1,37 @@
 centers:
   TEST_CENTER_01:
-    name: "مركز التطعيم التجريبي"
-    device_ids:
-      - "130600113437"
-    temperature_ranges:
-      min: 2.0
-      max: 8.0
-  CENTER_TRIPOLI_01:
-    name: "مركز طرابلس الرئيسي"
-    device_ids: []
-  CENTER_BENGHAZI_01:
-    name: "مركز بنغازي"
-    device_ids: []
-  OPV_TEST_CENTER:
-    name: "مركز اختبار OPV"
-    device_ids:
-      - "OPV_TEST_001"
+    equipment:
+      Cold_Box:
+        device_id: '130600112767'
+        name: حافظة طعوم
+      Cold_Room:
+        device_id: '130600112769'
+        name: غرفة التبريد
+      Storage_Refrigerator:
+        device_id: '130600112764'
+        name: ثلاجة حفظ الطعوم
+    name: مركز التطعيم التجريبي
+  TEST_CENTER_02:
+    equipment:
+      Cold_Room:
+        device_id: '130600112758'
+        name: غرفة التبريد
+    name: مركز التطعيم طرابلس
+  TEST_CENTER_03:
+    equipment:
+      Device_130600205054:
+        device_id: '130600205054'
+        name: غرفة تبريد
+    name: TEST_CENTER_03
+  بنغازي:
+    equipment:
+      Device_130600113437:
+        device_id: '130600113437'
+        name: غرفة تبريد
+    name: بنغازي
+  ضي الهلال:
+    equipment:
+      Device_130600112663:
+        device_id: '130600112663'
+        name: غرفة تبريد
+    name: ضي الهلال

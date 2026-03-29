@@ -1,3 +1,5 @@
+from src.domain.adapters.vaccination_center_factory import make_vaccination_center
+
 """
 اختبارات ثوابت المجال — تضمن عدم كسر القواعد الأساسية
 """
@@ -16,7 +18,7 @@ class DummyEntry:
 
 def test_initial_decision_is_no_data():
     """القرار الابتدائي يجب أن يكون NO_DATA"""
-    center = VaccinationCenter(
+    center = make_vaccination_center(
         id="TEST",
         name="Test",
         device_ids=["D1"],
@@ -28,7 +30,7 @@ def test_initial_decision_is_no_data():
 
 def test_freeze_tolerance_policy_is_enforced():
     """سياسة ZERO_TOLERANCE يجب أن ترفض أي تجمد فوراً"""
-    center = VaccinationCenter(
+    center = make_vaccination_center(
         id="TEST",
         name="Test",
         device_ids=["D1"],
@@ -43,7 +45,7 @@ def test_freeze_tolerance_policy_is_enforced():
 
 def test_boundary_temperature_does_not_trigger_freeze():
     """درجة -0.5 بالضبط لا تُعتبر تجمداً (الشرط: < -0.5)"""
-    center = VaccinationCenter(
+    center = make_vaccination_center(
         id="TEST",
         name="Test",
         device_ids=["D1"],

@@ -1,7 +1,7 @@
 # src/domain/entities/vaccination_center.py
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from src.domain.entities.ft2_entry import \
     FT2Entry  # افتراض وجود هذا الكيان في المسار الجديد
@@ -19,9 +19,13 @@ class VaccinationCenter:
 
     id: str
     name: str
-    device_ids: List[str]
     temperature_ranges: Dict[str, float]
     decision_thresholds: Dict[str, Any]
+
+    # المعدات (المصدر الوحيد للحقيقة)
+    equipment: Dict[str, Any] = field(default_factory=dict)
+    # معرفات الأجهزة (مشتقة تلقائياً)
+    device_ids: List[str] = field(default_factory=list, init=False)
 
     # الإدخالات (يفضل أن تكون من نوع FT2Entry)
     ft2_entries: List[FT2Entry] = field(default_factory=list)
@@ -40,6 +44,22 @@ class VaccinationCenter:
     _freeze_event_count: int = field(default=0, init=False)
     # stage may be assigned by rules logic or internally updated
     vvm_stage: Optional[str] = None
+
+    def __post_init__(self):
+        """بناء device_ids من المعدات المتاحة"""
+        if self.equipment:
+            self.device_ids = [
+                eq.get("device_id")
+                for eq in self.equipment.values()
+                if eq.get("device_id")
+            ]
+
+    def get_equipment_for_device(self, device_id: str) -> Optional[Tuple[str, Dict]]:
+        """البحث عن بيانات المعدات بناءً على معرف الجهاز"""
+        for eq_id, eq_data in self.equipment.items():
+            if eq_data.get("device_id") == device_id:
+                return eq_id, eq_data
+        return None
 
     def add_ft2_entry(self, entry: FT2Entry):
         """إضافة مدخل حراري وتحديث القرار فوراً إذا لزم الأمر"""

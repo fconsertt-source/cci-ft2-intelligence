@@ -12,6 +12,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from scripts.create_test_data import create_test_data
 from src.application.dtos.center_dto import CenterDTO
+from src.application.mappers.center_mapper import CenterMapper
 from src.application.dtos.evaluate_cold_chain_safety_request import (
     EvaluateColdChainSafetyRequest, TemperatureReading)
 from src.application.use_cases.evaluate_cold_chain_safety_use_case import \
@@ -32,11 +33,16 @@ logger = get_logger(__name__)
 # التي يحتاجها محرك القواعد. يتم التحويل إلى DTO فقط عند التقرير.
 class RuntimeCenter:
     def __init__(
-        self, id, name, device_ids, temperature_ranges=None, decision_thresholds=None
+        self, id, name, equipment=None, temperature_ranges=None, decision_thresholds=None
     ):
         self.id = id
         self.name = name
-        self.device_ids = device_ids
+        self.equipment = equipment or {}
+        self.device_ids = [
+            eq.get('device_id') 
+            for eq in self.equipment.values() 
+            if eq.get('device_id')
+        ]
         self.temperature_ranges = temperature_ranges or {'min': 2.0, 'max': 8.0}
         self.decision_thresholds = decision_thresholds or {}
         self.ft2_entries = []
@@ -70,7 +76,23 @@ def setup_directories():
 
 
 def load_centers(config_path: str = "config/center_profiles.yaml") -> List:
-    """تحميل مراكز التطعيم من ملف التكوين"""
+    """تحميل مراكز التطعيم عبر المحول الموحد"""
+    try:
+        raw = load_yaml(config_path)
+        centers_data = raw.get('centers', {})
+        centers = []
+        for center_id, profile in centers_data.items():
+            center = CenterMapper.from_dict_to_dto(center_id, profile)
+            centers.append(center)
+        logger.info("تم تحميل %d مركز تطعيم", len(centers))
+        return centers
+    except Exception as e:
+        logger.critical(MessageProvider.get('CRITICAL_CONFIG_LOAD_FAILED', error=e))
+        raise RuntimeError(MessageProvider.get('CONFIG_LOAD_FAILED_STOP')) from e
+
+# Old implementation kept for reference:
+def _old_load_centers(config_path: str = "config/center_profiles.yaml") -> List:
+    """تحميل مراكز التطعيم من ملف التكوين (Legacy)"""
     try:
         center_profiles = load_yaml(config_path)
         centers = []
@@ -160,7 +182,7 @@ def process_ft2_file_new(
 
         # أثناء المرحلة المرحلية، سنبقي الربط القديم كقيمة احتياطية
         try:
-            from src.infrastructure.ft2_reader.services.ft2_linker import \
+            from src.infrastructure.adapters.ft2_reader.services.ft2_linker import \
                 FT2Linker
 
             FT2Linker.link(entries, centers)
@@ -239,15 +261,18 @@ def run_pipeline(
 
     # تحسين الأداء: إنشاء خريطة البحث السريع (Hash Map) للأجهزة
     # التعقيد: O(1) للبحث بدلاً من O(N)
+    # خريطة البحث السريع: device_id → EquipmentDTO (وليس Center)
     device_map = {}
     for center in centers:
-        device_ids = (
-            getattr(center, 'device_ids', [])
-            if not isinstance(center, dict)
-            else center.get('device_ids', [])
-        )
-        for device_id in device_ids:
-            device_map[device_id] = center
+        units = getattr(center, 'equipment_units', [])
+        if units:
+            for unit in units:
+                if unit.device_id:
+                    device_map[unit.device_id] = unit
+        else:
+            # fallback للمراكز بدون equipment_units
+            for device_id in getattr(center, 'device_ids', []):
+                device_map[device_id] = center
 
     # 3. تحويل الملفات الخام (إذا كانت موجودة)
     ft2_files = []
@@ -277,8 +302,8 @@ def run_pipeline(
     # --- الإصلاح المعماري ---
     # إزالة حالة الاستخدام (Use Case) والعودة إلى منطق التحليل والربط البسيط
     # الذي يتوافق مع بنية البرنامج النصي.
-    from src.infrastructure.ft2_reader.parser.ft2_parser import FT2Parser
-    from src.infrastructure.ft2_reader.services.ft2_linker import FT2Linker
+    from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
+    from src.infrastructure.adapters.ft2_reader.services.ft2_linker import FT2Linker
 
     for ft2_file in ft2_files:
         ft2_path = os.path.join(ft2_dir, ft2_file)
@@ -306,70 +331,63 @@ def run_pipeline(
 
     all_results = []  # للتوافق مع بنية التقرير القديمة
     for center in centers:
-        if center.ft2_entries:
-            # 1. Prepare Request (Data Only)
+        units = getattr(center, 'equipment_units', [])
+        if not units:
+            continue
+        for unit in units:
+            if not unit.ft2_entries:
+                unit.decision = 'NO_DATA'
+                continue
+
+            # 1. Prepare Request لكل معدة على حدة
             readings = tuple(
                 TemperatureReading(
-                    value=entry.temp,
+                    value=entry.temperature,
                     timestamp=entry.timestamp,
                     device_id=getattr(entry, 'device_id', 'unknown'),
                 )
-                for entry in center.ft2_entries
+                for entry in unit.ft2_entries
             )
 
             request = EvaluateColdChainSafetyRequest(
-                center_id=center.id,
-                center_name=center.name,
+                center_id=unit.center_id,
+                center_name=f"{center.name} — {unit.equipment_name}",
                 readings=readings,
-                temperature_ranges=center.temperature_ranges,
-                decision_thresholds=center.decision_thresholds,
+                temperature_ranges=unit.temperature_ranges,
+                decision_thresholds=unit.decision_thresholds,
             )
 
             # 2. Execute UseCase (Pure Processing)
             response = use_case.execute(request)
 
-            # 3. Update Runtime Object with Results (for reporting compatibility)
-            center.decision = response.decision
-            center.vvm_stage = response.vvm_stage
-            center.alert_level = response.alert_level
-            center.stability_budget_consumed_pct = (
-                response.stability_budget_consumed_pct
-            )
-            center.thaw_remaining_hours = response.thaw_remaining_hours
-            center.category_display = response.category_display
-            center.decision_reasons = list(response.decision_reasons)
-
-            all_results.append(
-                {
-                    'file_path': 'Multiple sources',
-                    'centers_affected': [
-                        {
-                            'center_name': center.name,
-                            'entries_count': len(center.ft2_entries),
-                        }
-                    ],
-                }
-            )
+            # 3. تحديث EquipmentDTO بالنتائج
+            unit.decision = response.decision
+            unit.vvm_stage = response.vvm_stage
+            unit.alert_level = response.alert_level
+            unit.stability_budget_consumed_pct = response.stability_budget_consumed_pct
+            unit.thaw_remaining_hours = response.thaw_remaining_hours
+            unit.category_display = response.category_display
+            unit.decision_reasons = list(response.decision_reasons)
+            unit.stats = calculate_center_stats(unit)
+            
+        all_results.append(
+            {
+                'file_path': 'Multiple sources',
+                'centers_affected': [
+                    {
+                        'center_name': center.name,
+                        'entries_count': center.ft2_entries_count,
+                    }
+                ],
+            }
+        )
 
     # --- Phase 2: Mapping Boundary ---
     # تحويل RuntimeCenter إلى CenterDTO قبل التقرير
     # هذا يضمن أن طبقة التقرير لا تتعامل مع كائنات المجال أو الكائنات المؤقتة
-    center_dtos = []
-    for c in centers:
-        dto = CenterDTO(
-            id=c.id,
-            name=c.name,
-            device_ids=c.device_ids,
-            ft2_entries=c.ft2_entries,
-            decision=c.decision,
-            vvm_stage=c.vvm_stage,
-            alert_level=c.alert_level,
-            stability_budget_consumed_pct=c.stability_budget_consumed_pct,
-            thaw_remaining_hours=c.thaw_remaining_hours,
-            category_display=c.category_display,
-            decision_reasons=c.decision_reasons,
-        )
-        center_dtos.append(dto)
+    # centers هي بالفعل CenterDTO من load_centers()
+    # لا حاجة لإعادة إنشائها
+    center_dtos = centers
 
     # تقرير المراكز
     centers_report_path = os.path.join(output_dir, "centers_report.tsv")
@@ -386,7 +404,7 @@ def run_pipeline(
     logger.info(
         MessageProvider.get(
             'FILES_PROCESSED',
-            processed_count=len(all_results),
+            processed_count=len(ft2_files) - len(failed_files) ,
             total_count=len(ft2_files),
         )
     )
@@ -464,6 +482,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    1
-    2
