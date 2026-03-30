@@ -5,13 +5,77 @@ from typing import Any, Dict, List, Optional
 
 from src.domain.enums.vvm_stage import VVMStage
 
+# محاولة استيراد logger بشكل آمن (قد يكون غير متاح في بعض السياقات)
+try:
+    from src.infrastructure.logging import get_logger
+    _logger = get_logger(__name__)
+except Exception:
+    import logging
+    _logger = logging.getLogger(__name__)
+
+
+def _extract_temperature(entry):
+    """محاولة موحدة لاستخراج قيمة الحرارة من entry (object أو dict)."""
+    try:
+        if hasattr(entry, "temperature"):
+            val = getattr(entry, "temperature")
+            if val is not None and val != "":
+                return float(val)
+    except Exception:
+        pass
+
+    try:
+        if hasattr(entry, "temp"):
+            val = getattr(entry, "temp")
+            if val is not None and val != "":
+                return float(val)
+    except Exception:
+        pass
+
+    try:
+        if isinstance(entry, dict):
+            for key in ("temperature", "temp", "temp_c", "value", "reading"):
+                if key in entry and entry[key] not in (None, ""):
+                    return float(entry[key])
+    except Exception:
+        pass
+
+    return None
+
+
+def _extract_duration_minutes(entry):
+    """محاولة موحدة لاستخراج مدة القراءة بالدقائق من entry."""
+    try:
+        if hasattr(entry, "duration_minutes"):
+            val = getattr(entry, "duration_minutes")
+            if val is not None and val != "":
+                return float(val)
+    except Exception:
+        pass
+
+    try:
+        if hasattr(entry, "duration"):
+            val = getattr(entry, "duration")
+            if val is not None and val != "":
+                return float(val)
+    except Exception:
+        pass
+
+    try:
+        if isinstance(entry, dict):
+            for key in ("duration_minutes", "duration", "minutes"):
+                if key in entry and entry[key] not in (None, ""):
+                    return float(entry[key])
+    except Exception:
+        pass
+
+    return 0.0
+
 
 def calculate_center_stats(center) -> Dict[str, Any]:
     """
-    حساب إحصائيات المركز بناءً على القواعد الموحدة.
-    يعيد قاموساً يحتوي على المدد الزمنية وحالة الانتهاكات.
+    حساب إحصائيات المركز وإرجاع مفاتيح متوافقة مع مُولّد التقرير.
     """
-    # استخراج الإعدادات (مع قيم افتراضية آمنة)
     temp_ranges = getattr(center, "temperature_ranges", {})
     thresholds = getattr(center, "decision_thresholds", {})
 
@@ -27,29 +91,58 @@ def calculate_center_stats(center) -> Dict[str, Any]:
             "heat_duration": 0,
             "has_freeze": False,
             "has_ccm_violation": False,
-            "avg_temp": 0,
-            "min_temp": 0,
-            "max_temp": 0,
+            "avg_temperature": 0.0,
+            "min_temperature": 0.0,
+            "max_temperature": 0.0,
         }
 
-    temperatures = [e.temperature for e in entries if e.temperature is not None]
+    temperatures = []
+    for e in entries:
+        t = _extract_temperature(e)
+        if t is not None:
+            temperatures.append(t)
 
-    # حساب المدد الزمنية بدقة
-    freeze_duration = sum(
-        e.duration_minutes for e in entries if e.temperature < freeze_threshold
-    )
-    heat_duration = sum(
-        e.duration_minutes for e in entries if e.temperature > max_limit
-    )
+    freeze_duration = 0.0
+    heat_duration = 0.0
+    for e in entries:
+        t = _extract_temperature(e)
+        duration = _extract_duration_minutes(e)
+        if t is None:
+            continue
+        if t < freeze_threshold:
+            freeze_duration += duration
+        if t > max_limit:
+            heat_duration += duration
+
+    has_freeze = freeze_duration > 0
+    has_ccm_violation = heat_duration > ccm_limit
+
+    avg_temperature = sum(temperatures) / len(temperatures) if temperatures else 0.0
+    min_temperature = min(temperatures) if temperatures else 0.0
+    max_temperature = max(temperatures) if temperatures else 0.0
+
+    try:
+        _logger.debug(
+            "DEBUG stats for center %s: temps=%s avg=%s min=%s max=%s freeze_dur=%s heat_dur=%s",
+            getattr(center, "id", "unknown"),
+            temperatures,
+            avg_temperature,
+            min_temperature,
+            max_temperature,
+            freeze_duration,
+            heat_duration,
+        )
+    except Exception:
+        pass
 
     return {
         "freeze_duration": freeze_duration,
         "heat_duration": heat_duration,
-        "has_freeze": freeze_duration > 0,  # قاعدة عدم التسامح
-        "has_ccm_violation": heat_duration > ccm_limit,  # قاعدة التراكم
-        "avg_temp": sum(temperatures) / len(temperatures) if temperatures else 0,
-        "min_temp": min(temperatures) if temperatures else 0,
-        "max_temp": max(temperatures) if temperatures else 0,
+        "has_freeze": has_freeze,
+        "has_ccm_violation": has_ccm_violation,
+        "avg_temperature": avg_temperature,
+        "min_temperature": min_temperature,
+        "max_temperature": max_temperature,
     }
 
 
@@ -59,29 +152,12 @@ def calculate_center_stats(center) -> Dict[str, Any]:
 
 
 class DecisionRule(ABC):
-    """
-    Abstract Base Class for all safety decision rules.
-    """
-
     @abstractmethod
     def evaluate(self, center: Any, stats: Dict[str, Any]) -> Optional[str]:
-        """
-        Evaluates the rule against the center's data and stats.
-
-        Args:
-            center: The VaccinationCenter or object being evaluated.
-            stats: Pre-computed statistics and extra data (e.g., HER).
-
-        Returns:
-            Optional[str]: A decision string (e.g., "REJECTED_FREEZE") if the rule
-            is triggered, or None if the next rule should be evaluated.
-        """
         pass
 
 
 class ExpiryRule(DecisionRule):
-    """قاعدة التحقق من تاريخ الصلاحية (Expiry Date)"""
-
     def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
         expiry_date_str = getattr(center, "expiry_date", None)
         if not expiry_date_str:
@@ -105,19 +181,13 @@ class ExpiryRule(DecisionRule):
 
 
 class FreezeRule(DecisionRule):
-    """
-    قاعدة التجميد: ذكية وتعتمد على صنف اللقاح (v1.1.0)
-    """
-
     def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
-        # استخراج حالة التجميد من اللقاح أو المركز (دعم التوافق مع freeze_sensitive)
         is_freeze_stable = getattr(
             center, "is_freeze_stable", not getattr(center, "freeze_sensitive", True)
         )
 
-        if stats["has_freeze"]:
+        if stats.get("has_freeze", False):
             if not is_freeze_stable:
-                # لقاح حساس للتجميد - رفض فوري أو توصية باختبار الرج
                 action = getattr(center, "actions", {}).get(
                     "on_freeze", "تلف فوري محتمل"
                 )
@@ -126,7 +196,6 @@ class FreezeRule(DecisionRule):
                 )
                 return "REJECTED_FREEZE"
             else:
-                # لقاح مقاوم للتجميد (مثل OPV)
                 center.decision_reasons.append(
                     f"تم رصد تجميد ({stats['freeze_duration']} دقيقة) ولكن اللقاح مقاوم للتجميد وفق المكتبة العلمية."
                 )
@@ -136,23 +205,31 @@ class FreezeRule(DecisionRule):
 
 
 class HeatCriticalRule(DecisionRule):
-    """قاعدة الحرارة الحرجة بناءً على الميزانية الحرارية (v1.1.0)"""
-
     def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
-        critical_limit = getattr(
-            center, "critical_temp_limit", stats.get("critical_temp_limit", 10.0)
-        )
+        # محاولة الحصول على max_temp من stats أولاً، وإلا حسابه من الإدخالات
+        max_temp = stats.get("max_temp")
+        if max_temp is None and hasattr(center, "ft2_entries"):
+            temps = []
+            for e in center.ft2_entries:
+                t = _extract_temperature(e)
+                if t is not None:
+                    temps.append(t)
+            if temps:
+                max_temp = max(temps)
+        if max_temp is None:
+            return None
 
-        if stats["max_temp"] > critical_limit:
+        critical_limit = getattr(center, "critical_temp_limit", stats.get("critical_temp_limit", 10.0))
+        if max_temp > critical_limit:
             action = getattr(center, "actions", {}).get("on_heat", "حرارة حرجة")
             center.decision_reasons.append(
-                f"حرارة حرجة: {stats['max_temp']}°C > {critical_limit}°C. {action}"
+                f"حرارة حرجة: {max_temp:.1f}°C > {critical_limit}°C. {action}"
             )
             return "REJECTED_HEAT_C"
 
-        if stats["has_ccm_violation"]:
+        if stats.get("has_ccm_violation", False):
             center.decision_reasons.append(
-                f"تجاوز الحد التراكمي (CCM): {stats['heat_duration']} دقيقة"
+                f"تجاوز الحد التراكمي (CCM): {stats.get('heat_duration', 0)} دقيقة"
             )
             return "REJECTED_HEAT_C"
 
@@ -163,13 +240,14 @@ class HeatCriticalRule(DecisionRule):
 
 
 class TemperatureWarningRule(DecisionRule):
-    """قاعدة التحذير (0-2°C أو 8-10°C)"""
-
     def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
-        if stats["min_temp"] < 2.0 or stats["max_temp"] > 8.0:
-            # تسجيل التحذير كسمة إضافية دون تغيير القرار النهائي
+        min_temp = stats.get("min_temp")
+        max_temp = stats.get("max_temp")
+        if min_temp is None or max_temp is None:
+            return None
+        if min_temp < 2.0 or max_temp > 8.0:
             center.decision_reasons.append(
-                f"تحذير خروج عن النطاق: ({stats['min_temp']}°C - {stats['max_temp']}°C)"
+                f"تحذير خروج عن النطاق: ({min_temp:.1f}°C - {max_temp:.1f}°C)"
             )
             center.has_warning = True
             return None
@@ -178,10 +256,6 @@ class TemperatureWarningRule(DecisionRule):
 
 
 class ThawRule(DecisionRule):
-    """
-    قاعدة تتبع الذوبان (Thawing Logic) لقاحات mRNA (v1.1.0)
-    """
-
     def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
         if not getattr(center, "ultra_cold_chain_required", False):
             return None
@@ -190,7 +264,6 @@ class ThawRule(DecisionRule):
         max_thaw_days = getattr(center, "thaw_duration_days", 70)
 
         if thaw_start:
-            # حساب الأيام المنقضية منذ الثوب
             if isinstance(thaw_start, str):
                 try:
                     thaw_start = datetime.strptime(thaw_start, "%Y-%m-%d")
@@ -214,10 +287,7 @@ class ThawRule(DecisionRule):
 
 
 class VVMStageRule(DecisionRule):
-    """قاعدة تحديد مرحلة VVM بناءً على نسبة التدهور (HER)"""
-
     def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
-        # إذا تم حساب HER مسبقاً في الإحصائيات
         her = stats.get("her", 0.0)
 
         if her >= 1.0:
@@ -242,11 +312,6 @@ class VVMStageRule(DecisionRule):
 
         return None
 
-class HeatDurationRule(DecisionRule):
-    """قاعدة مدة الحرارة فوق max_temp باستخدام max_heat_duration_hours"""
-
-    def __init__(self, enable_heat_duration: bool = False):
-        self._enable = enable_heat_duration
 
 class HeatDurationRule(DecisionRule):
     def __init__(self, enable_heat_duration: bool = False):
@@ -278,32 +343,14 @@ class HeatDurationRule(DecisionRule):
             )
         return None
 
-class DefaultRule(DecisionRule):
-    """القاعدة الافتراضية: القبول"""
 
+class DefaultRule(DecisionRule):
     def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
         return "ACCEPTED"
 
 
 class RulesEngine:
-    """
-    Engine that manages the priority-based execution of Decision Rules.
-
-    Rules are executed in order. The first rule to return a non-None decision
-    sets the final outcome for the analysis.
-
-    Priority Table:
-    1. ExpiryRule (Critical)
-    2. VVMStageRule (Biological/Scientific)
-    3. FreezeRule (Zero Tolerance)
-    4. HeatCriticalRule (Threshold Violations)
-    5. TemperatureWarningRule (Non-decisional monitoring)
-    6. DefaultRule (Last resort - Accept)
-    """
-
-class RulesEngine:
     def __init__(self, enable_heat_duration: bool = False):
-        # ترتيب القواعد يحدد الأولوية
         self.rules: List[DecisionRule] = [
             ExpiryRule(),
             VVMStageRule(),
@@ -325,7 +372,6 @@ class RulesEngine:
 
 def apply_rules(center, extra_stats: Optional[Dict[str, Any]] = None, enable_heat_duration: bool = False):
     """واجهة التطبيق المتوافقة مع الكود القديم"""
-    # تهيئة قائمة الأسباب للتدقيق (Explainability)
     center.decision_reasons = []
 
     stats = calculate_center_stats(center)
@@ -337,6 +383,5 @@ def apply_rules(center, extra_stats: Optional[Dict[str, Any]] = None, enable_hea
         center.decision = "NO_DATA"
         return
 
-    # استخدام المحرك الجديد
     engine = RulesEngine(enable_heat_duration=enable_heat_duration)
     engine.run(center, stats)
