@@ -1,0 +1,4 @@
+# Development Overrides
+logging:
+  level: "DEBUG"
+  console: true

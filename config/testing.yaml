@@ -1,0 +1,7 @@
+logging:
+  level: "CRITICAL"
+  file: null
+
+storage:
+  ledger_path: "data/ledger/test_ledger.jsonl"
+  auto_archive: false

@@ -1,0 +1,14 @@
+data/input_raw/130600112663_converted.csv
+data/input_raw/130600112758_converted.csv
+data/input_raw/130600113437_converted.csv
+data/input_raw/130600113438_converted.csv
+data/input_raw/130600205054_converted.csv
+data/input_raw/freeze_clinic_130600112767.csv
+data/input_raw/heat_mobile_130600112769.csv
+data/input_raw/safe_hospital_130600112764.csv
+أصل 8
+المجلد: config
+المجلد: data/input_ft2
+المجلد: data/input_raw
+المجلد: data/output
+المجلد: data/reports

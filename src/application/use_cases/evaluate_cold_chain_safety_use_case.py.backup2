@@ -1,0 +1,206 @@
+from src.infrastructure.logging import get_logger
+
+logger = get_logger(__name__)
+
+from itertools import tee
+from typing import List
+from datetime import datetime
+
+from src.application.dtos.evaluate_cold_chain_safety_request import (
+    EvaluateColdChainSafetyRequest,
+    EvaluateColdChainSafetyResponse,
+)
+from src.domain.services.rules_engine import apply_rules, calculate_center_stats
+from src.domain.services.exposure_analysis_service import ExposureAnalysisService
+from src.domain.services.judgment_engine import JudgmentEngine
+from src.domain.enums.vaccine_decision import VaccineDecision
+from src.shared.config import get_config
+from src.domain.value_objects.temperature_entry import TemperatureEntry
+
+
+def pairwise(iterable):
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
+
+class DomainCenterContext:
+    def __init__(self, request: EvaluateColdChainSafetyRequest, entries: List[TemperatureEntry]):
+        self.id = request.center_id
+        self.name = request.center_name
+        self.temperature_ranges = request.temperature_ranges or {"min": 2.0, "max": 8.0}
+        self.decision_thresholds = request.decision_thresholds or {}
+        self.ft2_entries = entries
+        self.vaccine_spec = request.vaccine_spec
+
+        # Output fields
+        self.decision = "UNKNOWN"
+        self.vvm_stage = "NONE"
+        self.alert_level = None
+        self.stability_budget_consumed_pct = 0.0
+        self.thaw_remaining_hours = None
+        self.category_display = None
+        self.decision_reasons = []
+
+    @classmethod
+    def from_request(cls, request: EvaluateColdChainSafetyRequest):
+        entries = []
+        
+        if not request.readings:
+            return cls(request, entries)
+
+        # ترتيب القراءات حسب الزمن
+        sorted_readings = sorted(request.readings, key=lambda r: str(r.timestamp))
+
+        # تحويل timestamp إلى datetime
+        converted_readings = []
+        for r in sorted_readings:
+            ts = r.timestamp
+            if isinstance(ts, str):
+                try:
+                    ts = datetime.fromisoformat(ts.replace('Z', '+00:00'))
+                except ValueError:
+                    try:
+                        ts = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+                    except ValueError:
+                        try:
+                            ts = datetime.strptime(ts, "%Y-%m-%d %H:%M")
+                        except ValueError:
+                            logger.warning(f"⚠️ تعذر تحويل timestamp: {ts} | المركز: {request.center_name}")
+                            continue
+            elif isinstance(ts, datetime):
+                pass
+            else:
+                logger.warning(f"⚠️ نوع timestamp غير مدعوم: {type(ts)}")
+                continue
+
+            converted_readings.append((ts, float(r.value), getattr(r, 'device_id', None)))
+
+        if not converted_readings:
+            logger.warning(f"⚠️ لا توجد قراءات صالحة في المركز: {request.center_name}")
+            return cls(request, entries)
+
+        # حساب الـ duration بين القراءات المتتالية
+        for i in range(len(converted_readings) - 1):
+            prev_ts, prev_value, prev_device = converted_readings[i]
+            curr_ts, curr_value, curr_device = converted_readings[i + 1]
+
+            duration_minutes = max(0.0, (curr_ts - prev_ts).total_seconds() / 60.0)
+
+            entries.append(
+                TemperatureEntry(
+                    temperature=prev_value,
+                    timestamp=prev_ts,
+                    duration_minutes=duration_minutes,
+                    device_id=prev_device,
+                )
+            )
+
+        # إضافة آخر قراءة
+        if converted_readings:
+            last_ts, last_value, last_device = converted_readings[-1]
+            entries.append(
+                TemperatureEntry(
+                    temperature=last_value,
+                    timestamp=last_ts,
+                    duration_minutes=0.0,
+                    device_id=last_device,
+                )
+            )
+
+        logger.info(f"✅ تم إنشاء {len(entries)} TemperatureEntry للمركز: {request.center_name}")
+        return cls(request, entries)
+
+
+class EvaluateColdChainSafetyUseCase:
+    def execute(self, request: EvaluateColdChainSafetyRequest) -> EvaluateColdChainSafetyResponse:
+        config = get_config()
+        enable_supply_date = config.get_feature('CCI_ENABLE_SUPPLY_DATE', False)
+        enable_heat_duration = config.get_feature('CCI_ENABLE_HEAT_DURATION', False)
+
+        ctx = DomainCenterContext.from_request(request)
+
+        print("✅ 1. تم تنفيذ from_request بنجاح")
+
+        if not ctx.ft2_entries:
+            print("⚠️ لا توجد قراءات → NO_DATA")
+            ctx.decision = "NO_DATA"
+            stats = {"has_freeze": False, "has_ccm_violation": False, "her_ratio": 0.0}
+            return EvaluateColdChainSafetyResponse.from_context(ctx, stats)
+
+        if ctx.ft2_entries:
+            sample_ts = ctx.ft2_entries[0].timestamp
+            print(f"DEBUG: نوع timestamp = {type(sample_ts)}, قيمة = {sample_ts}")
+
+        print("✅ 2. بدء ExposureAnalysisService...")
+
+        # ── 1. Exposure Analysis ──
+        supply_date = None
+        if request.vaccine_inventory and enable_supply_date:
+            supply_date = request.vaccine_inventory.get('supply_date')
+
+        analysis = ExposureAnalysisService().analyze(
+            readings=ctx.ft2_entries,
+            spec=request.vaccine_spec,
+            supply_date=supply_date,
+            enable_supply_date=enable_supply_date,
+        )
+
+        print("✅ 3. تم تنفيذ ExposureAnalysisService بنجاح")
+
+        ctx.stability_budget_consumed_pct = analysis.get("her_ratio", 0.0) * 100.0
+
+        print("✅ 4. بدء apply_rules (هنا غالباً يحدث الخطأ)...")
+
+        # ── 2. Rules Engine ──
+        extra_stats = {
+            "her_ratio": analysis.get("her_ratio", 0.0),
+            "her": analysis.get("her_ratio", 0.0),
+            "ccm_index": analysis.get("ccm_index", "0"),
+            "has_freeze": analysis.get("has_freeze", False),
+            "has_critical_heat": analysis.get("has_critical_heat", False),
+            "has_ccm_violation": analysis.get("has_ccm_violation", False),
+        }
+
+        # هنا يحدث الخطأ غالباً
+        apply_rules(ctx, extra_stats=extra_stats, enable_heat_duration=enable_heat_duration)
+
+        print("✅ 5. تم تنفيذ apply_rules بنجاح")
+
+        # ── 3. Judgment Engine ──
+        decision_map = {
+            "REJECTED_HEAT_C": VaccineDecision.DISCARD,
+            "REJECTED_FREEZE": VaccineDecision.DISCARD,
+            "REJECTED_EXPIRED": VaccineDecision.DISCARD,
+            "REJECTED_THAW": VaccineDecision.DISCARD,
+            "DISCARD": VaccineDecision.DISCARD,
+            "PARTIAL": VaccineDecision.PARTIAL,
+            "ACCEPTED": VaccineDecision.SAFE,
+            "SAFE": VaccineDecision.SAFE,
+        }
+
+        judgment_engine = JudgmentEngine()
+        judgment = judgment_engine.judge(
+            decision=decision_map.get(ctx.decision, VaccineDecision.SAFE),
+            decision_reason=" | ".join(ctx.decision_reasons),
+            her_ratio=analysis.get("her_ratio", 0.0),
+            ccm_index=analysis.get("ccm_index", "0"),
+            freeze_detected=analysis.get("has_freeze", False),
+            has_critical_heat=analysis.get("has_critical_heat", False),
+        )
+
+        extra_stats.update({
+            'judgment_risk': judgment.risk_level,
+            'judgment_icon': judgment.risk_icon,
+            'confidence': judgment.confidence,
+            'requires_review': judgment.requires_human_review,
+            'her_percentage': judgment.her_percentage,
+            'judgment_narrative': judgment.narrative,
+        })
+
+        # ── 4. Final Stats ──
+        stats = calculate_center_stats(ctx)
+        stats.update(extra_stats)
+        stats["her_ratio"] = analysis.get("her_ratio", 0.0)
+
+        return EvaluateColdChainSafetyResponse.from_context(ctx, stats)

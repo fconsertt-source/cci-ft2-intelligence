@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  cci-ft2-app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+      - ./logs:/app/logs
+    environment:
+      - CCI_ENV=production
+      - CCI_DATA_ROOT=/app/data
+      - CCI_LOG_LEVEL=INFO
+    depends_on:
+      - cci-ft2-db
+
+  cci-ft2-db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: cci_ft2
+      POSTGRES_USER: cci_user
+      POSTGRES_PASSWORD: cci_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

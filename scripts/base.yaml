@@ -1,0 +1,7 @@
+# Base Configuration
+app:
+  name: "CCI-FT2 Intelligence"
+  version: "1.0.0"
+
+reporting:
+  output_dir: "data/output/reports"
