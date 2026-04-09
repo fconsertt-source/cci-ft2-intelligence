@@ -14,13 +14,32 @@ class ConfigLoader:
         """Loads and caches the system configuration."""
         if cls._config is None:
             if not os.path.exists(config_path):
-                # Fallback or default values if config is missing
-                return {}
+                cls._config = {}
+            else:
+                with open(config_path, "r", encoding="utf-8") as f:
+                    cls._config = yaml.safe_load(f) or {}
 
-            with open(config_path, "r", encoding="utf-8") as f:
-                cls._config = yaml.safe_load(f)
+            cls._merge_thresholds()
 
         return cls._config
+
+    @classmethod
+    def _merge_thresholds(cls) -> None:
+        """Merge threshold values from config/thresholds.yaml into the main config."""
+        thresholds_path = "config/thresholds.yaml"
+        if not os.path.exists(thresholds_path):
+            return
+
+        with open(thresholds_path, "r", encoding="utf-8") as f:
+            thresholds_data = yaml.safe_load(f) or {}
+
+        thresholds = thresholds_data.get("thresholds", {})
+        if thresholds:
+            cls._config.setdefault("thresholds", {})
+            cls._config["thresholds"] = {
+                **thresholds,
+                **cls._config.get("thresholds", {}),
+            }
 
     @classmethod
     def get(cls, key_path: str, default: Any = None) -> Any:

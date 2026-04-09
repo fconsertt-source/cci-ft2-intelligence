@@ -69,12 +69,15 @@ class ThermalDegradationEstimator:
             if record.temperature > max_heat_temp:
                 max_temp_exceeded_count += 1
 
+        remaining_potency = self.estimate_remaining_potency(
+            thermal_history, spec
+        )
+
         return {
             "freeze_events": freeze_events,
             "heat_events": heat_events,
             "total_heat_hours": total_heat_hours,
             "max_temp_exceeded_count": max_temp_exceeded_count,
-            "remaining_potency_estimate": self.estimate_remaining_potency(
-                thermal_history, spec
-            ),
+            "remaining_potency_estimate": remaining_potency,
+            "remaining_shelf_life": remaining_potency,
         }
