@@ -12,3 +12,8 @@ thresholds:
   remaining_shelf_life_percentage: 50
   fridgetag_alarm_enabled: true
   flexible_vvm_allowed: true
+
+# === إعدادات V1.4 - Circular Prompt ===
+remaining_shelf_life_percentage: 50
+fridgetag_alarm_enabled: true
+flexible_vvm_allowed: true
