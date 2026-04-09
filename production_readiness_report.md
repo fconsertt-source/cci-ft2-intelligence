@@ -1,5 +1,5 @@
 # CCI-FT2 Production Readiness Report
-**تاريخ التقرير:** 2026-04-10 00:08:24
+**تاريخ التقرير:** 2026-04-10 00:10:34
 **الإصدار:** Circular Prompt v1.4
 
 ---
@@ -38,7 +38,6 @@ src/infrastructure/adapters/reporting/new_pdf_engine.py:        # TODO: Implemen
 ## 5. حالة Git (التغييرات غير المُلتزم بها)
 
  M config/center_profiles.yaml
- M config/thresholds.yaml
  M data/registry/processed_files.json
  M data/reports/performance_metrics.jsonl
  M pyproject.toml
@@ -52,7 +51,6 @@ src/infrastructure/adapters/reporting/new_pdf_engine.py:        # TODO: Implemen
  M scripts/run_ft2_pipeline.py
  M scripts/verify_visual_reports.py
  M sensitive_hashes.json
- M src/application/app_composer.py
  M src/application/dtos/__init__.py
  M src/application/dtos/analysis_result_dto.py
  M src/application/dtos/base_dto.py
@@ -94,7 +92,6 @@ src/infrastructure/adapters/reporting/new_pdf_engine.py:        # TODO: Implemen
  M src/infrastructure/logging.py
  M src/infrastructure/pdf/arabic_font_manager.py
  M src/infrastructure/pdf/unified_pdf_generator.py
- M src/presentation/cli/cli.py
  M src/presentation/reporting/guard.py
  M src/shared/__init__.py
  M src/shared/config.py
@@ -139,7 +136,6 @@ src/infrastructure/adapters/reporting/new_pdf_engine.py:        # TODO: Implemen
 ?? data/registry/session_registry.json
 ?? docs/PDF_REPORT_GENERATION.md
 ?? main_analysis.ipynb
-?? production_readiness_report.md
 ?? scripts/migrate_pickle_to_parquet.py
 ?? scripts/production_readiness_health_check.py
 ?? src/application/ports/i_pdf_report_generator.py
