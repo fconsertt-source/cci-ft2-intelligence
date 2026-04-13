@@ -72,4 +72,4 @@ jobs:
       - name: Check dependencies
         run: |
           pip install pip-audit
-          pip-audit --format json --output vulns.json || true
+          pip-audit --format json --output vulns.json

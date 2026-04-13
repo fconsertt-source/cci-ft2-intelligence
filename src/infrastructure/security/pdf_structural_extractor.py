@@ -11,7 +11,7 @@ except ImportError:  # pragma: no cover
 import hashlib
 import logging
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import List
@@ -49,7 +49,7 @@ class PDFStructuralExtractor:
         if not pdf_path.exists():
             raise ExtractionError(f"الملف غير موجود: {pdf_path}")
 
-        llogger.info("بدء استخراج البيانات من: %s", pdf_path.name)
+        logger.info("بدء استخراج البيانات من: %s", pdf_path.name)
 
         # 1. حساب الهاش للملف الأصلي
         pdf_hash = self._calculate_hash(pdf_path)
@@ -128,7 +128,7 @@ class PDFStructuralExtractor:
             avg_temperature=avg_temp,
             alarm_count=alarm_count,
             total_readings=total_readings,
-            extraction_timestamp=datetime.utcnow(),
+            extraction_timestamp=datetime.now(timezone.utc),
             pdf_hash=pdf_hash,
         )
 
@@ -323,7 +323,7 @@ class PDFStructuralExtractor:
         dates = self._extract_all_dates(text)
         if dates:
             result = len(set(dates))
-            ogger.debug("تم حساب عدد القراءات من التواريخ الفريدة: %s", result)
+            logger.debug("تم حساب عدد القراءات من التواريخ الفريدة: %s", result)
             return result
 
         logger.warning(

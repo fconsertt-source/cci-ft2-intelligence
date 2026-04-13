@@ -1,6 +1,6 @@
 # src/domain/services/rules_engine.py
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from src.domain.enums.vvm_stage import VVMStage
@@ -17,24 +17,24 @@ def _extract_temperature(entry):
             val = getattr(entry, "temperature")
             if val is not None and val != "":
                 return float(val)
-    except Exception:
-        pass
+    except (ValueError, TypeError) as e:
+        _logger.debug("Failed to extract temperature attribute: %s", e)
 
     try:
         if hasattr(entry, "temp"):
             val = getattr(entry, "temp")
             if val is not None and val != "":
                 return float(val)
-    except Exception:
-        pass
+    except (ValueError, TypeError) as e:
+        _logger.debug("Failed to extract temp attribute: %s", e)
 
     try:
         if isinstance(entry, dict):
             for key in ("temperature", "temp", "temp_c", "value", "reading"):
                 if key in entry and entry[key] not in (None, ""):
                     return float(entry[key])
-    except Exception:
-        pass
+    except (ValueError, TypeError) as e:
+        _logger.debug("Failed to extract temperature from dict: %s", e)
 
     return None
 
@@ -46,24 +46,24 @@ def _extract_duration_minutes(entry):
             val = getattr(entry, "duration_minutes")
             if val is not None and val != "":
                 return float(val)
-    except Exception:
-        pass
+    except (ValueError, TypeError) as e:
+        _logger.debug("Failed to extract duration_minutes attribute: %s", e)
 
     try:
         if hasattr(entry, "duration"):
             val = getattr(entry, "duration")
             if val is not None and val != "":
                 return float(val)
-    except Exception:
-        pass
+    except (ValueError, TypeError) as e:
+        _logger.debug("Failed to extract duration attribute: %s", e)
 
     try:
         if isinstance(entry, dict):
             for key in ("duration_minutes", "duration", "minutes"):
                 if key in entry and entry[key] not in (None, ""):
                     return float(entry[key])
-    except Exception:
-        pass
+    except (ValueError, TypeError) as e:
+        _logger.debug("Failed to extract duration from dict: %s", e)
 
     return 0.0
 
@@ -128,8 +128,8 @@ def calculate_center_stats(center) -> Dict[str, Any]:
             freeze_duration,
             heat_duration,
         )
-    except Exception:
-        pass
+    except Exception as e:
+        _logger.warning("Failed to log debug stats: %s", e)
 
     return {
         "freeze_duration": freeze_duration,
@@ -167,7 +167,7 @@ class ExpiryRule(DecisionRule):
             )
             return "REJECTED_EXPIRED"
 
-        if datetime.now().date() > expiry_date:
+        if datetime.now(timezone.utc).date() > expiry_date:
             center.decision_reasons.append(
                 f"لقاح منتهي الصلاحية بتاريخ: {expiry_date_str}"
             )
@@ -276,11 +276,13 @@ class ThawRule(DecisionRule):
         if thaw_start:
             if isinstance(thaw_start, str):
                 try:
-                    thaw_start = datetime.strptime(thaw_start, "%Y-%m-%d")
+                    thaw_start = datetime.strptime(thaw_start, "%Y-%m-%d").replace(
+                        tzinfo=timezone.utc
+                    )
                 except ValueError:
                     return None
 
-            days_since_thaw = (datetime.now() - thaw_start).days
+            days_since_thaw = (datetime.now(timezone.utc) - thaw_start).days
 
             if days_since_thaw > max_thaw_days:
                 center.decision_reasons.append(

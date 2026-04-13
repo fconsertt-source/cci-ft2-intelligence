@@ -1,7 +1,10 @@
 import json
+import logging
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Optional
+
+logger = logging.getLogger(__name__)
 
 class SessionRegistry:
     """سجل زمني لكل جهاز - يمنع التكرار ويحافظ على الاستمرارية"""
@@ -14,7 +17,8 @@ class SessionRegistry:
         if self.registry_path.exists():
             try:
                 return json.loads(self.registry_path.read_text(encoding="utf-8"))
-            except:
+            except (json.JSONDecodeError, OSError) as e:
+                logger.warning("Failed to load session registry: %s", e)
                 return {}
         return {}
 
@@ -35,7 +39,7 @@ class SessionRegistry:
             "last_timestamp": last_timestamp.isoformat(),
             "last_file": filename,
             "total_readings": self.data.get(device_id, {}).get("total_readings", 0) + readings_count,
-            "updated_at": datetime.now().isoformat()
+            "updated_at": datetime.now(timezone.utc).isoformat()
         }
         self.save()
 

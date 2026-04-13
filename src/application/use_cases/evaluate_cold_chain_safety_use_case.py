@@ -121,14 +121,6 @@ class EvaluateColdChainSafetyUseCase:
 
         ctx = DomainCenterContext.from_request(request)
 
-        # إيقاف مؤقت لمعرفة أين يحدث الخطأ بالضبط
-        print("✅ وصلنا إلى بعد from_request بنجاح")
-
-        # تحقق سريع للتصحيح
-        if ctx.ft2_entries:
-            sample_ts = ctx.ft2_entries[0].timestamp
-            print(f"DEBUG: نوع timestamp = {type(sample_ts)}, قيمة = {sample_ts}")
-
         if not ctx.ft2_entries:
             ctx.decision = "NO_DATA"
             stats = {"has_freeze": False, "has_who_heat_exposure": False, "her_ratio": 0.0}

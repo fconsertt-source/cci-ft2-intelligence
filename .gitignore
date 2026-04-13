@@ -45,6 +45,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.pyc
+.env
+.env.*
+!.env.example
 .venv/
 venv/
 env/

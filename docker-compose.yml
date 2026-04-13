@@ -18,10 +18,12 @@ services:
 
   cci-ft2-db:
     image: postgres:13
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: cci_ft2
-      POSTGRES_USER: cci_user
-      POSTGRES_PASSWORD: cci_password
+      POSTGRES_DB: ${POSTGRES_DB:-cci_ft2}
+      POSTGRES_USER: ${POSTGRES_USER:-cci_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
