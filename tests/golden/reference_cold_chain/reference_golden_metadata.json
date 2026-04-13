@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "description": "Proposed golden metadata manifest for parallel reference cold-chain scenarios. Discovery-only placeholder for later implementation.",
+  "contract_notes": {
+    "parallel_path_only": true,
+    "direct_replacement_forbidden": true,
+    "extra_stats_prefix": "reference_"
+  },
+  "fixtures": {
+    "safe_nominal": {
+      "file": "fixtures/safe_nominal.json",
+      "coverage_target": "Nominal in-range readings should keep primary decision intact while enabling parallel reference assertions."
+    },
+    "freeze_breach": {
+      "file": "fixtures/freeze_breach.json",
+      "coverage_target": "Reference path should detect a clear freeze excursion and expose only additive reference_* metrics."
+    },
+    "heat_duration_breach": {
+      "file": "fixtures/heat_duration_breach.json",
+      "coverage_target": "Reference path should detect prolonged heat exposure and expose only additive reference_* metrics."
+    },
+    "no_data": {
+      "file": "fixtures/no_data.json",
+      "coverage_target": "Reference path should gracefully handle missing readings without breaking the operational path."
+    },
+    "borderline_freeze_threshold": {
+      "file": "fixtures/borderline_freeze_threshold.json",
+      "coverage_target": "Threshold-edge freeze case for deterministic regression coverage."
+    },
+    "borderline_heat_duration_threshold": {
+      "file": "fixtures/borderline_heat_duration_threshold.json",
+      "coverage_target": "Threshold-edge heat-duration case for deterministic regression coverage."
+    },
+    "mixed_excursion_freeze_and_heat": {
+      "file": "fixtures/mixed_excursion_freeze_and_heat.json",
+      "coverage_target": "Combined excursion scenario to validate adapter mapping and coexistence of multiple reference_* metrics."
+    },
+    "vaccine_profile_sensitivity_compare": {
+      "file": "fixtures/vaccine_profile_sensitivity_compare.json",
+      "coverage_target": "SSOT vaccine-library sensitivity scenario for profile-driven reference comparisons."
+    }
+  }
+}

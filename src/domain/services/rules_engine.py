@@ -6,12 +6,8 @@ from typing import Any, Dict, List, Optional
 from src.domain.enums.vvm_stage import VVMStage
 
 # محاولة استيراد logger بشكل آمن (قد يكون غير متاح في بعض السياقات)
-try:
-    from src.infrastructure.logging import get_logger
-    _logger = get_logger(__name__)
-except Exception:
-    import logging
-    _logger = logging.getLogger(__name__)
+import logging
+_logger = logging.getLogger(__name__)
 
 
 def _extract_temperature(entry):
@@ -90,7 +86,7 @@ def calculate_center_stats(center) -> Dict[str, Any]:
             "freeze_duration": 0,
             "heat_duration": 0,
             "has_freeze": False,
-            "has_ccm_violation": False,
+            "has_heat_duration_breach": False,
             "avg_temperature": 0.0,
             "min_temperature": 0.0,
             "max_temperature": 0.0,
@@ -115,7 +111,7 @@ def calculate_center_stats(center) -> Dict[str, Any]:
             heat_duration += duration
 
     has_freeze = freeze_duration > 0
-    has_ccm_violation = heat_duration > ccm_limit
+    has_heat_duration_breach = heat_duration > ccm_limit
 
     avg_temperature = sum(temperatures) / len(temperatures) if temperatures else 0.0
     min_temperature = min(temperatures) if temperatures else 0.0
@@ -139,7 +135,7 @@ def calculate_center_stats(center) -> Dict[str, Any]:
         "freeze_duration": freeze_duration,
         "heat_duration": heat_duration,
         "has_freeze": has_freeze,
-        "has_ccm_violation": has_ccm_violation,
+        "has_heat_duration_breach": has_heat_duration_breach,
         "avg_temperature": avg_temperature,
         "min_temperature": min_temperature,
         "max_temperature": max_temperature,
@@ -182,23 +178,26 @@ class ExpiryRule(DecisionRule):
 
 class FreezeRule(DecisionRule):
     def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
-        is_freeze_stable = getattr(
-            center, "is_freeze_stable", not getattr(center, "freeze_sensitive", True)
-        )
+        freeze_sensitive = getattr(center, "freeze_sensitive", True)
+        is_freeze_stable = getattr(center, "is_freeze_stable", not freeze_sensitive)
 
         if stats.get("has_freeze", False):
-            if not is_freeze_stable:
+            if freeze_sensitive and not is_freeze_stable:
+                # لقاح حساس → رفض
                 action = getattr(center, "actions", {}).get(
                     "on_freeze", "تلف فوري محتمل"
                 )
                 center.decision_reasons.append(
-                    f"انتهاك تجميد: {stats['freeze_duration']} دقيقة < 0°C. {action}"
+                    f"انتهاك تجميد: {stats.get('freeze_duration', 0)} دقيقة < 0°C. {action}"
                 )
                 return "REJECTED_FREEZE"
             else:
+                # لقاح مقاوم للتجميد → تحذير فقط
                 center.decision_reasons.append(
-                    f"تم رصد تجميد ({stats['freeze_duration']} دقيقة) ولكن اللقاح مقاوم للتجميد وفق المكتبة العلمية."
+                    f"تم رصد تجميد ({stats.get('freeze_duration', 0)} دقيقة) ولكن اللقاح مقاوم للتجميد."
                 )
+                # لا نرفض، لكن نضع تحذير
+                center.has_warning = True
         else:
             center.decision_reasons.append("لم يتم رصد تجميد")
         return None
@@ -227,7 +226,7 @@ class HeatCriticalRule(DecisionRule):
             )
             return "REJECTED_HEAT_C"
 
-        if stats.get("has_ccm_violation", False):
+        if stats.get("has_heat_duration_breach", False):
             center.decision_reasons.append(
                 f"تجاوز الحد التراكمي (CCM): {stats.get('heat_duration', 0)} دقيقة"
             )
@@ -243,14 +242,25 @@ class TemperatureWarningRule(DecisionRule):
     def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
         min_temp = stats.get("min_temp")
         max_temp = stats.get("max_temp")
+
+        # fallback إذا لم تكن موجودة في stats
+        if min_temp is None or max_temp is None:
+            if hasattr(center, "ft2_entries") and center.ft2_entries:
+                temps = [_extract_temperature(e) for e in center.ft2_entries if _extract_temperature(e) is not None]
+                if temps:
+                    min_temp = min(temps)
+                    max_temp = max(temps)
+
         if min_temp is None or max_temp is None:
             return None
+
         if min_temp < 2.0 or max_temp > 8.0:
             center.decision_reasons.append(
                 f"تحذير خروج عن النطاق: ({min_temp:.1f}°C - {max_temp:.1f}°C)"
             )
             center.has_warning = True
-            return None
+            return None   # لا نرفض، فقط تحذير
+
         center.decision_reasons.append("درجات الحرارة ضمن النطاق الآمن (2-8°C)")
         return None
 
@@ -288,25 +298,36 @@ class ThawRule(DecisionRule):
 
 class VVMStageRule(DecisionRule):
     def evaluate(self, center, stats: Dict[str, Any]) -> Optional[str]:
-        her = stats.get("her", 0.0)
+        # دعم كلا المفتاحين (her_ratio من الخدمة الجديدة + her من القديم)
+        her = stats.get("her_ratio", stats.get("her", 0.0))
+
+        flexible_vvm_allowed = getattr(center, "flexible_vvm_allowed", False) or stats.get(
+            "flexible_vvm_allowed", False
+        )
 
         if her >= 1.0:
             center.vvm_stage = VVMStage.D
             center.decision_reasons.append(
-                "VVM المرحلة D: اللقاح منتهي الصلاحية حرارياً"
+                f"VVM المرحلة D: HER ratio = {her:.3f} ≥ 1.0 → منتهي حرارياً"
             )
             return "REJECTED_HEAT_C"
         elif her >= 0.7:
             center.vvm_stage = VVMStage.C
-            center.decision_reasons.append(
-                "VVM المرحلة C: اقتراب شديد من نهاية الصلاحية"
-            )
+            if (
+                flexible_vvm_allowed
+                and getattr(center, "vaccine_type", "").upper() == "OPV"
+            ):
+                center.decision_reasons.append(
+                    "Fast Chain Flexible VVM policy applied for OPV campaigns"
+                )
+            else:
+                center.decision_reasons.append(f"VVM المرحلة C: HER = {her:.3f}")
         elif her >= 0.4:
             center.vvm_stage = VVMStage.B
-            center.decision_reasons.append("VVM المرحلة B: تدهور ملحوظ")
+            center.decision_reasons.append(f"VVM المرحلة B: HER = {her:.3f}")
         elif her >= 0.1:
             center.vvm_stage = VVMStage.A
-            center.decision_reasons.append("VVM المرحلة A: بداية تأثر بالحرارة")
+            center.decision_reasons.append(f"VVM المرحلة A: HER = {her:.3f}")
         else:
             center.vvm_stage = VVMStage.NONE
 
@@ -371,8 +392,9 @@ class RulesEngine:
 
 
 def apply_rules(center, extra_stats: Optional[Dict[str, Any]] = None, enable_heat_duration: bool = False):
-    """واجهة التطبيق المتوافقة مع الكود القديم"""
     center.decision_reasons = []
+    if not hasattr(center, 'has_warning'):
+        center.has_warning = False
 
     stats = calculate_center_stats(center)
     if extra_stats:

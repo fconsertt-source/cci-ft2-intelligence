@@ -1,19 +1,50 @@
-from src.domain.dtos.center_dto import CenterDTO
+# src/application/mappers/center_mapper.py
+from typing import Any, Dict, List
+
+from src.application.dtos.center_dto import CenterDTO
+from src.application.dtos.equipment_dto import EquipmentDTO
 
 
-def to_center_dto(center_obj) -> CenterDTO:
-    return CenterDTO(
-        id=getattr(center_obj, "id", None),
-        name=getattr(center_obj, "name", ""),
-        device_ids=getattr(center_obj, "device_ids", []),
-        ft2_entries=getattr(center_obj, "ft2_entries", []),
-        decision=getattr(center_obj, "decision", "UNKNOWN"),
-        vvm_stage=getattr(center_obj, "vvm_stage", "NONE"),
-        alert_level=getattr(center_obj, "alert_level", None),
-        stability_budget_consumed_pct=getattr(
-            center_obj, "stability_budget_consumed_pct", 0.0
-        ),
-        thaw_remaining_hours=getattr(center_obj, "thaw_remaining_hours", None),
-        category_display=getattr(center_obj, "category_display", None),
-        decision_reasons=getattr(center_obj, "decision_reasons", []),
-    )
+class CenterMapper:
+    """محول وحيد: YAML dict -> CenterDTO (مباشرة، بدون VaccinationCenter)"""
+
+    @staticmethod
+    def _build_equipment_units(
+        center_id: str,
+        equipment_raw: Dict[str, Any],
+        temperature_ranges: Dict[str, float],
+        decision_thresholds: Dict[str, Any],
+    ) -> List[EquipmentDTO]:
+        units = []
+        for eq_id, eq_data in equipment_raw.items():
+            device_id = eq_data.get("device_id", "")
+            if not device_id:
+                continue
+            units.append(EquipmentDTO(
+                equipment_id=eq_id,
+                equipment_name=eq_data.get("name", eq_id),
+                device_id=device_id,
+                center_id=center_id,
+                temperature_ranges=temperature_ranges,
+                decision_thresholds=decision_thresholds,
+            ))
+        return units
+
+    @staticmethod
+    def from_dict_to_dto(center_id: str, data: Dict[str, Any]) -> CenterDTO:
+        equipment_raw = data.get("equipment", {})
+        temperature_ranges = data.get("temperature_ranges", {"min": 2.0, "max": 8.0})
+        decision_thresholds = data.get("decision_thresholds", {})
+
+        equipment_units = CenterMapper._build_equipment_units(
+            center_id, equipment_raw, temperature_ranges, decision_thresholds
+        )
+
+        return CenterDTO(
+            id=center_id,
+            name=data.get("name", ""),
+            equipment=equipment_raw,
+            temperature_ranges=temperature_ranges,
+            decision_thresholds=decision_thresholds,
+            equipment_units=equipment_units,
+        )

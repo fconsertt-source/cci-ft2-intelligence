@@ -1,0 +1,38 @@
+{
+  "session_id": "130600113437_20260406_164056",
+  "rows": 60,
+  "schema_fields": [
+    "timestamp",
+    "temperature",
+    "device_id",
+    "duration_minutes",
+    "vaccine_type",
+    "batch",
+    "freeze_duration",
+    "heat_duration"
+  ],
+  "schema_types": [
+    "string",
+    "double",
+    "string",
+    "int64",
+    "string",
+    "string",
+    "int64",
+    "int64"
+  ],
+  
+  "compression": "snappy",
+  "checksum": null,
+  "user_metadata": {
+    "center_id": "TEST_CENTER_04",
+    "center_name": "TEST_CENTER_04",
+    "equipment_name": "غرفة تبريد",
+    "device_id": "130600113437",
+    "decision": "ACCEPTED",
+    "vvm_stage": "VVMStage.NONE",
+    "alert_level": null,
+    "stability_budget_consumed_pct": 6.864771956405062,
+    "run_id": "20260406_164035"
+  }
+}

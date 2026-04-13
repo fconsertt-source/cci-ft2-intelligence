@@ -1,0 +1,27 @@
+{
+  "session_id": "130600112758",
+  "rows": 60,
+  "schema_fields": [
+    "device_id",
+    "timestamp",
+    "temperature",
+    "vaccine_type",
+    "batch",
+    "duration_minutes",
+    "freeze_duration",
+    "heat_duration"
+  ],
+  "schema_types": [
+    "int64",
+    "string",
+    "double",
+    "string",
+    "string",
+    "int64",
+    "int64",
+    "int64"
+  ],
+  "compression": "snappy",
+  "checksum": null,
+  "user_metadata": {}
+}

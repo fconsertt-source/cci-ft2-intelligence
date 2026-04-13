@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 from typing import Dict, List, Optional, TYPE_CHECKING
 from datetime import datetime
+from src.domain.value_objects.analysis_result import AnalysisResult
 
 if TYPE_CHECKING:
     from src.domain.entities.temperature_reading import TemperatureReading
@@ -73,12 +74,12 @@ class ExposureAnalysisService:
         return 0.0
 
     def analyze(
-        self,
-        readings: List["TemperatureReading"],
-        spec: Optional["VaccineSpecification"] = None,
-        supply_date: Optional[datetime] = None,
-        enable_supply_date: bool = False,
-    ) -> Dict:
+            self,
+            readings: List["TemperatureReading"],
+            spec: Optional["VaccineSpecification"] = None,
+            supply_date: Optional[datetime] = None,
+            enable_supply_date: bool = False,
+        ) -> AnalysisResult:  # <--- التعديل هنا
         if spec is None:
             from src.domain.value_objects.vaccine_specification import (
                 VACCINE_CATALOGUE,
@@ -159,20 +160,17 @@ class ExposureAnalysisService:
             hours_above_34 >= _CCM_CRITICAL_HOURS,
         )
 
-        return {
-            "her_ratio": her_ratio,
-            "ccm_index": ccm_index,
-            "has_freeze": min_temp < _FREEZE_THRESHOLD,
-            "has_critical_heat": hours_above_34 >= _CCM_CRITICAL_HOURS,
-            "max_temp": max_temp,
-            "min_temp": min_temp,
-            "total_hours_above_10": round(hours_above_10, 2),
-            "total_hours_above_34": round(hours_above_34, 4),
-            "circuit_breaker": circuit_breaker,
-            # ── legacy: كان موجوداً في الإصدار القديم ──────────
-            "data_quality_flags": {"sampling_gap": False},
-            "has_ccm_violation": hours_above_10 > 0,
-        }
+        return AnalysisResult(
+                    her_ratio=her_ratio,
+                    ccm_index=ccm_index,
+                    has_freeze=min_temp < _FREEZE_THRESHOLD,
+                    has_critical_heat=hours_above_34 >= _CCM_CRITICAL_HOURS,
+                    circuit_breaker=circuit_breaker,
+                    max_temp=max_temp,
+                    min_temp=min_temp,
+                    total_hours_above_10=round(hours_above_10, 2),
+                    total_hours_above_34=round(hours_above_34, 4),
+                )
 
     # ──────────────────────────────────────────────────────────
     # Circuit Breakers
@@ -382,16 +380,16 @@ class ExposureAnalysisService:
         return total_hours
 
     @staticmethod
-    def _empty_analysis() -> Dict:
+    def _empty_analysis() -> AnalysisResult:
         """نتيجة فارغة عند غياب البيانات."""
-        return {
-            "her_ratio": 0.0,
-            "ccm_index": "0",
-            "has_freeze": False,
-            "has_critical_heat": False,
-            "max_temp": 0.0,
-            "min_temp": 0.0,
-            "total_hours_above_10": 0.0,
-            "total_hours_above_34": 0.0,
-            "circuit_breaker": None,
-        }
+        return AnalysisResult(
+            her_ratio=0.0,
+            ccm_index="0",
+            has_freeze=False,
+            has_critical_heat=False,
+            circuit_breaker=None,
+            max_temp=0.0,
+            min_temp=0.0,
+            total_hours_above_10=0.0,
+            total_hours_above_34=0.0,
+        )

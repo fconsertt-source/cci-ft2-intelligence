@@ -100,11 +100,11 @@ class CoolingDevice:
             spec=spec,
         )
 
-        her_ratio = analysis["her_ratio"]
-        ccm_index = analysis["ccm_index"]
-        circuit_breaker = analysis["circuit_breaker"]
-        max_temp = analysis["max_temp"]
-        min_temp = analysis["min_temp"]
+        her_ratio = analysis.her_ratio
+        ccm_index = analysis.ccm_index
+        circuit_breaker = analysis.circuit_breaker
+        max_temp = analysis.max_temp
+        min_temp = analysis.min_temp
 
         # ── 4. منطق القرار ───────────────────────────────────
         status, vvm_stage, reason = self._decide(

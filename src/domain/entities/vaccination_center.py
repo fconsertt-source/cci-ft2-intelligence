@@ -177,7 +177,7 @@ class VaccinationCenter:
     @property
     def ccm_violations(self) -> List[FT2Entry]:
         """إدخالات تحتوي على انتهاكات CCM"""
-        return [entry for entry in self.ft2_entries if entry.has_ccm_violation]
+        return [entry for entry in self.ft2_entries if entry.has_ft2_tacc_alarm]
 
     @property
     def total_ccm_minutes(self) -> int:

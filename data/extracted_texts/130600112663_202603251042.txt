@@ -1,0 +1,88 @@
+PDF document of the Fridge-tag® 2 E
+Identification number: 130600112663
+Date and time of report creation: 25.03.2026 10:42h
+Activation date: 29.10.2022 10:36h
+Upper alarm limit: Above +8.0°C for 10h
+Lower alarm limit: Below -0.5°C for 1h
+Measurement interval:1) 1min (fixed)
+Lower alarm limit Upper alarm limit
+No. Date Events2) Average Status Min. Cumulative Alarm Status Max. Cumulative Alarm Signature / notes
+(dd.MM.yyyy) temp. temp. daily time trigger temp. daily time trigger Action taken
+below the limit time above the limit time
+1 Today 07:38 +3.5°C In progress +3.3°C 0min In progress +6.3°C 0min
+2 24.03.2026 08:28 +9.2°C ok +3.5°C 0min ALARM +17.4°C 11h 44min 00:00h
+3 23.03.2026 +11.3°C ok +8.4°C 0min ALARM +13.7°C 1d 08:59h
+4 22.03.2026 +5.0°C ok +3.6°C 0min ok +8.4°C 1h 1min
+5 21.03.2026 +3.7°C ok +3.6°C 0min ok +4.0°C 0min
+6 20.03.2026 +3.7°C ok +3.5°C 0min ok +4.0°C 0min
+7 19.03.2026 +3.5°C ok +3.3°C 0min ok +4.1°C 0min
+8 18.03.2026 +3.2°C ok +3.1°C 0min ok +3.8°C 0min
+9 17.03.2026 +3.3°C ok +3.0°C 0min ok +4.9°C 0min
+10 16.03.2026 +3.4°C ok +3.2°C 0min ok +4.4°C 0min
+11 15.03.2026 +3.4°C ok +3.3°C 0min ok +4.0°C 0min
+12 14.03.2026 +3.6°C ok +3.4°C 0min ok +4.8°C 0min
+13 13.03.2026 +3.3°C ok +3.3°C 0min ok +3.5°C 0min
+14 12.03.2026 +3.6°C ok +3.1°C 0min ok +4.9°C 0min
+15 11.03.2026 +3.6°C ok +3.5°C 0min ok +4.0°C 0min
+16 10.03.2026 +3.5°C ok +3.2°C 0min ok +4.6°C 0min
+17 09.03.2026 +3.6°C ok +3.1°C 0min ok +4.9°C 0min
+18 08.03.2026 +3.7°C ok +3.2°C 0min ok +5.8°C 0min
+19 07.03.2026 +3.8°C ok +3.6°C 0min ok +4.8°C 0min
+20 06.03.2026 +3.6°C ok +3.6°C 0min ok +3.6°C 0min
+21 05.03.2026 +3.8°C ok +3.5°C 0min ok +5.3°C 0min
+22 04.03.2026 +3.5°C ok +3.4°C 0min ok +4.1°C 0min
+23 03.03.2026 +3.4°C ok +3.3°C 0min ok +4.3°C 0min
+24 02.03.2026 +3.4°C ok +3.0°C 0min ok +6.2°C 0min
+25 01.03.2026 +3.2°C ok +3.0°C 0min ok +4.8°C 0min
+26 28.02.2026 +3.4°C ok +3.1°C 0min ok +4.8°C 0min
+27 27.02.2026 +3.0°C ok +3.0°C 0min ok +3.1°C 0min
+28 26.02.2026 +3.4°C ok +2.9°C 0min ok +6.4°C 0min
+29 25.02.2026 +3.0°C ok +2.9°C 0min ok +3.1°C 0min
+30 24.02.2026 +3.3°C ok +3.0°C 0min ok +5.1°C 0min
+1) Sampling and data analysis every minute
+2) t = time / date changed, hh:mm = status checked
+Date and place: ____________________________ Signature: ____________________________ Page 1/2
+PDF document of the Fridge-tag® 2 E
+Identification number: 130600112663
+Date and time of report creation: 25.03.2026 10:42h
+Activation date: 29.10.2022 10:36h
+Upper alarm limit: Above +8.0°C for 10h
+Lower alarm limit: Below -0.5°C for 1h
+Measurement interval:1) 1min (fixed)
+Lower alarm limit Upper alarm limit
+No. Date Events2) Average Status Min. Cumulative Alarm Status Max. Cumulative Alarm Signature / notes
+(dd.MM.yyyy) temp. temp. daily time trigger temp. daily time trigger Action taken
+below the limit time above the limit time
+31 23.02.2026 +3.5°C ok +3.1°C 0min ok +5.9°C 0min
+32 22.02.2026 +3.7°C ok +3.3°C 0min ok +5.3°C 0min
+33 21.02.2026 +3.5°C ok +3.5°C 0min ok +4.1°C 0min
+34 20.02.2026 +3.4°C ok +3.4°C 0min ok +3.5°C 0min
+35 19.02.2026 +3.5°C ok +3.3°C 0min ok +5.0°C 0min
+36 18.02.2026 +3.5°C ok +3.3°C 0min ok +4.6°C 0min
+37 17.02.2026 +3.5°C ok +3.2°C 0min ok +6.1°C 0min
+38 16.02.2026 +3.5°C ok +3.2°C 0min ok +5.0°C 0min
+39 15.02.2026 +3.6°C ok +3.4°C 0min ok +4.5°C 0min
+40 14.02.2026 +3.7°C ok +3.5°C 0min ok +4.4°C 0min
+41 13.02.2026 +3.5°C ok +3.5°C 0min ok +3.6°C 0min
+42 12.02.2026 +3.8°C ok +3.3°C 0min ok +5.6°C 0min
+43 11.02.2026 +3.6°C ok +3.5°C 0min ok +4.6°C 0min
+44 10.02.2026 +3.9°C ok +3.1°C 0min ok +8.3°C 19min
+45 09.02.2026 +3.2°C ok +3.1°C 0min ok +3.9°C 0min
+46 08.02.2026 +3.3°C ok +3.1°C 0min ok +4.1°C 0min
+47 07.02.2026 +3.4°C ok +3.1°C 0min ok +4.3°C 0min
+48 06.02.2026 +3.1°C ok +3.1°C 0min ok +3.4°C 0min
+49 05.02.2026 +3.3°C ok +3.0°C 0min ok +4.3°C 0min
+50 04.02.2026 +3.0°C ok +2.9°C 0min ok +3.7°C 0min
+51 03.02.2026 +3.1°C ok +2.9°C 0min ok +4.2°C 0min
+52 02.02.2026 +3.1°C ok +3.0°C 0min ok +4.7°C 0min
+53 01.02.2026 09:00 +4.8°C ok +3.1°C 0min ok +9.8°C 16min
+54 31.01.2026 +6.2°C ok +5.7°C 0min ok +6.7°C 0min
+55 30.01.2026 +6.1°C ok +5.6°C 0min ok +6.5°C 0min
+56 29.01.2026 +6.2°C ok +5.6°C 0min ok +8.0°C 0min
+57 28.01.2026 +6.0°C ok +5.6°C 0min ok +6.3°C 0min
+58 27.01.2026 +6.1°C ok +5.5°C 0min ok +7.0°C 0min
+59 26.01.2026 +6.0°C ok +5.5°C 0min ok +6.8°C 0min
+60 25.01.2026 +6.0°C ok +5.5°C 0min ok +6.6°C 0min
+1) Sampling and data analysis every minute
+2) t = time / date changed, hh:mm = status checked
+Date and place: ____________________________ Signature: ____________________________ Page 2/2

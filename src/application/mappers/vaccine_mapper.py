@@ -1,4 +1,4 @@
-from src.domain.dtos.vaccine_dto import VaccineDTO
+from src.application.dtos.vaccine_dto import VaccineDTO
 
 
 def to_vaccine_dto(vaccine_obj) -> VaccineDTO:

@@ -12,7 +12,7 @@ from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import 
     get_pdf_generator
 
 if TYPE_CHECKING:
-    from src.domain.dtos.device_report_dto import DeviceReportDTO
+    from src.application.dtos.device_report_dto import DeviceReportDTO
 
 
 class PDFReportStrategy(ABC):

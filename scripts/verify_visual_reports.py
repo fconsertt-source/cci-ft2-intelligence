@@ -136,7 +136,7 @@ def generate_visual_reports(
 
     # Import heavy generator lazily
     try:
-        from src.presentation.reporting.unified_pdf_generator import (
+        from src.infrastructure.pdf.unified_pdf_generator import (
             ReportType, UnifiedPDFGenerator)
     except Exception as e:
         logger.error("Could not import UnifiedPDFGenerator: %s", e)

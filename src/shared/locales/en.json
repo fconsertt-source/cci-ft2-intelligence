@@ -173,6 +173,11 @@
   "report.visual_trends": "Visual Trends",
   "report.batch_analysis": "Detailed Batch Analysis",
   "report.temperature_range": "Temperature Range: 2°C - 8°C",
+  "report.exposure_minutes": "Exposure Minutes",
+  "report.report_id": "Report ID",
+  "report.status_alert": "Status Alert",
+  "report.stability_budget": "Stability Budget",
+  "report.category": "Category",
   "report.avg_temperature": "Average Temperature",
   "report.max_excursion": "Max Excursion",
   "report.vvm_distribution": "VVM Stage Distribution",
@@ -211,5 +216,11 @@
   "help.content.steps": "Steps: 1) Enter general data, 2) Register cooling units, 3) Add vaccines, 4) Import FT2 files, 5) Verify digitally, 6) Generate report",
   "help.content.support_email": "Support Email: support@cci-ft2.example.com",
   "help.content.support_phone": "Support Phone: +XXX-XXX-XXXX",
-  "filetype.all": "All Files"
+  "filetype.all": "All Files",
+  "SSOT_STATUS": "SSOT Status",
+  "DATA_QUALITY_SCORE": "Data Quality Score",
+  "PIPELINE_SUMMARY": "Pipeline Summary",
+  "VISUAL_REPORT_TECHNICAL": "Technical Visual Report",
+  "VISUAL_REPORT_OFFICIAL": "Official Visual Report",
+  "VISUAL_REPORT_ARABIC": "Arabic Visual Report"
 }

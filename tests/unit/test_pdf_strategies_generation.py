@@ -1,6 +1,6 @@
 """Ensure PDF strategies successfully produce byte output."""
 
-from src.domain.dtos.device_report_dto import DeviceReportDTO
+from src.application.dtos.device_report_dto import DeviceReportDTO
 from src.infrastructure.adapters.reporting.pdf_strategy import (
     ArabicPDFStrategy, OfficialPDFStrategy, TechnicalPDFStrategy)
 from src.utils.time import utc_now_iso

@@ -5,6 +5,7 @@ import warnings
 from datetime import datetime
 from typing import List
 
+from src.application.dtos.ft2_entry_dto import FT2EntryDTO
 from src.infrastructure.logging import get_logger
 
 logger = get_logger(__name__)
@@ -66,18 +67,21 @@ class FT2Parser:
                                 try:
                                     ts = datetime.fromisoformat(ts_str)
                                 except ValueError:
-                                    # Handle simple cases or assume ISO
-                                    ts = datetime.now()  # Fallback or error logic
+                                    ts = datetime.now()
                             else:
                                 ts = datetime.now()
 
-                            entry = FT2Reading(
+                            entry = FT2EntryDTO(
+                                id=f"{row['device_id']}_{ts.isoformat()}",
                                 device_id=str(row["device_id"]),
                                 timestamp=ts,
                                 temperature=float(row["temperature"]),
                                 vaccine_type=row.get("vaccine_type", "UNKNOWN"),
-                                batch=row.get("batch", "UNKNOWN"),
-                                duration_minutes=15.0,  # افتراض 15 دقيقة لكل قراءة في CSV
+                                # ✅ الإصلاح: إزالة batch_id (غير موجود في FT2EntryDTO)
+                                # batch_id كان يُمرَّر بالخطأ — الحقل الصحيح هو batch فقط
+                                batch=row.get("batch") or row.get("batch_id", "UNKNOWN"),
+                                duration_minutes=float(row.get("duration_minutes", 15.0)),
+                                center_id="UNKNOWN",
                             )
                             entries.append(entry)
                         except Exception as e:
@@ -96,14 +100,11 @@ class FT2Parser:
 # Compatibility shim
 # ---------------------------------------------------------------------------
 
-# preserve old name for external callers; emit warning at import time
-
-
 class FT2Entry(FT2Reading):  # type: ignore
     """Deprecated alias kept for backward compatibility.
 
     Use :class:`FT2Reading` or domain entities instead.  This class will be
-    removed in Phase 5.
+    removed in Phase 5.
     """
 
     def __init__(self, *args, **kwargs):

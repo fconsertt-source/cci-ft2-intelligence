@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Tuple
 
-from src.domain.dtos.analysis_result_dto import (AnalysisResultDTO,
+from src.application.dtos.analysis_result_dto import (AnalysisResultDTO,
                                                  VaccineStatus)
 
 

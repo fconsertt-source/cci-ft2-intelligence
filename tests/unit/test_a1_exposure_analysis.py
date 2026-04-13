@@ -116,10 +116,10 @@ class TestExposureAnalysisService:
 
     def test_empty_readings_returns_zeros(self):
         result = self.service.analyze([], spec=self.general_spec)
-        assert result["her_ratio"] == 0.0
-        assert result["ccm_index"] == "0"
-        assert result["has_freeze"] is False
-        assert result["circuit_breaker"] is None
+        assert result.her_ratio == 0.0
+        assert result.ccm_index == "0"
+        assert result.has_freeze is False
+        assert result.circuit_breaker is None
 
     # ── المشكلة الأصلية: 9.8°C / 22 دقيقة ────────────────────
 
@@ -132,7 +132,7 @@ class TestExposureAnalysisService:
         result = self.service.analyze(readings, spec=self.general_spec)
 
         # HER يجب أن يكون أكبر من صفر
-        assert result["her_ratio"] > 0.0
+        assert result.her_ratio > 0.0
 
         # Q10 factor عند 9.8°C (ref=5°C):
         # factor = 2.0^((9.8-5.0)/10) = 2.0^0.48 ≈ 1.394
@@ -142,14 +142,14 @@ class TestExposureAnalysisService:
         expected_deg_hours = (22.0 / 60.0) * expected_factor
         expected_ratio = expected_deg_hours / (730.0 * 24.0)
 
-        assert abs(result["her_ratio"] - expected_ratio) < 1e-6
+        assert abs(result.her_ratio - expected_ratio) < 1e-6
 
     def test_normal_range_low_her(self):
         """4°C لأسبوع كامل → HER منخفض جداً."""
         readings = make_readings([(4.0, 1440.0)] * 7)  # 7 أيام
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["her_ratio"] < 0.1
-        assert result["ccm_index"] == "0"
+        assert result.her_ratio < 0.1
+        assert result.ccm_index == "0"
 
     # ── Circuit Breakers ───────────────────────────────────────
 
@@ -157,35 +157,35 @@ class TestExposureAnalysisService:
         """35°C لمدة 3 ساعات → CIRCUIT_BREAKER."""
         readings = make_readings([(35.0, 180.0)])  # 3 ساعات
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["circuit_breaker"] == "CRITICAL_HEAT_34C"
-        assert result["has_critical_heat"] is True
+        assert result.circuit_breaker == "CRITICAL_HEAT_34C"
+        assert result.has_critical_heat is True
 
     def test_critical_heat_exactly_2_hours_triggers(self):
         """34.1°C لمدة ساعتين بالضبط → CIRCUIT_BREAKER."""
         readings = make_readings([(34.1, 120.0)])  # ساعتان
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["circuit_breaker"] == "CRITICAL_HEAT_34C"
+        assert result.circuit_breaker == "CRITICAL_HEAT_34C"
 
     def test_critical_heat_under_2_hours_no_trigger(self):
         """35°C لمدة ساعة واحدة → لا circuit breaker."""
         readings = make_readings([(35.0, 59.0)])  # أقل من ساعة
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["circuit_breaker"] is None
+        assert result.circuit_breaker is None
 
     def test_freeze_sensitive_vaccine_triggers_on_freeze(self):
         """HepB عند -1°C → CIRCUIT_BREAKER: FREEZE."""
         readings = make_readings([(-1.0, 30.0)])
         result = self.service.analyze(readings, spec=self.hepb_spec)
-        assert result["circuit_breaker"] == "FREEZE_EXCURSION"
-        assert result["has_freeze"] is True
+        assert result.circuit_breaker == "FREEZE_EXCURSION"
+        assert result.has_freeze is True
 
     def test_non_freeze_sensitive_no_circuit_breaker_on_freeze(self):
         """OPV عند -2°C → لا circuit breaker للتجمد."""
         readings = make_readings([(-2.0, 60.0)])
         result = self.service.analyze(readings, spec=self.opv_spec)
         # OPV ليس freeze_sensitive → لا circuit breaker للتجمد
-        assert result["circuit_breaker"] is None
-        assert result["has_freeze"] is True  # لكن has_freeze يبقى True للتسجيل
+        assert result.circuit_breaker is None
+        assert result.has_freeze is True  # لكن has_freeze يبقى True للتسجيل
 
     # ── CCM Index ─────────────────────────────────────────────
 
@@ -193,31 +193,31 @@ class TestExposureAnalysisService:
         """أقل من 72 ساعة فوق 10°C → مؤشر 0."""
         readings = make_readings([(11.0, 60.0)] * 70)  # 70 ساعة
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["ccm_index"] == "0"
+        assert result.ccm_index == "0"
 
     def test_ccm_index_a_3_to_8_days(self):
         """72-192 ساعة فوق 10°C → مؤشر A."""
         readings = make_readings([(12.0, 60.0)] * 80)  # 80 ساعة
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["ccm_index"] == "A"
+        assert result.ccm_index == "A"
 
     def test_ccm_index_ab_8_to_14_days(self):
         """192-336 ساعة فوق 10°C → مؤشر AB."""
         readings = make_readings([(12.0, 60.0)] * 200)  # 200 ساعة
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["ccm_index"] == "AB"
+        assert result.ccm_index == "AB"
 
     def test_ccm_index_abc_over_14_days(self):
         """فوق 336 ساعة فوق 10°C → مؤشر ABC."""
         readings = make_readings([(12.0, 60.0)] * 340)  # 340 ساعة
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["ccm_index"] == "ABC"
+        assert result.ccm_index == "ABC"
 
     def test_ccm_index_d_critical_heat(self):
         """فوق 34°C لأكثر من ساعتين → مؤشر D."""
         readings = make_readings([(37.0, 180.0)])  # 3 ساعات
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["ccm_index"] == "D"
+        assert result.ccm_index == "D"
 
     # ── HER ratio ─────────────────────────────────────────────
 
@@ -227,7 +227,7 @@ class TestExposureAnalysisService:
         r_10 = make_readings([(10.0, 1440.0)])
         result_5 = self.service.analyze(r_5, spec=self.general_spec)
         result_10 = self.service.analyze(r_10, spec=self.general_spec)
-        assert result_10["her_ratio"] > result_5["her_ratio"]
+        assert result_10.her_ratio > result_5.her_ratio
 
     def test_her_ratio_accumulates_over_time(self):
         """HER لـ 7 أيام أكبر من HER ليوم واحد.
@@ -240,8 +240,8 @@ class TestExposureAnalysisService:
         r_7days = make_readings([(6.0, 1440.0)] * 7)
         result_1 = self.service.analyze(r_1day, spec=self.general_spec)
         result_7 = self.service.analyze(r_7days, spec=self.general_spec)
-        assert result_7["her_ratio"] > result_1["her_ratio"]
-        assert abs(result_7["her_ratio"] - result_1["her_ratio"] * 7) < 1e-5
+        assert result_7.her_ratio > result_1.her_ratio
+        assert abs(result_7.her_ratio - result_1.her_ratio * 7) < 1e-5
 
     def test_opv_her_ratio_higher_than_hepb_same_exposure(self):
         """
@@ -251,21 +251,21 @@ class TestExposureAnalysisService:
         readings = make_readings([(8.0, 1440.0)] * 10)
         result_opv = self.service.analyze(readings, spec=self.opv_spec)
         result_hepb = self.service.analyze(readings, spec=self.hepb_spec)
-        assert result_opv["her_ratio"] > result_hepb["her_ratio"]
+        assert result_opv.her_ratio > result_hepb.her_ratio
 
     def test_her_without_spec_uses_general(self):
         """بدون spec → يستخدم GENERAL تلقائياً."""
         readings = make_readings([(6.0, 60.0)])
         result = self.service.analyze(readings, spec=None)
-        assert result["her_ratio"] >= 0.0
+        assert result.her_ratio >= 0.0
 
     # ── إحصاءات أساسية ────────────────────────────────────────
 
     def test_max_min_temp_correct(self):
         readings = make_readings([(3.0, 60.0), (8.5, 60.0), (2.0, 60.0)])
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["max_temp"] == 8.5
-        assert result["min_temp"] == 2.0
+        assert result.max_temp == 8.5
+        assert result.min_temp == 2.0
 
     def test_hours_above_10_correct(self):
         """ساعتان فوق 10°C + ساعة دون 10°C → 2 ساعات فقط."""
@@ -277,7 +277,7 @@ class TestExposureAnalysisService:
             ]
         )
         result = self.service.analyze(readings, spec=self.general_spec)
-        assert result["total_hours_above_10"] == 2.0
+        assert result.total_hours_above_10 == 2.0
 
 
 # ══════════════════════════════════════════════════════════════
@@ -293,7 +293,7 @@ class TestEvaluateColdChainSafetyUseCaseA1:
 
     def test_use_case_accepts_vaccine_spec(self):
         """Request يقبل vaccine_spec بدون خطأ."""
-        from src.domain.dtos.evaluate_cold_chain_safety_request import (
+        from src.application.dtos.evaluate_cold_chain_safety_request import (
             EvaluateColdChainSafetyRequest, TemperatureReading)
 
         spec = get_vaccine_spec("OPV")
@@ -315,7 +315,7 @@ class TestEvaluateColdChainSafetyUseCaseA1:
 
     def test_use_case_without_spec_uses_fallback(self):
         """بدون vaccine_spec → يستخدم نوع اللقاح من الإدخالات."""
-        from src.domain.dtos.evaluate_cold_chain_safety_request import (
+        from src.application.dtos.evaluate_cold_chain_safety_request import (
             EvaluateColdChainSafetyRequest, TemperatureReading)
 
         t0 = datetime(2024, 7, 1, 0, 0, tzinfo=timezone.utc)

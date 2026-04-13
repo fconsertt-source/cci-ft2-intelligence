@@ -1,108 +1,50 @@
 # src/infrastructure/adapters/reporting/new_pdf_engine.py
+"""Modular replacement for UnifiedPDFGenerator."""
 
-"""Modular replacement for UnifiedPDFGenerator.
-
-This file defines a new `PDFGenerator` class with a simple public API:
-
-    generator = PDFGenerator()
-    pdf_bytes = generator.generate(dto, report_type="official", language="ar")
-
-Internally it will delegate to builder components located in
-`src/presentation/reporting/components`.
-
-The implementation is currently a stub; the legacy engine remains available
-until migration completes.
-"""
-
+import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 
+from src.application.dtos.device_report_dto import DeviceReportDTO
+from src.application.ports.i_pdf_report_generator import IPDFReportGenerator
+
+logger = logging.getLogger(__name__)
+
 try:
-    from reportlab.pdfbase import pdfmetrics
-
-    REPORTLAB_AVAILABLE = True
+    from weasyprint import HTML, CSS
+    from weasyprint.text.fonts import FontConfiguration
+    WEASYPRINT_AVAILABLE = True
 except ImportError:
-    REPORTLAB_AVAILABLE = False
-from reportlab.pdfbase.ttfonts import TTFont
-
-# ✅ Add logging
-from src.infrastructure.logging import get_logger
-
-logger = get_logger(__name__)
-
-# Helper to ensure all story elements are Flowables
-try:
-    from reportlab.lib.styles import ParagraphStyle
-    from reportlab.platypus import Flowable, Paragraph
-except ImportError:
-    Paragraph = None  # type: ignore
-    Flowable = None  # type: ignore
-    ParagraphStyle = Any  # type: ignore
+    WEASYPRINT_AVAILABLE = False
 
 
-def register_arabic_fonts():
-    """تسجيل خط Amiri العربي في ReportLab مع مسارات مرنة"""
-    # قائمة المسارات المحتملة
-    possible_paths = [
-        Path(__file__).parent.parent.parent.parent.parent
-        / "assets/fonts/Amiri-Regular.ttf",
-        Path(__file__).parent.parent.parent / "assets/fonts/Amiri-Regular.ttf",
-        Path("assets/fonts/Amiri-Regular.ttf"),
-    ]
+class PDFGenerator(IPDFReportGenerator):
+    """المحرك الرئيسي لتوليد التقارير عبر WeasyPrint."""
 
-    font_path = None
-    for p in possible_paths:
-        if p.exists():
-            font_path = p
-            break
-
-    if font_path is None:
-        raise FileNotFoundError(
-            f"Amiri font not found in any expected location: {possible_paths}"
-        )
-
-    pdfmetrics.registerFont(TTFont("Amiri", str(font_path)))
-
-    # تسجيل النسخة العريضة إذا موجودة
-    bold_path = font_path.parent / "Amiri-Bold.ttf"
-    if bold_path.exists():
-        pdfmetrics.registerFont(TTFont("Amiri-Bold", str(bold_path)))
-
-
-def ensure_flowable(obj: Any, style: Any) -> Any:
-    """
-    تأكد أن العنصر المرسل إلى story هو Flowable صالح.
-    - إذا كان Flowable بالفعل، إرجاعه كما هو.
-    - إذا كان str، تحويله إلى Paragraph باستخدام style.
-    - أي شيء آخر، تحويله إلى str ثم Paragraph.
-    """
-    if Flowable and isinstance(obj, Flowable):
-        return obj
-    if Paragraph:
-        if isinstance(obj, str):
-            return Paragraph(obj, style)
-        return Paragraph(str(obj), style)
-    return obj
-
-
-class PDFGenerator:
     def __init__(self, language: str = "ar", theme_color: str = "blue") -> None:
-        # future: load fonts, set up styles, ensure dependencies
         self.language = language
-        # basic theme configuration used by chart builder etc.
         self.theme_color = theme_color
-        # determine base font name (may register Arabic-capable font if needed)
-        self.font_name = "Helvetica"
-        if self.language == "ar":
-            try:
-                # reuse wrapper's font registration logic to avoid duplication
-                from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import \
-                    _register_arabic_font
+        self.font_name = "Tajawal"
 
-                self.font_name = _register_arabic_font()
-            except Exception:
-                # if registration fails, fall back to generic font
-                self.font_name = "Helvetica"
+    def generate_device_report_pdf(
+        self,
+        dto: DeviceReportDTO,
+        report_type: str = "official",
+        language: str = "ar",
+        filename: Optional[str] = None,
+    ) -> bytes:
+        return self.generate(dto, report_type, language)
+
+    def generate_center_report_pdf(
+        self,
+        center_data: dict,
+        report_type: str = "official",
+        language: str = "ar",
+        filename: Optional[str] = None,
+    ) -> bytes:
+        logger.warning("Center report generation not fully implemented yet")
+        return b""
 
     def generate(
         self,
@@ -110,107 +52,83 @@ class PDFGenerator:
         report_type: str = "official",
         language: Optional[str] = None,
     ) -> bytes:
-        """Return PDF bytes for supplied DTO.
+        """نقطة الدخول الرئيسية: تحويل DTO إلى PDF باستخدام WeasyPrint."""
+        if not WEASYPRINT_AVAILABLE:
+            raise ImportError("WeasyPrint library is required for PDF generation")
 
-        The implementation will eventually replace
-        `UnifiedPDFGeneratorWrapper` as the default generator.
-        """
-        # attempt to build a real PDF using reportlab and the new component
-        from reportlab.lib.pagesizes import A4
-        from reportlab.platypus import SimpleDocTemplate
-
-        from src.presentation.reporting.components.arabic_processor import \
-            shape
-        from src.presentation.reporting.components.chart_builder import \
-            ChartBuilder
-        # import our builders
-        from src.presentation.reporting.components.header_builder import (
-            FooterBuilder, HeaderBuilder)
-        from src.presentation.reporting.components.table_builder import \
-            TableBuilder
-
-        # determine language for this run
-        if language is not None:
-            lang = language
-        else:
-            lang = self.language
-
-        # build document story
-        from io import BytesIO
-
-        from reportlab.lib.styles import getSampleStyleSheet
-        from reportlab.platypus import Spacer
-
-        buffer = BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=A4)
-        elements = []
-
-        # assemble paragraph styles; we start with a sample stylesheet and
-        # override font names if Arabic.
-        styles = getSampleStyleSheet()
-        if lang == "ar":
-            for key in ("Title", "Normal", "Info"):  # some keys may not exist
-                if key in styles:
-                    styles[key].fontName = self.font_name
-        # let builders receive both font and styles
-        hb = HeaderBuilder(self.font_name, styles)
-        fb = FooterBuilder(self.font_name, styles)
-        tb = TableBuilder(self.font_name, styles)
-        cb = ChartBuilder(self.theme_color)
-
-        # header
-        elements.extend(hb.build(report_type, dto, language=lang))
-        # dummy body from dto (perhaps scientific_rationale)
-        body = getattr(dto, "scientific_rationale", "")
-        if lang == "ar":
-            body = shape(body)
-        if body:
-            # convert to Paragraph to ensure it's a valid flowable
-            from reportlab.lib.styles import (ParagraphStyle,
-                                              getSampleStyleSheet)
-            from reportlab.platypus import Paragraph
-
-            base_style = getSampleStyleSheet()["Normal"]
-            body_style = ParagraphStyle(
-                "BodyText", parent=base_style, fontName=self.font_name, alignment=1
+        lang = language or self.language
+        try:
+            from src.presentation.reporting.professional.professional_vaccine_report import (
+                ProfessionalVaccineReport,
             )
-            elements.append(Paragraph(body, body_style))
-            elements.append(Spacer(1, 12))
+        except ImportError:
+            logger.exception("Failed to import ProfessionalVaccineReport")
+            raise
 
-            elements.append(Spacer(1, 12))
-
-        # example table + chart
-        records = []
-        elements.extend(tb.build(records, report_type))
-        elements.extend(cb.build(records, report_type))
-
-        # footer
-        elements.extend(fb.build(dto))
-
-        # Sanitize elements to ensure they are all Flowables
-        normal_style = styles.get("Normal")
-        if normal_style is None:
-            from reportlab.lib.styles import getSampleStyleSheet
-
-            normal_style = getSampleStyleSheet()["Normal"]
-
-        elements = [ensure_flowable(e, normal_style) for e in elements]
+        report = ProfessionalVaccineReport()
+        context = self._build_context(dto, report_type=report_type, language=lang)
+        readings = getattr(dto, "readings", [])
 
         try:
-            doc.build(elements)
-            pdf_bytes = buffer.getvalue()
-            buffer.close()
-
-            # sometimes ReportLab builds a valid PDF with no pages (Count 0)
-            # which isn't useful; detect and treat it as failure so we fall back.
-            if b"/Type /Page" not in pdf_bytes:
-                raise ValueError("generated PDF contained no pages")
-
-            return pdf_bytes
-        except Exception as _:
-            # if building fails or produced empty document, log and re-raise.
-            # This ensures that tests fail loudly instead of passing with a
-            # minimal (and incorrect) PDF.
-            logger.exception("ReportLab generation failed")
-            # ⚠️ في الاختبارات لا يجب الرجوع إلى minimal
+            # ✅ استدعاء render_vaccine_a4 مباشرة — لا وجود لـ prepare_elements
+            return report.render_vaccine_a4(context, readings=readings)
+        except Exception:
+            logger.exception("Critical failure in WeasyPrint PDF generation")
             raise
+
+    def _build_context(self, dto: Any, report_type: str, language: str) -> dict:
+        generated_at = getattr(dto, "generated_at", None)
+        if isinstance(generated_at, datetime):
+            generated_at = generated_at.strftime("%Y-%m-%d %H:%M:%S")
+        elif generated_at is None:
+            generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            generated_at = str(generated_at)
+
+        final_status = getattr(dto, "final_status", "")
+        if isinstance(final_status, str):
+            final_status = final_status.lower()
+        elif hasattr(final_status, "value"):
+            final_status = str(final_status.value).lower()
+        else:
+            final_status = str(final_status).lower()
+
+        if not final_status:
+            decision = getattr(dto, "decision", "")
+            final_status = (
+                str(decision.value).lower()
+                if hasattr(decision, "value")
+                else str(decision).lower()
+            )
+
+        summary = {
+            "total": max(1, int(getattr(dto, "total_records", 1) or 1)),
+            "safe": 1 if final_status == "safe" else 0,
+            "warning": 1 if final_status == "warning" else 0,
+            "discard": 1 if final_status == "discard" else 0,
+        }
+
+        temperature_ranges = getattr(dto, "temperature_ranges", {}) or {}
+
+        return {
+            "language": language,
+            "report_id": getattr(dto, "device_id", "UNKNOWN").replace(" ", "_").upper(),
+            "generated_at": generated_at,
+            "subtitle": getattr(dto, "scientific_rationale", ""),
+            "device_id": getattr(dto, "device_id", "-"),
+            "center_name": getattr(dto, "center_name", "-"),
+            "equipment_type": getattr(dto, "equipment_type", "-"),
+            "vaccine_type": getattr(dto, "vaccine_type", "-"),
+            "temp_min": temperature_ranges.get("min", "-"),
+            "temp_max": temperature_ranges.get("max", "-"),
+            "exposure_minutes": getattr(dto, "stats", {}).get("exposure_minutes", 0),
+            "category_display": getattr(dto, "advisory_section", {}).get("category_display", "-"),
+            "stability_budget_consumed_pct": float(
+                getattr(dto, "stability_budget_consumed_pct", 0.0) or 0.0
+            ),
+            "supervisor_name": getattr(dto, "operator", "-"),
+            "municipality": getattr(dto, "municipality", "-"),
+            "decision": getattr(dto, "decision", ""),
+            "vvm_stage": getattr(dto, "vvm_stage", ""),
+            "summary": summary,
+        }

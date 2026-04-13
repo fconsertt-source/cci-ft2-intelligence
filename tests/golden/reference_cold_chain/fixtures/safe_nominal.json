@@ -1,0 +1,34 @@
+{
+  "scenario": "safe_nominal",
+  "coverage_target": "Nominal in-range readings should keep primary decision intact while enabling additive reference assertions.",
+  "input": {
+    "center_id": "CENTER_SAFE",
+    "temperature_ranges": {
+      "min": 2.0,
+      "max": 8.0
+    },
+    "vaccine_profile": "generic_safe_profile",
+    "readings": [
+      {
+        "timestamp": "2024-01-01T10:00:00",
+        "value": 4.0
+      },
+      {
+        "timestamp": "2024-01-01T10:15:00",
+        "value": 4.4
+      },
+      {
+        "timestamp": "2024-01-01T10:30:00",
+        "value": 4.8
+      }
+    ]
+  },
+  "expected_reference": {
+    "primary_path_preserved": true,
+    "reference_extra_stats": {
+      "reference_decision": "SAFE",
+      "reference_has_freeze": false,
+      "reference_has_heat_duration_breach": false
+    }
+  }
+}

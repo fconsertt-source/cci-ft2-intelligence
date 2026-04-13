@@ -6,6 +6,7 @@ Production-ready version with Clean Architecture compliance and fail-fast valida
 """
 import os
 import uuid
+import math
 import logging
 from datetime import datetime
 from enum import Enum
@@ -289,6 +290,22 @@ class UnifiedPDFGenerator:
             reshaped = arabic_reshaper.reshape(text)
             return get_display(reshaped)
         return text
+
+    def _normalize_thaw(self, val: Any) -> Optional[float]:
+        """
+        تحويل وتطهير قيم ساعات الذوبان المتبقية.
+        تتعامل مع NaN، None، النصوص الفارغة، والقيم غير الصالحة.
+        """
+        if val is None or val == "":
+            return None
+        try:
+            v = float(val)
+        except (ValueError, TypeError):
+            return None
+
+        if math.isnan(v) or math.isinf(v):
+            return None
+        return v
 
     def _get_status_style(self, her_pct: float, is_arabic: bool) -> Dict[str, Any]:
         """
@@ -583,15 +600,13 @@ class UnifiedPDFGenerator:
             }
 
             if "Thaw Rem." in base_headers:
-                if thaw_val not in (None, "N/A", ""):
-                    try:
-                        v = float(thaw_val)
-                        if not math.isnan(v):
-                            cells["Thaw Rem."] = Paragraph(
-                                f"{v:.1f}h", self.styles["SmallCenter"]
-                            )
-                    except (ValueError, TypeError):
-                        pass
+                thaw_norm = self._normalize_thaw(thaw_val)
+                if thaw_norm is not None:
+                    cells["Thaw Rem."] = Paragraph(
+                        f"{thaw_norm:.1f}h", self.styles["SmallCenter"]
+                    )
+                else:
+                    cells["Thaw Rem."] = Paragraph("-", self.styles["SmallCenter"])
 
             line = [cells[h] for h in base_headers]
             table_data.append(line)
@@ -730,13 +745,16 @@ class UnifiedPDFGenerator:
         chart_path = os.path.join(self.output_dir, "temp_dist.png")
 
         # Save chart image so ReportLab can embed it
-        logger.debug("Generating temporary chart image at: %s", chart_path)
+        logger.debug("Saving chart to %s", chart_path)
         try:
             plt.savefig(chart_path, format="png", bbox_inches="tight")
         except Exception as e:
             logger.warning("Failed to save chart image: %s", e)
         finally:
             plt.close()
+
+        if os.path.exists(chart_path):
+            logger.debug("Chart created successfully, size=%d bytes", os.path.getsize(chart_path))
 
         elements.append(Image(chart_path, width=16 * cm, height=8 * cm))
 

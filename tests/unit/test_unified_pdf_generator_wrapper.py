@@ -10,7 +10,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.domain.dtos.device_report_dto import DeviceReportDTO
+from src.application.dtos.device_report_dto import DeviceReportDTO, ReportDecision, VVMStage
 # make sure each unit test gets a fresh singleton instance
 from src.infrastructure.adapters.reporting import \
     unified_pdf_generator_wrapper as _wrapper_module
@@ -32,6 +32,11 @@ def sample_dto():
     """إنشاء DTO اختباري قياسي"""
     return DeviceReportDTO(
         device_id="TEST-001",
+        center_id="CTR-001",
+        center_name="Test Center",
+        temperature_ranges={"min": 2.0, "max": 8.0},
+        decision=ReportDecision.SAFE,
+        vvm_stage=VVMStage.A,
         vaccine_type="Pfizer-BioNTech",
         total_records=100,
         excursions=[],

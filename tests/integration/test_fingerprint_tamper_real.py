@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from src.application.security.license_guard import LicenseGuard
+from src.infrastructure.security.license_guard import LicenseGuard
 from src.application.security.license_validator import LicenseValidator
 from src.domain.policies.trial_policy import TrialPolicy
 from src.infrastructure.security.fingerprint_provider import \

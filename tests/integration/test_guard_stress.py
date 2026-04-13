@@ -9,7 +9,7 @@ import pytest
 @pytest.fixture
 def mock_guard():
     """Mock لـ LicenseGuard مع spec للصراحة النوعية"""
-    from src.application.security.license_guard import LicenseGuard
+    from src.infrastructure.security.license_guard import LicenseGuard
 
     guard = Mock(spec=LicenseGuard)
     guard.ensure_active.return_value = True

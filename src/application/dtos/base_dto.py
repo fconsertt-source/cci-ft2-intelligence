@@ -1,5 +1,9 @@
-# re-export shim — Phase 5.2 (2026-03-10)
-# @DEPRECATED: استخدم src.domain.dtos.base_dto مباشرة
-from src.domain.dtos.base_dto import BaseDTO  # noqa: F401
+from __future__ import annotations
 
-__all__ = ["BaseDTO"]
+from typing import Any, Mapping, Protocol
+
+
+class BaseDTO(Protocol):
+    """All DTOs must implement a deterministic dict representation."""
+
+    def to_dict(self) -> Mapping[str, Any]: ...

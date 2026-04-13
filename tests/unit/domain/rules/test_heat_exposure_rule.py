@@ -26,7 +26,7 @@ class TestHeatExposureRule:
         assert any("حرارة حرجة" in reason for reason in mock_context.decision_reasons)
 
     def test_ccm_violation_rejection(self, rule, mock_context):
-        stats = {"has_ccm_violation": True, "heat_duration": 120}
+        stats = {"has_heat_duration_breach": True, "heat_duration": 120}
         result = rule.evaluate(mock_context, stats)
 
         assert result == "REJECTED_HEAT_C"
@@ -40,7 +40,7 @@ class TestHeatExposureRule:
         assert any("15.0°C" in reason for reason in mock_context.decision_reasons)
 
     def test_no_violation_acceptance(self, rule, mock_context):
-        stats = {"max_temp": 5.0, "has_critical_heat": False, "has_ccm_violation": False}
+        stats = {"max_temp": 5.0, "has_critical_heat": False, "has_heat_duration_breach": False, "has_heat_duration_breach": False}
         result = rule.evaluate(mock_context, stats)
 
         assert result is None

@@ -9,13 +9,18 @@ from datetime import datetime, timezone
 
 import pytest
 
-from src.domain.dtos.device_report_dto import DeviceReportDTO
+from src.application.dtos.device_report_dto import DeviceReportDTO, ReportDecision, VVMStage
 
 
 @pytest.fixture
 def sample_dto():
     return DeviceReportDTO(
         device_id="INTEGRATION-TEST-001",
+        center_id="CTR-INT-001",
+        center_name="Integration Test Center",
+        temperature_ranges={"min": 2.0, "max": 8.0},
+        decision=ReportDecision.SAFE,
+        vvm_stage=VVMStage.A,
         vaccine_type="Pfizer-BioNTech",
         total_records=50,
         excursions=[],

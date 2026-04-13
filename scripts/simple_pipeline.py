@@ -41,7 +41,7 @@ def run_simple_pipeline():
     # إنشاء تقرير وهمي
     os.makedirs("data/output", exist_ok=True)
 
-    fake_report = '''center_id\tcenter_name\tdecision\tvvm_stage\trecommended_action\tnum_ft2_entries\thas_freeze\thas_ccm_violation\tfreeze_duration_mins\theat_duration_mins\tavg_temperature\tmin_temperature\tmax_temperature
+    fake_report = '''center_id\tcenter_name\tdecision\tvvm_stage\trecommended_action\tnum_ft2_entries\thas_freeze\thas_heat_duration_breach\tfreeze_duration_mins\theat_duration_mins\tavg_temperature\tmin_temperature\tmax_temperature
 HOSPITAL_01\tمستشفى المركز الرئيسي\tACCEPTED\tNONE\tاللقاحات سليمة (النوافذ بيضاء). تستخدم بشكل طبيعي\t24\tNO\tNO\t0\t0\t5.0\t4.8\t5.2
 CLINIC_02\tعيادة الحي الشمالي\tREJECTED_FREEZE_SENSITIVE\tNONE\tتحقق من خاصية اللقاح: إتلاف الحساسة للتجميد فقط. الباقي سليم\t24\tYES\tNO\t120\t0\t-1.8\t-2.1\t-1.5
 MOBILE_03\tوحدة التطعيم المتنقلة\tWARNING_HEAT_A\tA\tاستخدم شلل الأطفال خلال 3 أشهر. باقي اللقاحات طبيعي (المرحلة A)\t24\tNO\tYES\t0\t180\t13.4\t12.5\t14.2'''

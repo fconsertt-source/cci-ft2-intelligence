@@ -148,14 +148,14 @@ class EvaluateColdChainSafetyUseCase:
 
         print("✅ 3. تم تنفيذ ExposureAnalysisService بنجاح")
 
-        ctx.stability_budget_consumed_pct = analysis.get("her_ratio", 0.0) * 100.0
+        ctx.stability_budget_consumed_pct = analysis.her_ratio * 100.0
 
         print("✅ 4. بدء apply_rules (هنا غالباً يحدث الخطأ)...")
 
         # ── 2. Rules Engine ──
         extra_stats = {
-            "her_ratio": analysis.get("her_ratio", 0.0),
-            "her": analysis.get("her_ratio", 0.0),
+            "her_ratio": analysis.her_ratio,
+            "her": analysis.her_ratio,
             "ccm_index": analysis.get("ccm_index", "0"),
             "has_freeze": analysis.get("has_freeze", False),
             "has_critical_heat": analysis.get("has_critical_heat", False),
@@ -183,7 +183,7 @@ class EvaluateColdChainSafetyUseCase:
         judgment = judgment_engine.judge(
             decision=decision_map.get(ctx.decision, VaccineDecision.SAFE),
             decision_reason=" | ".join(ctx.decision_reasons),
-            her_ratio=analysis.get("her_ratio", 0.0),
+            her_ratio=analysis.her_ratio,
             ccm_index=analysis.get("ccm_index", "0"),
             freeze_detected=analysis.get("has_freeze", False),
             has_critical_heat=analysis.get("has_critical_heat", False),
@@ -201,6 +201,6 @@ class EvaluateColdChainSafetyUseCase:
         # ── 4. Final Stats ──
         stats = calculate_center_stats(ctx)
         stats.update(extra_stats)
-        stats["her_ratio"] = analysis.get("her_ratio", 0.0)
+        stats["her_ratio"] = analysis.her_ratio
 
         return EvaluateColdChainSafetyResponse.from_context(ctx, stats)

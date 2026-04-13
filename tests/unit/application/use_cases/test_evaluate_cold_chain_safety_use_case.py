@@ -2,8 +2,9 @@ from datetime import datetime, timedelta
 
 from src.application.use_cases.evaluate_cold_chain_safety_use_case import \
     EvaluateColdChainSafetyUseCase
-from src.domain.dtos.evaluate_cold_chain_safety_request import (
+from src.application.dtos.evaluate_cold_chain_safety_request import (
     EvaluateColdChainSafetyRequest, TemperatureReading)
+from src.shared.config import get_config
 
 
 class TestEvaluateColdChainSafetyUseCase:
@@ -37,7 +38,7 @@ class TestEvaluateColdChainSafetyUseCase:
         # Assert
         assert response.center_id == "CENTER_SAFE"
         assert response.has_freeze is False
-        assert response.has_ccm_violation is False
+        assert response.has_heat_duration_breach is False
         # نتوقع أن يكون القرار مقبولاً أو غير مرفوض بناءً على القواعد الافتراضية
         assert response.decision != "NO_DATA"
 

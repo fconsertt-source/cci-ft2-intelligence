@@ -99,9 +99,9 @@ class VaccineAssessmentService:
         # ── تحليل التعرض الحراري (Q10 + CCM + Circuit Breakers) ──
         if readings:
             analysis = self._exposure.analyze(readings=readings, spec=spec)
-            her_ratio = analysis["her_ratio"]
-            ccm_index = analysis["ccm_index"]
-            circuit_breaker = analysis["circuit_breaker"]
+            her_ratio = analysis.her_ratio
+            ccm_index = analysis.ccm_index
+            circuit_breaker = analysis.circuit_breaker
         else:
             # لا قراءات → نعتمد على VVM فقط
             logger.warning(

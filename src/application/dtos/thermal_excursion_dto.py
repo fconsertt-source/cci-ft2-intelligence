@@ -12,6 +12,7 @@ class ThermalExcursionDTO:
     min_temperature: Optional[float] = None
     timestamp: Optional[str] = None
     impact_level: str = "UNKNOWN"
+    aefi_report_recommended: bool = False
 
     def __post_init__(self):
         """التحقق من صحة البيانات الأساسية"""

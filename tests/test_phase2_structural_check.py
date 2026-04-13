@@ -86,7 +86,7 @@ def calculate_center_stats(center: RuntimeCenter):
         'freeze_duration': 0,
         'completeness_score': 100,
         'has_freeze': False,
-        'has_ccm_violation': False,
+        'has_heat_duration_breach': False,
     }
 
 

@@ -73,11 +73,14 @@ class ThermalDegradationEstimator:
             thermal_history, spec
         )
 
+        remaining_shelf_life_percent = max(0.0, min(100.0, remaining_potency))
+
         return {
             "freeze_events": freeze_events,
             "heat_events": heat_events,
             "total_heat_hours": total_heat_hours,
             "max_temp_exceeded_count": max_temp_exceeded_count,
             "remaining_potency_estimate": remaining_potency,
-            "remaining_shelf_life": remaining_potency,
+            "remaining_shelf_life": remaining_shelf_life_percent,
+            "remaining_shelf_life_percentage": remaining_shelf_life_percent,
         }

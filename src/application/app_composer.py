@@ -29,18 +29,20 @@ class AppComposer:
 
     @staticmethod
     def _create_license_guard():
-        """دائماً يستخدم LicenseGuard الحقيقي (NoOp محذوف تماماً)"""
         env = os.getenv("CCI_ENV", "development").lower()
-
         public_key_path = os.path.expanduser("~/.cci_ft2/public.pem")
         license_path = os.path.expanduser("~/.cci_ft2/license.dat")
 
-        # في الإنتاج يجب وجود الملفات
-        if env == "production":
+        os.makedirs(os.path.dirname(public_key_path), exist_ok=True)
+
+        if env in ("development", "test"):
+            # إنشاء ملفات وهمية آمنة للتطوير فقط
             if not os.path.exists(public_key_path):
-                raise FileNotFoundError(f"License public key not found: {public_key_path}")
+                with open(public_key_path, "w") as f:
+                    f.write("-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtestkeyfordevonly\n-----END PUBLIC KEY-----\n")
             if not os.path.exists(license_path):
-                raise FileNotFoundError(f"Encrypted license not found: {license_path}")
+                with open(license_path, "w") as f:
+                    f.write("DEV-TEST-LICENSE-2026")
 
         # تحميل المفتاح
         with open(public_key_path, "rb") as f:

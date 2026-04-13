@@ -15,7 +15,7 @@ class HeatExposureRule(BaseRule):
             return "REJECTED_HEAT_C"
 
         # Check for CCM violation (heat duration above threshold)
-        if stats.get("has_ccm_violation", False):
+        if stats.get("has_heat_duration_breach", False) or stats.get("has_who_heat_exposure", False):
             context.decision_reasons.append(
                 f"تجاوز الحد التراكمي (CCM): {stats.get('heat_duration', 0)} دقيقة"
             )

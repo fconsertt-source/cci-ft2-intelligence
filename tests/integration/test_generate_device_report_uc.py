@@ -116,6 +116,10 @@ def test_weakest_link_logic(guard):
         return "DISCARD" if temperature > 9.0 else "SAFE"
 
     mock_regulatory.evaluate.side_effect = mock_evaluate
+    mock_estimator.calculate_cumulative_impact.return_value = {
+        "cumulative_impact": 0.05,
+        "remaining_shelf_life": 95.0
+    }
 
     use_case = GenerateDeviceReportUseCase(
         device_repository=mock_repo,
@@ -145,7 +149,7 @@ def test_weakest_link_logic(guard):
     assert mock_regulatory.evaluate.call_count == 3
 
 
-@patch("src.application.use_cases.generate_device_report_uc.LicenseGuard.ensure_active")
+@patch("src.infrastructure.security.license_guard.LicenseGuard.ensure_active")
 def test_generate_device_report_executes_successfully(mock_guard, tmp_path):
     """Integration test: full pipeline without real license enforcement."""
 
@@ -172,7 +176,7 @@ def test_generate_device_report_executes_successfully(mock_guard, tmp_path):
         VaccineSpecificationPort
     from src.application.ports.validation_protocol_port import \
         ValidationProtocolPort
-    from src.application.security.license_guard import LicenseGuard
+    from src.infrastructure.security.license_guard import LicenseGuard
     from src.domain.services.regulatory_decision_service import \
         RegulatoryDecisionService
     from src.domain.services.thermal_degradation_estimator import \

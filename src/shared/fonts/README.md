@@ -1,11 +1,15 @@
-# Shared Fonts
+# Fonts Directory
 
-The PDF generator will look here (or in the path defined by
-`paths.fonts_dir` in `config.yaml`) for fonts it can register.
-Drop any TrueType/OpenType font files you want to use, especially for
-Arabic support. Example:
+This folder is scanned by the PDF generator when selecting a font for reports.
 
-- `Tajawal-Regular.ttf`
-- `Tajawal-Bold.ttf`
+To enable Arabic support, drop an Arabic-capable TrueType font here, for example:
 
-If the directory is empty the generator falls back to Helvetica.
+- `Tajawal-Regular.ttf` (open source from Google Fonts)
+- `arabic.ttf` (any suitably licensed font)
+
+The PDF engine will register the first font it finds and name it `ArabicFont` or
+`MainFont`. If no font is available the generator will fall back to Helvetica
+and Arabic text may not render correctly.
+
+You can also configure a custom path by setting `paths.fonts_dir` in
+`config.yaml`.

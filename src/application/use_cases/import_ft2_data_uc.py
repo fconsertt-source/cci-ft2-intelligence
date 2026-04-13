@@ -8,7 +8,7 @@ from src.application.ports.ft2_writer_port import Ft2WriterPort
 from src.application.ports.logger_port import LoggerPort
 from src.application.services.device_center_mapper import \
     DeviceCenterMapper  # ← الإضافة الوحيدة
-from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
+from src.application.dtos.ft2_entry_dto import FT2EntryDTO
 
 
 class ImportFt2DataUseCase:

@@ -7,7 +7,7 @@ class CenterStatsDTO:
     center_id: str
     num_ft2_entries: int
     has_freeze: bool
-    has_ccm_violation: bool
+    has_any_heat_duration: bool
     avg_temperature: Optional[float] = None
     min_temperature: Optional[float] = None
     max_temperature: Optional[float] = None

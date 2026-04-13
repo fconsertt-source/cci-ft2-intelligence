@@ -21,13 +21,13 @@ class CenterStatsService:
         max_temp = max(temps) if temps else None
         
         has_freeze = any(getattr(e, "freeze_duration", 0) > 0 for e in entries_list)
-        has_ccm_violation = any(getattr(e, "heat_duration", 0) > 0 for e in entries_list)
+        has_any_heat_duration = any(getattr(e, "heat_duration", 0) > 0 for e in entries_list)
         
         return CenterStatsDTO(
             center_id=center_id,
             num_ft2_entries=len(entries_list),
             has_freeze=has_freeze,
-            has_ccm_violation=has_ccm_violation,
+            has_any_heat_duration=has_any_heat_duration,
             avg_temperature=avg_temp,
             min_temperature=min_temp,
             max_temperature=max_temp

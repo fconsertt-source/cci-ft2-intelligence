@@ -100,7 +100,7 @@ class TestRulesLogic(unittest.TestCase):
 
         self.assertEqual(self.center.decision, 'REJECTED_HEAT_C')
         self.assertEqual(stats['heat_duration'], 700)
-        self.assertTrue(stats['has_ccm_violation'])
+        self.assertTrue(stats['has_heat_duration_breach'])
 
     def test_heat_below_ccm_limit(self):
         """اختبار الحرارة: تحت الحد التراكمي = ACCEPTED"""
@@ -113,7 +113,7 @@ class TestRulesLogic(unittest.TestCase):
 
         self.assertEqual(self.center.decision, 'ACCEPTED')
         self.assertEqual(stats['heat_duration'], 200)
-        self.assertFalse(stats['has_ccm_violation'])
+        self.assertFalse(stats['has_heat_duration_breach'])
 
     def test_temperature_warning_range(self):
         """اختبار نطاق التحذير (8-10 درجات)"""
@@ -155,7 +155,7 @@ class TestRulesLogic(unittest.TestCase):
         stats = calculate_center_stats(custom_center)
 
         self.assertEqual(custom_center.decision, 'REJECTED_HEAT_C')
-        self.assertTrue(stats['has_ccm_violation'])
+        self.assertTrue(stats['has_heat_duration_breach'])
         # تم التحقق من الحدود ضمنياً عبر النتيجة
 
     def test_no_violations(self):
@@ -170,7 +170,7 @@ class TestRulesLogic(unittest.TestCase):
 
         self.assertEqual(self.center.decision, 'ACCEPTED')
         self.assertEqual(stats['freeze_duration'], 0)
-        self.assertFalse(stats['has_ccm_violation'])
+        self.assertFalse(stats['has_heat_duration_breach'])
 
     def test_empty_entries(self):
         """اختبار عدم وجود بيانات"""

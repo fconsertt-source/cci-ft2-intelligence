@@ -2,6 +2,8 @@
 """Ensure the GUI uses AppComposer rather than manual DI."""
 import pytest
 
+pytest.importorskip("tkinter", reason="GUI tests require python3-tk")
+
 from src.presentation.cli import gui_main
 
 

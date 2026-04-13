@@ -125,7 +125,7 @@ def create_professional_pdf():
             row['recommended_action'],
             str(row['num_ft2_entries']),
             "نعم" if row['has_freeze'] == 'YES' else "لا",
-            "نعم" if row['has_ccm_violation'] == 'YES' else "لا",
+            "نعم" if row['has_who_heat_exposure'] == 'YES' else "لا",
             f"{row['avg_temperature']:.2f}",
             f"{row['min_temperature']:.2f}",
             f"{row['max_temperature']:.2f}",

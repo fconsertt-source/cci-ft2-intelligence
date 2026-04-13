@@ -16,11 +16,11 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 # ألوان للطباعة
-GREEN = "[92m"
-RED = "[91m"
-YELLOW = "[93m"
-BLUE = "[94m"
-RESET = "[0m"
+GREEN = "\033[92m"
+RED = "\033[91m"
+YELLOW = "\033[93m"
+BLUE = "\033[94m"
+RESET = "\033[0m"
 
 # ============================================================================
 # ✅ تحسين 1: Whitelist للتكرارات الشرعية
@@ -50,13 +50,16 @@ IGNORED_PATHS = {
 }
 
 # الكيانات الحرجة التي يجب أن تكون فريدة (Source of Truth)
-CRITICAL_SINGLE_SOURCE_ENTITIES = {
+CRITICAL_DOMAIN_ENTITIES = {
     "FT2Entry",
-    "FT2EntryDTO",
     "VaccinationCenter",
+    "CCMCalculator",
+}
+
+CRITICAL_APPLICATION_DTOS = {
+    "FT2EntryDTO",
     "DeviceReportDTO",
     "GenerateDeviceReportRequest",
-    "CCMCalculator",
     "RetentionPolicy",
 }
 
@@ -77,6 +80,7 @@ class DuplicateDetector:
         self.class_definitions: Dict[str, List[Path]] = defaultdict(list)
         self.file_hashes: Dict[str, List[Path]] = defaultdict(list)
         self.import_map: Dict[str, List[ImportInfo]] = defaultdict(list)
+        self.scanned_files_count: int = 0
 
     def _should_ignore_file(self, file_path: Path) -> bool:
         """✅ تحسين: تجاهل المسارات غير الحرجة"""
@@ -171,7 +175,8 @@ class DuplicateDetector:
         print("=" * 80)
 
         files = self.scan_all_python_files()
-        print(f"\n📁 جاري فحص {len(files)} ملف Python...")
+        self.scanned_files_count = len(files)
+        print(f"\n📁 جاري فحص {self.scanned_files_count} ملف Python...")
 
         # 1. جمع تعريفات الكلاس
         for file_path in files:
@@ -189,11 +194,11 @@ class DuplicateDetector:
             for imp in imports:
                 self.import_map[imp.name].append(imp)
 
-        # تحليل النتائج
-        self.report_duplicate_classes()
+        # ✅ تحليل النتائج - تخزين النتائج كمتغيرات حالة (لتجنب التكرار)
+        self.critical_class_violations = self.report_duplicate_classes()
         self.report_duplicate_files()
-        self.report_import_conflicts()
-        self.report_architecture_violations()
+        self.critical_import_violations = self.report_import_conflicts()
+        self.architectural_violations = self.report_architecture_violations()
 
     def report_duplicate_classes(self):
         """تقرير الكلاس مكررة التعريف — مع فلترة ذكية"""
@@ -201,8 +206,10 @@ class DuplicateDetector:
         print("-" * 80)
 
         duplicates_found = False
+        critical_violations_found = False
+        all_critical = CRITICAL_DOMAIN_ENTITIES | CRITICAL_APPLICATION_DTOS
+        
         for cls_name, files in self.class_definitions.items():
-            # ✅ فلتر: تجاهل التكرارات المسموحة
             if cls_name in ALLOWED_DUPLICATE_CLASSES:
                 continue
 
@@ -213,17 +220,18 @@ class DuplicateDetector:
                     rel_path = file_path.relative_to(self.root_dir)
                     layer = self._identify_layer(rel_path)
                     print(f"   - {rel_path} [{layer}]")
-
-                # ✅ توصية ذكية
-                if cls_name in CRITICAL_SINGLE_SOURCE_ENTITIES:
-                    print(
-                        f"   {RED}🔴 حرج: {cls_name} يجب أن يكون في domain فقط{RESET}"
-                    )
+                
+                # ✅ التصحيح: استخدام الثابت الصحيح
+                if cls_name in all_critical:
+                    print(f"   {RED}🔴 حرج: {cls_name} يجب أن يكون في domain فقط{RESET}")
+                    critical_violations_found = True
                 else:
-                    print(f"   {YELLOW}⚠️  تحذير: مراجعة التكرار{RESET}")
+                    print(f"   {YELLOW}⚠️ تحذير: مراجعة التكرار{RESET}")
 
         if not duplicates_found:
             print(f"{GREEN}✅ لا توجد تعريفات كلاس مكررة حرجة{RESET}")
+        
+        return critical_violations_found
 
     def report_duplicate_files(self):
         """تقرير الملفات المكررة نصياً"""
@@ -232,31 +240,34 @@ class DuplicateDetector:
 
         duplicates_found = False
         for file_hash, files in self.file_hashes.items():
-            if len(files) > 1 and file_hash:
+            # Only report if there are actual duplicates and a valid hash
+            if len(files) > 1 and file_hash and file_hash != "":
                 duplicates_found = True
                 print(f"\n{RED}❌ ملفات متطابقة نصياً:{RESET}")
                 for file_path in files:
                     print(f"   - {file_path.relative_to(self.root_dir)}")
-
+        
+        # This return value is not currently used by the caller, but good for future
         if not duplicates_found:
             print(f"{GREEN}✅ لا توجد ملفات مكررة نصياً{RESET}")
 
     def report_import_conflicts(self):
-        """
-        ✅ تحسين 3: تقرير تعارضات الاستيراد بدقة عالية
-        """
+        """تقرير تعارضات الاستيراد بدقة عالية"""
         print(f"\n{BLUE}📌 3. كشف تعارضات الاستيراد:{RESET}")
         print("-" * 80)
 
         conflicts_found = False
-        for entity in CRITICAL_SINGLE_SOURCE_ENTITIES:
+        critical_import_conflicts = False
+        all_critical = CRITICAL_DOMAIN_ENTITIES | CRITICAL_APPLICATION_DTOS
+        
+        # ✅ التصحيح: استخدام all_critical بدلاً من الثابت القديم
+        for entity in all_critical:
             if entity in self.import_map:
                 imports = self.import_map[entity]
-
-                # تجميع حسب module المصدر
                 sources = set(imp.module for imp in imports)
 
                 if len(sources) > 1:
+                    critical_import_conflicts = True
                     conflicts_found = True
                     print(f"\n{RED}❌ {entity} يُستورد من مصادر متعددة:{RESET}")
                     for source in sources:
@@ -266,55 +277,57 @@ class DuplicateDetector:
                             if imp.module == source
                         ]
                         print(f"   - {source}")
-                        for f in files_using[:3]:  # عرض أول 3 ملفات فقط
+                        for f in files_using[:3]:
                             print(f"     * {f}")
 
-                    # ✅ توصية
                     domain_source = [s for s in sources if "domain" in s]
                     if domain_source:
-                        print(
-                            f"   {GREEN}✅ الحل: توحيد الاستيراد من {domain_source[0]}{RESET}"
-                        )
-
+                        print(f"   {GREEN}✅ الحل: توحيد الاستيراد من {domain_source[0]}{RESET}")
+        
         if not conflicts_found:
             print(f"{GREEN}✅ لا توجد تعارضات استيراد للكيانات الحرجة{RESET}")
+        
+        return critical_import_conflicts
 
     def report_architecture_violations(self):
         """تقرير انتهاكات الطبقات المعمارية"""
+        violations_found = False
         print(f"\n{BLUE}📌 4. كشف انتهاكات الطبقات المعمارية:{RESET}")
         print("-" * 80)
 
         violations = []
 
+        all_critical = {**{k: "domain/" for k in CRITICAL_DOMAIN_ENTITIES}, 
+                        **{k: "application/dtos/" for k in CRITICAL_APPLICATION_DTOS}}
+
         for cls_name, files in self.class_definitions.items():
             for file_path in files:
                 rel_path = str(file_path.relative_to(self.root_dir))
 
-                # قاعدة: الكيانات النطاقية يجب أن تكون في domain/
-                if cls_name in CRITICAL_SINGLE_SOURCE_ENTITIES:
-                    if "domain/" not in rel_path and "domain\\" not in rel_path:
-                        violations.append(
-                            {
-                                "entity": cls_name,
-                                "file": rel_path,
-                                "rule": "Critical entities must be in domain/",
-                            }
-                        )
+                # قاعدة: الكيانات والـ DTOs يجب أن تلتزم بمواقعها الصحيحة
+                if cls_name in all_critical:
+                    expected_path = all_critical[cls_name]
+                    if expected_path not in rel_path.replace("\\", "/"):
+                        violations.append({
+                            "entity": cls_name,
+                            "file": rel_path,
+                            "rule": f"Entity/DTO must be in {expected_path}",
+                        })
+                        violations_found = True
 
                 # قاعدة: Infrastructure لا يجب أن يكيّن Domain Entities
                 if "infrastructure/" in rel_path or "infrastructure\\" in rel_path:
-                    if cls_name in CRITICAL_SINGLE_SOURCE_ENTITIES:
+                    if cls_name in CRITICAL_DOMAIN_ENTITIES:
                         # استثناء: alias مع تحذير deprecation
                         with open(file_path, "r", encoding="utf-8") as f:
                             content = f.read()
                             if "DeprecationWarning" not in content:
-                                violations.append(
-                                    {
-                                        "entity": cls_name,
-                                        "file": rel_path,
-                                        "rule": "Infrastructure cannot define domain entities",
-                                    }
-                                )
+                                violations.append({
+                                    "entity": cls_name,
+                                    "file": rel_path,
+                                    "rule": "Infrastructure cannot define domain entities",
+                                })
+                                violations_found = True
 
         if violations:
             for v in violations:
@@ -324,6 +337,8 @@ class DuplicateDetector:
                 print(f"   القاعدة: {v['rule']}")
         else:
             print(f"{GREEN}✅ لا توجد انتهاكات معمارية{RESET}")
+        
+        return violations_found
 
     def _identify_layer(self, rel_path: Path) -> str:
         """تحديد الطبقة المعمارية للملف"""
@@ -345,29 +360,39 @@ class DuplicateDetector:
         print(f"{BLUE}📊 ملخص المسح:{RESET}")
         print("=" * 80)
 
+        # ✅ استخدام النتائج المخزنة (لا نعيد استدعاء دوال التقرير)
+        critical_class_violations = getattr(self, 'critical_class_violations', False)
+        critical_import_violations = getattr(self, 'critical_import_violations', False)
+        architectural_violations = getattr(self, 'architectural_violations', False)
+
         total_classes = len(self.class_definitions)
-        duplicate_classes = sum(
-            1
-            for files in self.class_definitions.values()
-            if len(files) > 1
-            and list(self.class_definitions.keys())[0] not in ALLOWED_DUPLICATE_CLASSES
+        duplicate_class_names_count = sum(
+            1 for cls_name, files in self.class_definitions.items()
+            if len(files) > 1 and cls_name not in ALLOWED_DUPLICATE_CLASSES
         )
-        total_files = sum(len(files) for files in self.file_hashes.values())
-        duplicate_files = sum(
-            1 for files in self.file_hashes.values() if len(files) > 1
+        
+        duplicate_file_content_count = sum(
+            1 for file_hash, files in self.file_hashes.items()
+            if len(files) > 1 and file_hash != ""
         )
+        
+        total_files_scanned = getattr(self, 'scanned_files_count', 0)
 
         print(f"إجمالي الكلاس المكتشفة: {total_classes}")
-        print(f"الكلاس المكررة (بعد الفلترة): {duplicate_classes}")
-        print(f"إجمالي الملفات المفحوصة: {total_files}")
-        print(f"الملفات المكررة نصياً: {duplicate_files}")
+        print(f"الكلاس المكررة (بعد الفلترة): {duplicate_class_names_count}")
+        print(f"إجمالي الملفات المفحوصة: {total_files_scanned}")
+        print(f"الملفات المكررة نصياً: {duplicate_file_content_count}")
 
-        if duplicate_classes == 0 and duplicate_files == 0:
+        # ✅ التصحيح: استخدام المتغيرات الصحيحة
+        if duplicate_class_names_count == 0 and duplicate_file_content_count == 0:
             print(f"\n{GREEN}✅ المشروع نظيف معمارياً - لا توجد تكرارات حرجة{RESET}")
         else:
-            print(
-                f"\n{RED}⚠️  توجد {duplicate_classes} كلاس مكررة و {duplicate_files} ملفات مكررة{RESET}"
-            )
+            print(f"\n{RED}⚠️ توجد {duplicate_class_names_count} كلاس مكررة و {duplicate_file_content_count} ملفات مكررة{RESET}")
+
+        overall_success = not (critical_class_violations or critical_import_violations or 
+                            architectural_violations or duplicate_class_names_count > 0 or 
+                            duplicate_file_content_count > 0)
+        return overall_success
 
 
 def main():
@@ -375,9 +400,12 @@ def main():
 
     root_dir = sys.argv[1] if len(sys.argv) > 1 else "."
     detector = DuplicateDetector(root_dir)
-    detector.run_full_scan()
-    detector.generate_summary()
+    detector.run_full_scan() # This now calls the reporting methods internally
+    
+    if not detector.generate_summary():
+        sys.exit(1) # Exit with error code if any critical issues found
+
 
 
 if __name__ == "__main__":
-    main()
+    main() 

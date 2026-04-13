@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from src.application.use_cases.evaluate_cold_chain_safety_use_case import \
     EvaluateColdChainSafetyUseCase
-from src.domain.dtos.evaluate_cold_chain_safety_request import (
+from src.application.dtos.evaluate_cold_chain_safety_request import (
     EvaluateColdChainSafetyRequest, TemperatureReading)
 
 

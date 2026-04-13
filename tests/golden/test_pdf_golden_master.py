@@ -13,14 +13,10 @@ from pathlib import Path
 import pytest
 
 # ✅ استيراد من المسار الصحيح
-from src.domain.dtos.device_report_dto import DeviceReportDTO
+from src.application.dtos.device_report_dto import DeviceReportDTO
 # ensure fresh wrapper for each test module run
 from src.infrastructure.adapters.reporting import \
     unified_pdf_generator_wrapper as _wrapper_mod
-from src.infrastructure.adapters.reporting.new_pdf_engine import \
-    register_arabic_fonts
-
-register_arabic_fonts()
 
 _wrapper_mod._wrapper_instance = None
 
@@ -54,17 +50,9 @@ def pdf_strategies():
         pytest.skip(f"PDF strategies not available: {e}")
 
 
-def create_test_dto() -> DeviceReportDTO:
-    """مصنع لـ DTO صالح للاختبار"""
-    return DeviceReportDTO(
-        device_id="GOLDEN-TEST-001",
-        vaccine_type="Pfizer-BioNTech",
-        total_records=100,
-        excursions=[],
-        final_status="safe",
-        scientific_rationale="Golden baseline validation الحارس الرقمي سلسلة التبريد آمن",
-        generated_at=datetime.now(timezone.utc).isoformat(),
-    )
+def create_test_dto():
+    from src.application.dtos.device_report_dto import DeviceReportDTO
+    return DeviceReportDTO.create_golden_baseline()
 
 
 def normalize_pdf_bytes(pdf_bytes: bytes) -> bytes:

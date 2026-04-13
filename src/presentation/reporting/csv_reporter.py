@@ -31,7 +31,7 @@ def generate_centers_report(centers, output_path: str):
                 "decision", "has_warning", "alert_level", "vvm_stage",
                 "stability_budget_consumed_pct", "thaw_remaining_hours",
                 "category_display", "recommended_action", "num_ft2_entries",
-                "has_freeze", "has_ccm_violation", "avg_temperature",
+                "has_freeze", "has_who_heat_exposure", "avg_temperature",
                 "min_temperature", "max_temperature", "decision_reasons",
             ])
 
@@ -61,7 +61,7 @@ def generate_centers_report(centers, output_path: str):
                         get_recommended_action(decision_for_action),
                         len(ft2_entries),
                         "YES" if stats.get("has_freeze", False) else "NO",
-                        "YES" if stats.get("has_ccm_violation", False) else "NO",
+                        "YES" if stats.get("has_who_heat_exposure", False) else "NO",
                         f"{stats.get('avg_temperature', 0):.2f}" if has_entries else "N/A",
                         f"{stats.get('min_temperature', 0):.2f}" if has_entries else "N/A",
                         f"{stats.get('max_temperature', 0):.2f}" if has_entries else "N/A",

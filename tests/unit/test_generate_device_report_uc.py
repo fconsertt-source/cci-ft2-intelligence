@@ -223,6 +223,25 @@ class TestGenerateDeviceReportUseCase:
         # التحقق من وجود قسم استشاري
         assert hasattr(result, "advisory_section") or "advisory" in str(result)
 
+    def test_aefi_reporting_and_shelf_life_threshold(self, mock_dependencies):
+        """التأكد من أن تجاوزات الحرارة تربط بتوصيات AEFI وصلاحية الرف"""
+        mock_dependencies["regulatory_decision_service"].evaluate.return_value = "DISCARD"
+        mock_dependencies["estimator"].calculate_cumulative_impact.return_value = {
+            "cumulative_impact": 25.0,
+            "remaining_shelf_life": 45.0,
+            "remaining_shelf_life_percentage": 45.0,
+        }
+
+        uc = GenerateDeviceReportUseCase(**mock_dependencies)
+        request = GenerateDeviceReportRequest(device_id="DEV-001")
+        result = uc.execute(request)
+
+        assert result.aefi_reporting_required is True
+        assert any(exc.aefi_report_recommended for exc in result.excursions)
+        assert result.remaining_shelf_life_ok is False
+        assert result.advisory_section["remaining_shelf_life_threshold"] == 50
+        assert "below recommended" in " ".join(result.decision_reasons)
+
     def test_data_path_optional(self, mock_dependencies):
         """التأكد من أن data_path اختياري"""
         # بدون data_path

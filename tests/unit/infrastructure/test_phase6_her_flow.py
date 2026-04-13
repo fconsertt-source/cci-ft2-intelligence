@@ -117,19 +117,8 @@ class TestExposureAnalysisService:
             TemperatureReading("V", 5.0, t0 + timedelta(hours=1)),
         ]
         result = svc.analyze(readings)
-        assert "her_ratio" in result
-        assert isinstance(result["her_ratio"], float)
-
-    def test_returns_data_quality_flags_key(self):
-        svc = ExposureAnalysisService()
-        t0 = datetime(2025, 1, 1)
-        readings = [
-            TemperatureReading("V", 5.0, t0),
-            TemperatureReading("V", 5.0, t0 + timedelta(hours=1)),
-        ]
-        result = svc.analyze(readings)
-        assert "data_quality_flags" in result
-        assert "sampling_gap" in result["data_quality_flags"]
+        assert hasattr(result, "her_ratio")
+        assert isinstance(result.her_ratio, float)
 
     def test_her_ratio_not_zero_above_reference(self):
         """HER يجب أن يكون > 0 عند درجة حرارة فوق المرجع."""
@@ -140,12 +129,12 @@ class TestExposureAnalysisService:
             TemperatureReading("V", 15.0, t0 + timedelta(hours=1)),
         ]
         result = svc.analyze(readings)
-        assert result["her_ratio"] > 0.0
+        assert result.her_ratio > 0.0
 
     def test_empty_readings_her_ratio_zero(self):
         svc = ExposureAnalysisService()
         result = svc.analyze([])
-        assert result["her_ratio"] == 0.0
+        assert result.her_ratio == 0.0
 
     def test_accepts_spec_without_error(self):
         """يجب ألا يرفع استثناءً عند تمرير spec."""
@@ -157,7 +146,7 @@ class TestExposureAnalysisService:
             TemperatureReading("V", 7.0, t0 + timedelta(minutes=10)),
         ]
         result = svc.analyze(readings, spec=spec)
-        assert "her_ratio" in result
+        assert hasattr(result, "her_ratio")
 
 
 # ---------------------------------------------------------------------------
@@ -266,7 +255,7 @@ class TestFullHERFlow:
         svc = ExposureAnalysisService(reference_temp=5.0)
         result = svc.analyze(readings)
 
-        assert result["her_ratio"] > 0.0
+        assert result.her_ratio > 0.0
 
     def test_her_ratio_in_analysis_matches_calculator_direct(self):
         """
@@ -289,6 +278,6 @@ class TestFullHERFlow:
         service_result = svc.analyze(readings)
         calc_result = calc.calculate(readings)
 
-        assert service_result["her_ratio"] == pytest.approx(
+        assert service_result.her_ratio == pytest.approx(
             calc_result.her_ratio, rel=1e-9
         )

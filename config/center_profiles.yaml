@@ -1,18 +1,102 @@
 centers:
   TEST_CENTER_01:
-    name: "مركز التطعيم التجريبي"
-    device_ids:
-      - "130600113437"
-    temperature_ranges:
-      min: 2.0
-      max: 8.0
-  CENTER_TRIPOLI_01:
-    name: "مركز طرابلس الرئيسي"
-    device_ids: []
-  CENTER_BENGHAZI_01:
-    name: "مركز بنغازي"
-    device_ids: []
-  OPV_TEST_CENTER:
-    name: "مركز اختبار OPV"
-    device_ids:
-      - "OPV_TEST_001"
+    name: مركز التطعيم التجريبي
+    municipality: الزاوية
+    supervisor_name: مشرف التطعيم
+    equipment:
+      Cold_Box:
+        device_id: '130600112767'
+        name: حافظة طعوم
+        equipment_code: "CB-01"
+      Cold_Room:
+        device_id: '130600112769'
+        name: غرفة التبريد
+        equipment_code: "CR-01"
+      Storage_Refrigerator:
+        device_id: '130600112764'
+        name: ثلاجة حفظ الطعوم
+        equipment_code: "SR-01"
+
+  TEST_CENTER_02:
+    name: TEST_CENTER_02
+    municipality: الزاوية
+    supervisor_name: مشرف التطعيم
+    equipment:
+      Cold_Room:
+        device_id: '130600113438'
+        name: غرفة التبريد
+        equipment_code: "CR-02"
+
+  TEST_CENTER_03:
+    name: TEST_CENTER_03
+    municipality: الزاوية
+    supervisor_name: مشرف التطعيم
+    equipment:
+      Storage_Refrigerator:
+        device_id: '130600112758'
+        name: ثلاجة
+        equipment_code: "SR-03"
+      Cold_Room:
+        device_id: '130600205054'
+        name: غرفة تبريد
+        equipment_code: "CR-03"
+
+  TEST_CENTER_04:
+    name: TEST_CENTER_04
+    municipality: الزاوية
+    supervisor_name: مشرف التطعيم
+    equipment:
+      Cold_Room:
+        device_id: '130600113437'
+        name: غرفة تبريد
+        equipment_code: "CR-04"
+
+  TEST_CENTER_05:
+    name: TEST_CENTER_05
+    municipality: الزاوية
+    supervisor_name: مشرف التطعيم
+    equipment:
+      Cold_Room:
+        device_id: '130600112748'
+        name: غرفة التبريد
+        equipment_code: "CR-05"
+
+  TEST_CENTER_06:
+    name: TEST_CENTER_06
+    municipality: الزاوية
+    supervisor_name: مشرف التطعيم
+    equipment:
+      Cold_Room:
+        device_id: '130600112939'
+        name: غرفة التبريد
+        equipment_code: "CR-06"
+
+  TEST_CENTER_07:
+    name: TEST_CENTER_07
+    municipality: الزاوية
+    supervisor_name: مشرف التطعيم
+    equipment:
+      Cold_Room:
+        device_id: '130600205389'
+        name: غرفة التبريد
+        equipment_code: "CR-07"
+
+  TEST_CENTER_08:
+    name: TEST_CENTER_08
+    municipality: الزاوية
+    supervisor_name: مشرف التطعيم
+    equipment:
+      Cold_Room:
+        device_id: '160600190685'
+        name: غرفة التبريد
+        equipment_code: "CR-08"
+
+  بنغازي:
+    name: بنغازي
+    municipality: بنغازي
+    supervisor_name: مشرف التطعيم
+    equipment:
+      Cold_Room:
+        device_id: '130600112663'
+        name: غرفة تبريد
+        equipment_code: "CR-BG"

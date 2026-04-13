@@ -205,10 +205,11 @@ class UnifiedPDFGeneratorWrapper:
             return
         if self._is_new_engine_enabled():
             try:
-                from src.infrastructure.adapters.reporting.new_pdf_engine import \
-                    PDFGenerator
+                from src.application.use_cases.generate_pdf_report_uc import GeneratePDFReportUseCase
+                from src.infrastructure.adapters.reporting.new_pdf_engine import PDFGenerator
 
-                self._engine = PDFGenerator()
+                pdf_generator = PDFGenerator(language=self.language)
+                self._engine = GeneratePDFReportUseCase(pdf_generator)
             except ImportError as e:
                 logger.warning("pdf_engine_unavailable", extra={"error": str(e)})
         self._inner = self._engine or self._legacy
@@ -228,7 +229,12 @@ class UnifiedPDFGeneratorWrapper:
         engine = self._inner
         if engine:
             try:
-                return engine.generate(dto, report_type=force_report_type or "official")
+                if hasattr(engine, 'execute_device_report'):
+                    # New Use Case interface
+                    return engine.execute_device_report(dto, report_type=force_report_type or "official", language=self.language)
+                else:
+                    # Legacy interface
+                    return engine.generate(dto, report_type=force_report_type or "official")
             except (ImportError, ModuleNotFoundError):
                 return self._generate_large_placeholder(dto)
             except Exception as exc:

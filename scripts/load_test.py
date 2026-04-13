@@ -61,10 +61,15 @@ def main():
 
     stats = run_load_test(args.devices, args.workers)
 
-    print("
-📊 نتائج اختبار الحمل:"    print(".2f"    print(f"✅ ناجح: {stats['successful']}")
+    print("\n📊 نتائج اختبار الحمل:")
+    print(f"⏱️  الوقت الكلي: {stats['total_time']:.2f}s")
+    print(f"✅ ناجح: {stats['successful']}")
     print(f"❌ فاشل: {stats['failed']}")
-    print(".3f"    print(".3f"    print(".3f"    print(".1f"
+    print(f"⌛ متوسط وقت الاستجابة: {stats['avg_response_time']:.3f}s")
+    print(f"📈 أقصى وقت استجابة: {stats['max_response_time']:.3f}s")
+    print(f"📉 أدنى وقت استجابة: {stats['min_response_time']:.3f}s")
+    print(f"🚀 الإنتاجية: {stats['throughput']:.1f} طلب/ثانية")
+
     # فحص الحدود
     if stats['total_time'] <= args.threshold:
         print(f"✅ الأداء مقبول: {stats['total_time']:.2f}s < {args.threshold}s")

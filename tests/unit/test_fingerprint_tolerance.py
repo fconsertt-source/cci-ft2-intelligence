@@ -4,7 +4,7 @@ from unittest.mock import Mock
 import pytest
 
 # Assuming these classes exist from previous steps, based on di_container.py
-from src.application.security.license_guard import LicenseGuard
+from src.infrastructure.security.license_guard import LicenseGuard
 from src.application.security.license_validator import LicenseValidator
 from src.domain.policies.trial_policy import TrialPolicy
 from src.infrastructure.security.encrypted_license_repository import \

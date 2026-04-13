@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Iterable, List
 
 from src.application.ports.i_repository import IDataRepository
-from src.domain.dtos.center_dto import CenterDTO
-from src.domain.dtos.vaccine_dto import VaccineDTO
+from src.application.dtos.center_dto import CenterDTO
+from src.application.dtos.vaccine_dto import VaccineDTO
 from src.infrastructure.utils.vaccine_library_loader import \
     VaccineLibraryLoader
 

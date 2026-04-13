@@ -7,7 +7,7 @@ from src.application.ports.vaccine_specification_port import \
     VaccineSpecificationPort
 from src.application.ports.validation_protocol_port import \
     ValidationProtocolPort
-from src.application.security.license_guard import LicenseGuard
+from src.infrastructure.security.license_guard import LicenseGuard
 # Assume these modules and classes exist from previous work
 from src.application.use_cases.generate_device_report_uc import \
     GenerateDeviceReportUseCase
