@@ -1,0 +1,77 @@
+# ====================== STAGE 1: Builder ======================
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# Copy requirements first for better Docker layer caching
+COPY requirements-prod.txt .
+
+# Install production dependencies
+RUN pip install --no-cache-dir -r requirements-prod.txt
+
+# ====================== STAGE 2: Runtime (Production) ======================
+FROM python:3.12-slim AS runtime
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+# === Install WeasyPrint system dependencies ===
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
+    libpangocairo-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf-2.0-0 \
+    libglib2.0-0 \
+    libgobject-2.0-0 \
+    libffi8 \
+    libfontconfig1 \
+    libfreetype6 \
+    fonts-liberation \
+    fonts-dejavu \
+    shared-mime-info \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy application code and necessary directories
+COPY src/ ./src/
+COPY scripts/ ./scripts/
+COPY config/ ./config/
+COPY assets/ ./assets/
+COPY config.yaml .
+
+# Security: Create non-root user
+RUN useradd -m -r cciuser && \
+    chown -R cciuser:cciuser /app
+
+# USER cciuser
+
+RUN mkdir -p /home/cciuser/.cache/fontconfig && chown -R cciuser:cciuser /home/cciuser/.cache
+
+# Healthcheck - matches docker-compose port (8000)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "\
+    import urllib.request; \
+    import sys; \
+    try: \
+    with urllib.request.urlopen('http://localhost:8000/health', timeout=5) as resp: \
+    sys.exit(0 if resp.getcode() == 200 else 1) \
+    except Exception: \
+    sys.exit(1) \
+    " || exit 1
+
+ENV MPLCONFIGDIR=/tmp/matplotlib_cache
+RUN mkdir -p /tmp/matplotlib_cache && chmod 777 /tmp/matplotlib_cache
+
+# Run the application (default: show help)
+ENTRYPOINT ["python", "-m", "src"]
+CMD []

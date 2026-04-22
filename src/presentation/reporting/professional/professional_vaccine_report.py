@@ -137,10 +137,11 @@ class ProfessionalVaccineReport:
                 "exposure_minutes": data.get("exposure_minutes", 0),
                 "category_display": data.get("category_display", "-"),
                 "stability_budget_consumed_pct": float(data.get("stability_budget_consumed_pct", 0.0)),
+                "equipment_code": data.get("device_id", "N/A"),
                 "supervisor_name": data.get("supervisor_name", "-"),
                 "municipality": data.get("municipality", "-"),
-                "temp_timeline_chart": Path(timeline_path).resolve().as_uri() if timeline_path else None,
-                "stability_budget_chart": Path(stability_path).resolve().as_uri() if stability_path else None,
+                "temp_timeline_chart": timeline_path if timeline_path and timeline_path.startswith("data:") else Path(timeline_path).resolve().as_uri() if timeline_path else None,
+                "stability_budget_chart": stability_path if stability_path and stability_path.startswith("data:") else Path(stability_path).resolve().as_uri() if stability_path else None,
                 "font_tajawal_regular": str((self.fonts_dir / "Tajawal-Regular.ttf").resolve().as_uri()),
                 "font_tajawal_bold": str((self.fonts_dir / "Tajawal-Bold.ttf").resolve().as_uri()),
             }

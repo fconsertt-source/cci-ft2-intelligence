@@ -24,7 +24,7 @@ from src.infrastructure.adapters.equipment_vaccine_repository import \
 # ══════════════════════════════════════════════════════════════
 
 
-def future_date(days: int = 365) -> date:
+def future_date(days: int = 90) -> date:
     return date.today() + timedelta(days=days)
 
 

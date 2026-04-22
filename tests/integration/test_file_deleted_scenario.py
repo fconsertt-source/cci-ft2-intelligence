@@ -120,7 +120,7 @@ class TestFileDeletedScenario:
             ),
             (
                 LedgerEvent.FILE_RETENTION_EXPIRED,
-                {"file_hash": "abc123", "retention_days": 365},
+                {"file_hash": "abc123", "retention_days": 90},
             ),
             (
                 LedgerEvent.FILE_DELETED,

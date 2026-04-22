@@ -62,7 +62,7 @@ class ImportFt2DataUseCase:
                     )
 
             # 3. Write the (optionally enriched) data to destination
-            self._writer.write(ft2_data, output_path)
+            self._writer.write(output_path, ft2_data)
             if self._logger:
                 self._logger.info("Successfully wrote data to destination.")
 

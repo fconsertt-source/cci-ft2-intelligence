@@ -20,10 +20,10 @@ class RetentionPolicy:
 
     default_retention_days: int = 90
     min_retention_days: int = 30
-    max_retention_days: int = 365
+    max_retention_days: int = 90
     # phase‑5 field; currently mirrors max_retention_days but gives the policy a
     # meaningful name when we query for "critical" devices specifically.
-    critical_retention_days: int = 365
+    critical_retention_days: int = 90
     # keyword used to identify critical devices (case-sensitive)
     CRITICAL_KEYWORD: str = "CRITICAL"
 

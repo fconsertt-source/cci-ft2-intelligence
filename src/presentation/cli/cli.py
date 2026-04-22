@@ -45,23 +45,32 @@ def health_check():
 
 @app.command()
 def import_data(
-    input_dir: Path = typer.Option(..., "--input", "-i"),
-    output: Path = typer.Option("ft2_data.json", "--output", "-o"),
+    input_path: Path = typer.Option(
+        ..., "--input", "-i", help="Path to FT2 input file or directory (TXT/TSV/CSV)."
+    ),
+    output: Path = typer.Option(
+        "data/ft2_data.json", "--output", "-o", help="Destination FT2 JSON file."
+    ),
 ):
     """استيراد بيانات FT2"""
     uc = AppComposer.create_import_ft2_bundle_uc()
-    uc.execute(input_dir=input_dir, output_path=output)
-    typer.echo(MessageMap.get("SIMPLE_PIPELINE_FAKE_REPORT_CREATED"))
+    try:
+        uc.execute(input_path, output)
+        typer.echo(f"✅ Successfully imported FT2 data from: {input_path}")
+        typer.echo(f"   → Written to: {output}")
+    except Exception as exc:
+        typer.echo(f"❌ Import failed: {exc}", err=True)
+        raise typer.Exit(code=1)
 
 
 @app.command()
 def generate_device_report(
     device_id: str = typer.Argument(..., help="معرف الجهاز"),
     output_path: Path = typer.Option("data/output/reports/device_reports/device_report.json", "--output", "-o"),
-    data_path: Path = typer.Option("ft2_data.json", "--data", "-d"),
+    data_path: Path = typer.Option("data/ft2_data.json", "--data", "-d"),
 ):
     """توليد تقرير جهاز فردي (الأمر الرئيسي)"""
-    uc = AppComposer.create_generate_device_report_uc()
+    uc = AppComposer.create_generate_device_report_uc(str(data_path))
     req = GenerateDeviceReportRequest(device_id=device_id)
     report = uc.execute(req)
 

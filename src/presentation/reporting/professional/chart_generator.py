@@ -1,19 +1,17 @@
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
+import base64
+import io
+import os
 from pathlib import Path
+from typing import List, Optional
 
-from src.shared.language_manager import lang
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/.matplotlib")
+Path(os.environ["MPLCONFIGDIR"]).mkdir(parents=True, exist_ok=True)
 
+import matplotlib.pyplot as plt
+from src.application.dtos.reading_dto import ReadingDTO
 
 class ReportChartGenerator:
-    """توليد الرسوم البيانية للتقارير"""
-
-    def __init__(self):
-        self.output_dir = Path("data/output/reports/charts")
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-
-    def generate_temperature_timeline(self, readings, filename="temp_timeline.png"):
-        """خط زمني لدرجة الحرارة"""
+    def generate_temperature_timeline(self, readings: List[ReadingDTO]) -> Optional[str]:
         if not readings or len(readings) < 2:
             return None
 
@@ -22,44 +20,47 @@ class ReportChartGenerator:
 
         plt.figure(figsize=(10, 4))
         plt.plot(times, temps, marker="o", linestyle="-", color="#1e40af", linewidth=2.4)
-        plt.axhline(y=8, color="#dc2626", linestyle="--", alpha=0.7, label=lang.get("chart.temp_max"))
-        plt.axhline(y=2, color="#2563eb", linestyle="--", alpha=0.7, label=lang.get("chart.temp_min"))
+        plt.title("Temperature Timeline")
+        plt.xlabel("Time")
+        plt.ylabel("Temperature (°C)")
+        plt.grid(True)
 
-        plt.title(lang.get("chart.temp_title"), fontsize=14, pad=14)
-        plt.xlabel(lang.get("chart.temp_y_label"))
-        plt.ylabel(lang.get("chart.temp_y_label"))
-        plt.grid(True, alpha=0.25)
-        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%d/%m %H:%M"))
-        plt.xticks(rotation=40, ha="right")
-        plt.legend(fontsize=8)
-        plt.tight_layout()
-
-        path = self.output_dir / filename
-        plt.savefig(path, dpi=200, bbox_inches="tight")
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png", bbox_inches="tight", transparent=True)
         plt.close()
-        return str(path)
+        buf.seek(0)
 
-    def generate_stability_budget_bar(self, stability_pct, filename="stability_budget.png"):
-        """مخطط شريطي لميزانية الاستقرار"""
-        plt.figure(figsize=(8, 3.2))
-        color = "#16a34a" if stability_pct < 50 else "#eab308" if stability_pct < 75 else "#dc2626"
+        return f"data:image/png;base64,{base64.b64encode(buf.read()).decode('utf-8')}"
 
-        plt.barh([lang.get("report.stability_budget")], [stability_pct], color=color, height=0.6)
-        plt.xlim(0, 100)
-        plt.xlabel(lang.get("report.stability_budget"))
-        plt.title(lang.get("report.stability_budget"), fontsize=14)
-        plt.gca().invert_yaxis()
-        plt.gca().xaxis.set_major_locator(plt.MultipleLocator(20))
-        plt.gca().xaxis.grid(True, linestyle="--", alpha=0.3)
-        plt.gca().spines["top"].set_visible(False)
-        plt.gca().spines["right"].set_visible(False)
-        plt.gca().spines["left"].set_visible(False)
-        plt.gca().spines["bottom"].set_color("#cbd5e1")
+    def generate_stability_budget_bar(self, consumed_pct: float) -> Optional[str]:
+        """
+        توليد رسم بياني شريطي يوضح الميزانية المستهلكة للاستقرار الحراري.
+        يعيد الصورة بصيغة Base64 لتضمينها في الـ HTML.
+        """
+        try:
+            import matplotlib.pyplot as plt
+            import io
+            import base64
 
-        plt.text(stability_pct + 2.5, 0, f"{stability_pct:.1f}%", va="center", fontsize=11, fontweight="bold")
-        plt.tight_layout()
+            plt.figure(figsize=(6, 1))
+            
+            # تحديد اللون بناءً على الاستهلاك
+            color = 'green' if consumed_pct < 50 else ('orange' if consumed_pct < 80 else 'red')
+            
+            plt.barh([0], [consumed_pct], color=color, height=0.5)
+            plt.barh([0], [100], color='lightgray', height=0.5, zorder=0) # الخلفية
+            
+            plt.xlim(0, 100)
+            plt.yticks([])
+            plt.xlabel('Stability Budget Consumed (%)')
+            plt.tight_layout()
 
-        path = self.output_dir / filename
-        plt.savefig(path, dpi=200, bbox_inches="tight")
-        plt.close()
-        return str(path)
+            buf = io.BytesIO()
+            plt.savefig(buf, format='png', bbox_inches='tight', transparent=True)
+            plt.close()
+            buf.seek(0)
+            
+            return base64.b64encode(buf.read()).decode('utf-8')
+        except Exception as e:
+            print(f"Warning: Failed to generate stability bar chart: {e}")
+            return None

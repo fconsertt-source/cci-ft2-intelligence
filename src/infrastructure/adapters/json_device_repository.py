@@ -8,7 +8,18 @@ from src.domain.entities.thermal_record import ThermalRecord
 
 class JsonDeviceRepository:
     def __init__(self, json_path: str):
-        self._path = json_path
+            import os
+            from pathlib import Path
+            # التأكد من أن المسار يوجه لمجلد البيانات الصحيح
+            data_dir = Path(os.getenv("CCI_DATA_ROOT", "./data"))
+            
+            # إذا كان المسار مجرد اسم ملف (مثل 'ft2_data.json')، نضعه داخل مجلد data
+            # أما إذا كان مساراً كاملاً، نتركه كما هو.
+            path_obj = Path(json_path)
+            if len(path_obj.parts) == 1:
+                self._path = str(data_dir / path_obj.name)
+            else:
+                self._path = json_path
 
     def get_device_history(
         self,

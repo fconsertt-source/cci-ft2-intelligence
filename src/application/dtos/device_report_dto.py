@@ -4,6 +4,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 from enum import Enum
 
+from .reading_dto import ReadingDTO
 from .thermal_excursion_dto import ThermalExcursionDTO
 
 
@@ -41,7 +42,7 @@ class DeviceReportDTO:
     flexible_vvm_policy_applied: bool = False
     remaining_shelf_life_ok: bool = True
     decision_reasons: List[str] = field(default_factory=list)
-    readings: List[Dict[str, Any]] = field(default_factory=list)
+    readings: List[ReadingDTO] = field(default_factory=list)
     stats: Dict[str, Any] = field(default_factory=dict)
     generated_at: datetime = field(default_factory=datetime.now)
     # Legacy fields for backward compatibility
@@ -70,7 +71,16 @@ class DeviceReportDTO:
         return counts
 
     def __post_init__(self):
-        """Validation after initialization."""
+        # تحويل readings من dict إلى ReadingDTO
+        if self.readings:
+            converted = []
+            for r in self.readings:
+                if isinstance(r, dict):
+                    from src.application.dtos.reading_dto import ReadingDTO
+                    converted.append(ReadingDTO.from_dict(r))
+                else:
+                    converted.append(r)
+            object.__setattr__(self, 'readings', converted)
         if not self.device_id:
             raise ValueError("device_id cannot be empty")
         if not self.center_id:
@@ -84,7 +94,6 @@ class DeviceReportDTO:
         if 'min' in self.temperature_ranges and 'max' in self.temperature_ranges:
             if self.temperature_ranges['min'] > self.temperature_ranges['max']:
                 raise ValueError("Minimum temperature cannot be greater than maximum temperature in temperature_ranges")
-
     @classmethod
     def create_golden_baseline(cls) -> "DeviceReportDTO":
         """Factory method للـ Golden Baseline – يعمل مع الـ enums المحلية"""

@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0d1117">
+<title>الحارس الرقمي — CCI-FT2 Sentinel v2.1</title>
+<style>
+/* ══ RESET & BASE ══════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0d1117; --surface:#161b22; --border:#21262d; --border2:#30363d;
+  --txt:#e6edf3; --muted:#8b949e; --dim:#c9d1d9;
+  --blue:#58a6ff; --green:#3fb950; --orange:#ff9500;
+  --red:#ff2d55;  --yellow:#ffcc00; --purple:#bc8cff;
+  --font:'Segoe UI','Tahoma',Arial,sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--txt);font-family:var(--font);
+     display:flex;flex-direction:column;direction:rtl}
+a{color:var(--blue);text-decoration:none}
+
+/* ══ TYPOGRAPHY ════════════════════════════════════════════ */
+.t-blue{color:var(--blue)} .t-green{color:var(--green)}
+.t-red{color:var(--red)}   .t-orange{color:var(--orange)}
+.t-muted{color:var(--muted)} .bold{font-weight:700}
+.mono{font-family:Consolas,'Courier New',monospace}
+
+/* ══ HEADER ════════════════════════════════════════════════ */
+#header{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:10px 16px;display:flex;align-items:center;gap:12px;
+  flex-shrink:0;position:sticky;top:0;z-index:100
+}
+#header-icon{font-size:22px}
+#header-titles{flex:1}
+#header-titles h1{font-size:15px;font-weight:700;color:var(--blue);line-height:1.2}
+#header-titles p{font-size:9px;color:var(--muted);margin-top:2px}
+#status-dot{font-size:11px;white-space:nowrap;color:var(--muted)}
+
+/* ══ TAB BAR ════════════════════════════════════════════════ */
+#tabbar{
+  display:flex;background:var(--surface);
+  border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;
+}
+#tabbar::-webkit-scrollbar{height:0}
+.tab{
+  flex:1;min-width:56px;padding:9px 4px;text-align:center;
+  font-size:10px;color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;white-space:nowrap;transition:.2s
+}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-icon{font-size:15px;display:block;margin-bottom:2px}
+
+/* ══ MAIN CONTENT ══════════════════════════════════════════ */
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page{display:none;padding:14px 12px}
+.page.active{display:block}
+
+/* ══ COMPONENTS ════════════════════════════════════════════ */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:14px;margin-bottom:12px
+}
+.card-title{font-size:12px;color:var(--blue);font-weight:600;margin-bottom:8px}
+.section-title{
+  font-size:13px;color:var(--blue);font-weight:600;
+  border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:10px
+}
+
+/* ══ UPLOAD ZONE ════════════════════════════════════════════ */
+#drop-zone{
+  border:2px dashed var(--border2);border-radius:10px;
+  padding:28px;text-align:center;cursor:pointer;margin-bottom:12px;
+  transition:.2s;background:var(--bg)
+}
+#drop-zone:hover,#drop-zone.drag{border-color:var(--blue);background:#1f2b3a}
+#drop-zone .icon{font-size:36px;margin-bottom:8px}
+#drop-zone .title{font-size:14px;color:var(--dim);margin-bottom:4px}
+#drop-zone .sub{font-size:11px;color:var(--muted)}
+#file-input{display:none}
+
+/* ══ KPI GRID ════════════════════════════════════════════════ */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:12px;text-align:center
+}
+.kpi-val{font-size:22px;font-weight:700;line-height:1.1}
+.kpi-lbl{font-size:10px;color:var(--muted);margin-top:3px}
+
+/* ══ TABLE ══════════════════════════════════════════════════ */
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{background:#0f1621;color:var(--blue);padding:8px 5px;
+   text-align:center;border-bottom:1px solid var(--border);font-weight:600;
+   white-space:nowrap;position:sticky;top:0;z-index:1}
+td{padding:7px 5px;text-align:center;border-bottom:1px solid var(--border);
+   color:var(--dim);white-space:nowrap}
+tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+tr:last-child td{border-bottom:none}
+
+/* ══ BUTTONS ════════════════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:10px 18px;border-radius:6px;font-size:13px;cursor:pointer;
+  border:none;font-family:var(--font);transition:.15s;
+}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:active{background:#388bfd}
+.btn-secondary{background:var(--border2);color:var(--dim)}
+.btn-secondary:active{background:#3d444d}
+.btn-success{background:var(--green);color:#000}
+.btn-full{width:100%;justify-content:center;margin-bottom:8px}
+
+/* ══ PROGRESS ════════════════════════════════════════════════ */
+#progress-wrap{display:none;margin-bottom:12px}
+.progress-bar{height:4px;background:var(--border2);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--blue);width:0;transition:.3s;border-radius:2px}
+
+/* ══ ALERT BANNER ════════════════════════════════════════════ */
+.alert{
+  padding:10px 14px;border-radius:6px;font-size:12px;margin-bottom:10px;
+  display:flex;gap:8px;align-items:flex-start
+}
+.alert-critical{background:#3d0914;border:1px solid var(--red);color:#ffa0b0}
+.alert-high    {background:#3d2200;border:1px solid var(--orange);color:#ffc070}
+.alert-info    {background:#0c2040;border:1px solid var(--blue);color:#a0c8ff}
+.alert-ok      {background:#0c2d0c;border:1px solid var(--green);color:#80e880}
+
+/* ══ CHART CANVAS ════════════════════════════════════════════ */
+canvas.chart{width:100%;border-radius:6px;display:block}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* ══ INFO ROW ════════════════════════════════════════════════ */
+.info-row{display:flex;justify-content:space-between;
+          padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.info-row:last-child{border-bottom:none}
+.info-row span:first-child{color:var(--muted)}
+.info-row span:last-child{color:var(--txt);font-weight:500}
+
+/* ══ EXPORT OPTIONS ══════════════════════════════════════════ */
+.export-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:14px;margin-bottom:10px
+}
+.export-card p{font-size:11px;color:var(--muted);margin-bottom:10px}
+
+/* ══ RISK BADGE ══════════════════════════════════════════════ */
+.badge{
+  display:inline-block;padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:700
+}
+.badge-critical{background:#3d0914;color:var(--red)}
+.badge-high    {background:#3d2200;color:var(--orange)}
+.badge-moderate{background:#3d3000;color:var(--yellow)}
+.badge-low     {background:#0c2d0c;color:var(--green)}
+
+/* ══ TOAST ═══════════════════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:#222d3a;color:var(--txt);padding:10px 20px;border-radius:20px;
+  font-size:12px;opacity:0;transition:.3s;pointer-events:none;
+  border:1px solid var(--border2);z-index:999;max-width:90vw;text-align:center
+}
+#toast.show{opacity:1}
+
+/* ══ EMPTY STATE ══════════════════════════════════════════════ */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+.empty .big{font-size:40px;margin-bottom:12px}
+
+/* ══ SCIENTIFIC NOTE ══════════════════════════════════════════= */
+.sci-note{
+  font-size:10px;color:var(--muted);padding:8px;
+  border-right:2px solid var(--border2);margin-top:8px;line-height:1.6
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER ─────────────────────────────────────────────── -->
+<div id="header">
+  <div id="header-icon">🛡️</div>
+  <div id="header-titles">
+    <h1>الحارس الرقمي | FT2 Sentinel v2.1</h1>
+    <p>HER · CCM · MKT · HEI · VVM | Berlinger FT2 | WHO/IVB/06.10 | Ea=83.144 kJ/mol | R=8.314 J/mol·K</p>
+  </div>
+  <div id="status-dot">● انتظار</div>
+</div>
+
+<!-- TAB BAR ─────────────────────────────────────────────── -->
+<div id="tabbar">
+  <div class="tab active" onclick="switchTab(0)">
+    <span class="tab-icon">📁</span>تحميل
+  </div>
+  <div class="tab" onclick="switchTab(1)">
+    <span class="tab-icon">📊</span>البيانات
+  </div>
+  <div class="tab" onclick="switchTab(2)">
+    <span class="tab-icon">🔬</span>التحليل
+  </div>
+  <div class="tab" onclick="switchTab(3)">
+    <span class="tab-icon">📈</span>الرسوم
+  </div>
+  <div class="tab" onclick="switchTab(4)">
+    <span class="tab-icon">💾</span>تصدير
+  </div>
+</div>
+
+<!-- CONTENT ─────────────────────────────────────────────── -->
+<div id="content">
+
+  <!-- ═══ PAGE 0: UPLOAD ════════════════════════════════════ -->
+  <div class="page active" id="page-0">
+
+    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div class="icon">📂</div>
+      <div class="title">اضغط لتحميل ملف FT2</div>
+      <div class="sub">صيغة .txt — Berlinger Fridge-tag 2 / Q-tag FT2 E</div>
+    </div>
+    <input type="file" id="file-input" accept=".txt" onchange="handleFile(event)">
+
+    <div id="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="pbar"></div></div>
+    </div>
+
+    <div id="alerts-section"></div>
+
+    <div id="device-card" style="display:none">
+      <div class="card">
+        <div class="card-title">ℹ️ معلومات الجهاز</div>
+        <div id="device-info-rows"></div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-box">
+          <div class="kpi-val t-blue" id="kpi-days">0</div>
+          <div class="kpi-lbl">يوم مرصود</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-val t-green" id="kpi-mean">—</div>
+          <div class="kpi-lbl">MKT (°C)</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-val t-orange" id="kpi-max">—</div>
+          <div class="kpi-lbl">أعلى درجة</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-val t-red" id="kpi-alarm">0</div>
+          <div class="kpi-lbl">دقيقة إنذار حراري</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-0 -->
+
+  <!-- ═══ PAGE 1: RAW DATA ══════════════════════════════════ -->
+  <div class="page" id="page-1">
+    <div class="section-title">السجلات اليومية الخام — FT2</div>
+    <div id="raw-table-wrap">
+      <div class="empty"><div class="big">📊</div>حمّل ملف FT2 أولاً</div>
+    </div>
+    <div class="sci-note">
+      📌 المصدر: Berlinger Fridge-tag 2E — السجل اليومي يشمل Min/Max/Avg و t Acc (الدقائق التراكمية فوق عتبة الإنذار).
+      نمط تراكمي يُكشف تلقائياً بفحص الرتابة الصارمة.
+    </div>
+  </div>
+
+  <!-- ═══ PAGE 2: ANALYSIS ══════════════════════════════════ -->
+  <div class="page" id="page-2">
+    <div class="section-title">التحليل العلمي — HER · CCM · MKT · HEI</div>
+
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--muted)">T المرجع (T_ref):</span>
+        <input id="tref-input" type="number" value="5" min="0" max="10" step="0.5"
+               style="width:70px;background:var(--surface);color:var(--txt);
+                      border:1px solid var(--border2);border-radius:4px;padding:5px;
+                      font-size:13px;text-align:center">
+        <span style="font-size:11px;color:var(--muted)">°C</span>
+        <button class="btn btn-primary" onclick="runAnalysis()" style="margin-right:auto">
+          ▶ تشغيل التحليل
+        </button>
+      </div>
+    </div>
+
+    <div id="results-table-wrap">
+      <div class="empty"><div class="big">🔬</div>حمّل ملف FT2 ثم اضغط "تشغيل التحليل"</div>
+    </div>
+
+    <div class="card" style="margin-top:10px">
+      <div class="card-title">📐 معادلات الحساب — المرجعية العلمية</div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.8">
+        <b class="t-blue">HER (Q10):</b> Σ Q10^((T_avg−T_ref)/10) × Δt / shelf_life_hours<br>
+        <b class="t-blue">HER Arrh.:</b> Σ exp(Ea/R × (1/T_ref_K − 1/T_K)) × Δt / shelf_life_hours<br>
+        <b class="t-blue">MKT:</b> (Ea/R) / −ln[Σ exp(−Ea/(R×T_K))×Δt / Σ Δt] − 273.15<br>
+        <b class="t-blue">HEI:</b> Σ max(0, T_avg−8°C) × alarm_minutes  [للأيام المنذرة فقط]<br>
+        <b class="t-blue">CCM (AUC):</b> Σ max(0, T_avg−8°C) × 1440 min  [جميع الأيام]<br>
+        <b class="t-blue">CCM Hours &gt;10°C:</b> Σ alarm_minutes / 60 [ساعات فوق T_alarm]<br>
+        <hr style="border-color:var(--border);margin:6px 0">
+        <b>النظام:</b> WHO/IVB/06.10 · WHO PQS E006/IN05.3 · Berlinger FT2 Manual<br>
+        <b>Ea:</b> 83.144 kJ/mol | <b>R:</b> 8.314 J/mol·K | <b>T_ref:</b> 5°C (278.15 K)
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:10px">
+      <div class="card-title">🏁 شجرة القرار — مُستندة إلى WHO VaccineAssessmentService</div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.8">
+        1️⃣ تجمد (T_min &lt; −0.5°C) + حساس للتجمد → <b class="t-red">DISCARD (تجمد)</b><br>
+        2️⃣ &gt;2ساعة فوق 34°C → <b class="t-red">DISCARD (CCM-D)</b><br>
+        3️⃣ HER &gt; 1.5 → <b class="t-red">DISCARD (HER شديد)</b><br>
+        4️⃣ HER &gt; 1.0 → <b class="t-orange">PARTIAL (شك بالفاعلية)</b><br>
+        5️⃣ HER &gt; 0.7 → <b class="t-orange">HIGH (مراجعة)</b><br>
+        6️⃣ HER &gt; 0.3 → <b class="t-yellow">MODERATE (مراقبة)</b><br>
+        7️⃣ HER ≤ 0.3 → <b class="t-green">LOW (آمن)</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE 3: CHARTS ════════════════════════════════════ -->
+  <div class="page" id="page-3">
+    <div class="section-title">الرسوم البيانية</div>
+
+    <div class="card">
+      <div class="card-title">نسبة التدهور الحراري HER — مقارنة بين اللقاحات</div>
+      <canvas id="chart-her" class="chart" height="200"></canvas>
+      <div class="chart-legend" id="legend-her"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">مسار درجات الحرارة اليومية (Min / Avg / Max)</div>
+      <canvas id="chart-temp" class="chart" height="200"></canvas>
+    </div>
+
+  </div>
+
+  <!-- ═══ PAGE 4: EXPORT ════════════════════════════════════ -->
+  <div class="page" id="page-4">
+    <div class="section-title">تصدير التقارير</div>
+
+    <div class="export-card">
+      <div class="card-title">📥 تصدير نتائج التحليل — CSV</div>
+      <p>يصدّر جدول النتائج الكاملة بصيغة CSV للاستيراد في Excel</p>
+      <button class="btn btn-primary btn-full" onclick="exportResultsCSV()">
+        📥 تنزيل نتائج التحليل
+      </button>
+    </div>
+
+    <div class="export-card">
+      <div class="card-title">📥 تصدير البيانات الخام — CSV</div>
+      <p>يصدّر السجلات اليومية المحللة من ملف FT2</p>
+      <button class="btn btn-secondary btn-full" onclick="exportRawCSV()">
+        📥 تنزيل البيانات الخام
+      </button>
+    </div>
+
+    <div class="export-card">
+      <div class="card-title">📄 تقرير نصي ملخص</div>
+      <p>تقرير نصي سريع يمكن مشاركته عبر WhatsApp أو البريد</p>
+      <button class="btn btn-success btn-full" onclick="shareReport()">
+        📤 مشاركة التقرير
+      </button>
+    </div>
+
+    <div class="card" style="margin-top:4px">
+      <div id="report-preview" style="font-size:11px;color:var(--muted);
+           font-family:Consolas,'Courier New',monospace;white-space:pre-wrap;
+           max-height:220px;overflow-y:auto">
+        شغّل التحليل أولاً لعرض ملخص التقرير...
+      </div>
+    </div>
+
+  </div><!-- /page-4 -->
+
+</div><!-- /#content -->
+
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCIENTIFIC CORE — v2.1
+     References:
+       - WHO/IVB/06.10 (Q10, VVM, shelf life)
+       - WHO PQS E006/IN05.3 (Berlinger FT2)
+       - USP <1079.2> (MKT formula)
+       - SCIENTIFIC_HEART_IMPLEMENTATION_PLAN_v2.1.1
+     ═══════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+// SCIENTIFIC CONSTANTS  (WHO/IVB/06.10 + SCIENTIFIC_HEART_PLAN)
+// ══════════════════════════════════════════════════════════════
+const EA_J_MOL   = 83144;          // Ea = 83.144 kJ/mol → J/mol
+const R_GAS      = 8.314;          // Universal gas constant J/(mol·K)
+const T_REF_C    = 5.0;            // WHO reference temperature °C
+const T_REF_K    = T_REF_C + 273.15; // 278.15 K
+const ALARM_THR  = 8.0;            // Upper alarm threshold Berlinger FT2 default (°C)
+const FREEZE_THR = -0.5;           // Freeze sensitivity threshold (°C) — FT2 safety margin
+const CCM_D_HOURS = 2.0;           // WHO CCM Window D: >2h above 34°C → DISCARD
+const CCM_C_HOURS = 72.0;          // WHO CCM Window C: >72h above 10°C
+
+// ══════════════════════════════════════════════════════════════
+// VACCINE LIBRARY  (aligned with config/vaccine_library.yaml v2.0.3)
+// Source: WHO/IVB/06.10 Table 1 + WHO/PQS E006/IN05.3
+// ══════════════════════════════════════════════════════════════
+const VACCINES = [
+  // freeze-stable vaccines
+  { code:'OPV',    ar:'شلل الأطفال (OPV)',          q10:3.6, ea:83.144, vvm:'VVM2',  shelf_days:126,  freeze_sensitive:false },
+  { code:'MEASLES',ar:'الحصبة',                      q10:2.0, ea:83.144, vvm:'VVM2',  shelf_days:365,  freeze_sensitive:false },
+  { code:'MMR',    ar:'MMR',                          q10:2.0, ea:83.144, vvm:'VVM2',  shelf_days:730,  freeze_sensitive:false },
+  { code:'BCG',    ar:'BCG (السل)',                   q10:2.0, ea:83.144, vvm:'VVM2',  shelf_days:365,  freeze_sensitive:false },
+  { code:'YF',     ar:'الحمى الصفراء',                q10:2.0, ea:83.144, vvm:'VVM2',  shelf_days:730,  freeze_sensitive:false },
+  // freeze-sensitive vaccines
+  { code:'HEPB',   ar:'التهاب الكبد ب',               q10:2.0, ea:83.144, vvm:'VVM30', shelf_days:1095, freeze_sensitive:true  },
+  { code:'DTP',    ar:'الثلاثي (DTP)',                 q10:2.0, ea:83.144, vvm:'VVM14', shelf_days:548,  freeze_sensitive:true  },
+  { code:'TT',     ar:'التيتانوس (TT)',                q10:2.0, ea:83.144, vvm:'VVM30', shelf_days:1825, freeze_sensitive:true  },
+  { code:'PENTA',  ar:'الخماسي (DTP+HepB+Hib)',        q10:2.0, ea:83.144, vvm:'VVM14', shelf_days:730,  freeze_sensitive:true  },
+  { code:'PCV',    ar:'المكورات الرئوية (PCV)',         q10:2.0, ea:83.144, vvm:'VVM14', shelf_days:730,  freeze_sensitive:true  },
+  { code:'IPV',    ar:'شلل الأطفال المعطّل (IPV)',     q10:2.0, ea:83.144, vvm:'VVM14', shelf_days:730,  freeze_sensitive:true  },
+  { code:'HPV',    ar:'فيروس الورم الحليمي (HPV)',     q10:2.0, ea:83.144, vvm:'VVM30', shelf_days:1095, freeze_sensitive:true  },
+];
+
+// Risk colour palette
+const RISK_COLOR = {
+  CRITICAL:'#ff2d55', DISCARD:'#ff2d55',
+  HIGH:'#ff9500',
+  MODERATE:'#ffcc00',
+  LOW:'#3fb950',
+  PARTIAL:'#bc8cff',
+  SAFE:'#3fb950',
+};
+
+// ── State ───────────────────────────────────────────────────
+let deviceInfo = {}, rawRecords = [], resultsData = [];
+
+// ══════════════════════════════════════════════════════════════
+// UTILITY
+// ══════════════════════════════════════════════════════════════
+function toK(c) { return c + 273.15; }
+function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+
+// ── Tab switching ────────────────────────────────────────────
+function switchTab(idx) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i===idx));
+}
+
+// ── Toast ────────────────────────────────────────────────────
+function toast(msg, ms=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+}
+
+// ── Progress ─────────────────────────────────────────────────
+function showProgress(on) {
+  document.getElementById('progress-wrap').style.display = on ? 'block' : 'none';
+  document.getElementById('pbar').style.width = on ? '80%' : '100%';
+}
+
+// ══════════════════════════════════════════════════════════════
+// FT2 PARSER
+// Ref: Berlinger Fridge-tag 2 / Q-tag FT2 E User Guide
+// ══════════════════════════════════════════════════════════════
+function handleFile(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    showProgress(true);
+    setTimeout(() => {
+      try {
+        parseFT2(e.target.result, file.name);
+        showProgress(false);
+      } catch(err) {
+        showProgress(false);
+        toast('❌ خطأ: ' + err.message);
+      }
+    }, 40);
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function parseFT2(content, filename) {
+  deviceInfo = parseHeader(content);
+  rawRecords  = parseDailyRecords(content);
+
+  if (!rawRecords.length)
+    throw new Error('لم يُعثر على سجلات يومية صالحة في الملف');
+
+  rawRecords.sort((a,b) => a.date.localeCompare(b.date));
+  resolveAlarmMode(rawRecords);          // كشف النمط وتحويل التراكمي → يومي
+  updateUploadUI(filename);
+  fillRawTable();
+  toast(`✅ تم تحميل ${rawRecords.length} سجل يومي`);
+}
+
+function parseHeader(c) {
+  const get = (pat, def='N/A') => { const m=c.match(pat); return m ? m[1].trim() : def; };
+  const am  = c.match(/1:\s*\n[\s\S]{0,50}T AL:\s*\+?([+-]?\d+\.?\d*),?\s*t AL:\s*(\d+)/);
+  return {
+    serial:        get(/Serial:\s*(\S+)/),
+    device:        get(/Device:\s*(.+)/),
+    fw:            get(/Fw Vers:\s*(\S+)/),
+    activationDate:get(/TS Actv:\s*([\d-]+ [\d:]+)/),
+    reportDate:    get(/TS Report Creation:\s*([\d-]+ [\d:]+)/),
+    upperAlarmT:   am ? parseFloat(am[1]) : 8.0,
+    upperAlarmDurMin: am ? parseInt(am[2]) : 600,
+  };
+}
+
+/**
+ * استخراج السجلات اليومية من كتل FT2.
+ * يأخذ t Acc من الإنذار الأول الساخن (الإنذار العلوي = alarm index 1 في FT2).
+ */
+function parseDailyRecords(content) {
+  const records = [];
+  const lines   = content.split('\n');
+  const n       = lines.length;
+
+  for (let i = 0; i < n; i++) {
+    // كل كتلة يومية تبدأ بـ "N:\n" حيث N = رقم اليوم
+    if (!/^\s*\d+:\s*$/.test(lines[i])) continue;
+
+    const block = lines.slice(i, i + 35).join('\n');
+    const dm = block.match(/Date:\s*(\d{4}-\d{2}-\d{2})/);
+    if (!dm) continue;
+
+    const gf = (pat) => { const m=block.match(pat); return m ? parseFloat(m[1]) : NaN; };
+
+    // t Acc: جميع القيم — FT2 يرتبها: الإنذار 0 (بارد) ثم الإنذار 1 (ساخن)
+    const tAccAll = [...block.matchAll(/t Acc:\s*(\d+)/g)].map(m => parseInt(m[1]));
+    // الإنذار الساخن هو الثاني (index 1) في FT2؛ إن غاب نأخذ الأول
+    const alarmRaw = tAccAll.length >= 2 ? tAccAll[1]
+                   : tAccAll.length === 1 ? tAccAll[0] : 0;
+
+    const minT = gf(/Min T:\s*([+-]?\d+\.?\d*)/);
+    const maxT = gf(/Max T:\s*([+-]?\d+\.?\d*)/);
+    const avgT = gf(/Avrg T:\s*([+-]?\d+\.?\d*)/);
+
+    // رفض الأيام التي لا تحتوي بيانات درجة حرارة
+    if (isNaN(minT) && isNaN(maxT) && isNaN(avgT)) continue;
+
+    records.push({
+      date:          dm[1],
+      minT:          isNaN(minT) ? 0 : minT,
+      maxT:          isNaN(maxT) ? 0 : maxT,
+      avgT:          isNaN(avgT) ? 0 : avgT,
+      alarmRaw,                          // القيمة الخام (قد تكون تراكمية)
+      alarmHeatMin:  0,                  // سيُحسب في resolveAlarmMode
+    });
+  }
+  return records;
+}
+
+/**
+ * كشف نمط t Acc: تراكمي أم يومي.
+ * المعيار: إذا كانت القيم رتيبة متزايدة وأعلاها > 1440 → تراكمي؛
+ *          ثم يُحوَّل بالفرق اليومي.
+ * Ref: Berlinger FT2 Technical Specification (دقيقة ≤ 1440 يومياً)
+ */
+function resolveAlarmMode(records) {
+  const vals = records.map(r => r.alarmRaw);
+  const maxV = Math.max(...vals, 0);
+
+  let monotone = true;
+  for (let i=1; i<vals.length; i++)
+    if (vals[i] < vals[i-1]) { monotone=false; break; }
+
+  const isCumulative = monotone && maxV > 1440;
+
+  if (isCumulative) {
+    let prev = 0;
+    records.forEach(r => {
+      r.alarmHeatMin = Math.max(0, r.alarmRaw - prev);
+      r.alarmHeatMin = Math.min(r.alarmHeatMin, 1440); // cap داخل يوم
+      prev = r.alarmRaw;
+    });
+  } else {
+    records.forEach(r => {
+      r.alarmHeatMin = Math.min(Math.max(0, r.alarmRaw), 1440);
+    });
+  }
+
+  // تحقق إضافي: إذا كان maxT < alarm_threshold في يوم ما وعنده دقائق → صفّر
+  records.forEach(r => {
+    if (r.maxT < (deviceInfo.upperAlarmT || ALARM_THR) - 0.5)
+      r.alarmHeatMin = 0;
+  });
+
+  deviceInfo.alarmMode = isCumulative ? 'تراكمي' : 'يومي';
+}
+
+// ══════════════════════════════════════════════════════════════
+// SCIENTIFIC CALCULATORS
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * MKT — Mean Kinetic Temperature  (USP <1079.2>)
+ * MKT = (Ea/R) / -ln[ Σ exp(-Ea/(R·Ti)) · Δt / Σ Δt ]  − 273.15
+ * حيث Δt = 1440 دقيقة (يوم واحد)
+ * Ref: WHO/IVB/06.10; USP <1079.2>
+ */
+function calcMKT(records, eaJMol = EA_J_MOL) {
+  let num = 0, den = 0;
+  for (const r of records) {
+    const tK = toK(r.avgT);
+    const dt = 1440; // دقيقة
+    num += Math.exp(-eaJMol / (R_GAS * tK)) * dt;
+    den += dt;
+  }
+  if (den === 0) return T_REF_C;
+  const ratio = num / den;
+  if (ratio <= 0) return T_REF_C;
+  const mktK = -eaJMol / (R_GAS * Math.log(ratio));
+  return mktK - 273.15;
+}
+
+/**
+ * HER — Heat Exposure Ratio — نموذج Q10
+ * HER = Σ Q10^((T_avg − T_ref)/10) × Δt_hours / shelf_life_hours
+ * Ref: WHO/IVB/06.10 Box 1; Q10HerCalculator في النظام
+ */
+function calcHER_Q10(records, q10, shelf_days, tRef = T_REF_C) {
+  const shelfH = shelf_days * 24.0;   // تحويل الأيام → ساعات
+  let cumH = 0;
+  for (const r of records) {
+    const dt_h = 24.0;                // كل سجل يمثل يوماً (24 ساعة)
+    const factor = Math.pow(q10, (r.avgT - tRef) / 10.0);
+    cumH += factor * dt_h;
+  }
+  return cumH / shelfH;
+}
+
+/**
+ * HER — نموذج Arrhenius
+ * HER_arr = Σ exp(Ea/R × (1/T_ref_K − 1/T_K)) × Δt_hours / shelf_life_hours
+ * ملاحظة: (1/T_ref − 1/T) تعطي قيمة موجبة عند T > T_ref (تسارع التدهور بالحرارة)
+ * Ref: ArrheniusHERCalculator; SCIENTIFIC_HEART_IMPLEMENTATION_PLAN_v2.1.1 §3.2
+ */
+function calcHER_Arrhenius(records, shelf_days, tRef = T_REF_C, eaJMol = EA_J_MOL) {
+  const shelfH = shelf_days * 24.0;
+  const tRefK  = toK(tRef);
+  let cumH = 0;
+  for (const r of records) {
+    const tK = toK(r.avgT);
+    if (tK <= 0) continue;
+    const exponent = (eaJMol / R_GAS) * (1/tRefK - 1/tK);
+    let factor;
+    try { factor = Math.exp(exponent); }
+    catch(e) { factor = Infinity; }
+    if (!isFinite(factor)) { return Infinity; }
+    cumH += factor * 24.0;
+  }
+  return cumH / shelfH;
+}
+
+/**
+ * HEI — Heat Exposure Index (°C·min)
+ * = Σ max(0, T_avg − T_threshold) × alarm_minutes
+ * يُطبَّق فقط على الأيام التي سُجِّل فيها إنذار حراري (alarmHeatMin > 0).
+ * Ref: CCI-FT2 domain (ExposureAnalysisService ccm_auc variant)
+ */
+function calcHEI(records, threshold = ALARM_THR) {
+  let total = 0;
+  for (const r of records) {
+    if (r.alarmHeatMin > 0)
+      total += Math.max(0, r.avgT - threshold) * r.alarmHeatMin;
+  }
+  return Math.round(total);
+}
+
+/**
+ * CCM_AUC — Cumulative Cold-chain Minutes (Area Under Curve)
+ * = Σ max(0, T_avg − 8°C) × 1440 min  [على جميع الأيام]
+ * يُقارَب بالمساحة تحت منحنى الحرارة فوق 8°C
+ * Ref: CCMCalculator.calculate_auc; WHO/IVB/06.10
+ */
+function calcCCM_AUC(records, base = ALARM_THR) {
+  let total = 0;
+  for (const r of records)
+    total += Math.max(0, r.avgT - base) * 1440;
+  return Math.round(total);
+}
+
+/**
+ * ساعات ≥ 10°C (CCM Window metric)
+ * يستخدم alarmHeatMin كمقرِّب للوقت فوق عتبة الجهاز (8°C)
+ * وbuilt-in هيورستيك لتقدير الساعات فوق 10°C
+ */
+function calcHoursAbove10(records, alarmThr = ALARM_THR) {
+  // إذا كانت عتبة الجهاز 8°C فإن الوقت فوق 10°C ≈ 60-75% من وقت الإنذار
+  // (هيورستيك محافظ بسبب محدودية بيانات FT2 اليومية)
+  const totalAlarmMin = records.reduce((s,r) => s + r.alarmHeatMin, 0);
+  return (totalAlarmMin * 0.70) / 60.0; // ساعات تقريبية
+}
+
+/**
+ * شجرة القرار — مُستندة إلى VaccineAssessmentService في النظام
+ * الأولوية: تجمد → CCM-D → HER >1.5 → HER >1.0 → HER >0.7 → HER >0.3 → آمن
+ */
+function classifyVaccine(vac, records, her_q10, her_arr, hei, ccmAuc, mkt) {
+  const minT_all = Math.min(...records.map(r => r.minT));
+  const maxT_all = Math.max(...records.map(r => r.maxT));
+  const hoursAbove34 = records.reduce((s,r) =>
+    s + (r.maxT > 34 ? r.alarmHeatMin / 60.0 : 0), 0);
+
+  // 1. تجمد حرج (حساس للتجمد)
+  if (vac.freeze_sensitive && minT_all < FREEZE_THR)
+    return { risk:'DISCARD', reason:'❌ تجمد مكتشف — إتلاف فوري', confidence:0.95 };
+
+  // 2. CCM Window D — >2ساعة فوق 34°C
+  if (hoursAbove34 > CCM_D_HOURS)
+    return { risk:'DISCARD', reason:`❌ ${hoursAbove34.toFixed(1)}ساعة فوق 34°C (CCM-D) — إتلاف`, confidence:0.90 };
+
+  // 3. HER Q10 > 1.5 → DISCARD
+  if (her_q10 > 1.5)
+    return { risk:'DISCARD', reason:`❌ HER=${(her_q10*100).toFixed(0)}% — استُنزف العمر الافتراضي`, confidence:0.90 };
+
+  // 4. HER Q10 > 1.0 → PARTIAL
+  if (her_q10 > 1.0)
+    return { risk:'PARTIAL', reason:`⚠️ HER=${(her_q10*100).toFixed(0)}% — تراجع محتمل في الفاعلية`, confidence:0.80 };
+
+  // 5. HER > 0.7 → HIGH
+  if (her_q10 > 0.7)
+    return { risk:'HIGH', reason:`⚠️ HER=${(her_q10*100).toFixed(0)}% — مراجعة عاجلة`, confidence:0.75 };
+
+  // 6. HER > 0.3 → MODERATE
+  if (her_q10 > 0.3)
+    return { risk:'MODERATE', reason:`⚠️ HER=${(her_q10*100).toFixed(0)}% — مراقبة مستمرة`, confidence:0.85 };
+
+  // 7. ذروة حرارية قصيرة دون تراكم معنوي
+  if (maxT_all > 10.0 && ccmAuc > 0)
+    return { risk:'MODERATE', reason:`⚠️ ذروة ${maxT_all.toFixed(1)}°C مع تراكم — مراقبة`, confidence:0.80 };
+
+  // 8. آمن
+  return { risk:'LOW', reason:'✅ ضمن النطاق — آمن', confidence:0.95 };
+}
+
+// ══════════════════════════════════════════════════════════════
+// RUN ANALYSIS
+// ══════════════════════════════════════════════════════════════
+function runAnalysis() {
+  if (!rawRecords.length) { toast('حمّل ملف FT2 أولاً'); return; }
+
+  const tRef = parseFloat(document.getElementById('tref-input').value);
+  if (isNaN(tRef) || tRef < 0 || tRef > 10) { toast('T المرجع يجب أن يكون بين 0 و10°C'); return; }
+
+  const mkt      = calcMKT(rawRecords, EA_J_MOL);
+  const hei      = calcHEI(rawRecords, ALARM_THR);
+  const ccmAuc   = calcCCM_AUC(rawRecords, ALARM_THR);
+  const totalAlm = rawRecords.reduce((s,r) => s + r.alarmHeatMin, 0);
+  const hrsAbv10 = calcHoursAbove10(rawRecords, ALARM_THR);
+
+  resultsData = VACCINES.map(vac => {
+    const her_q10 = calcHER_Q10(rawRecords, vac.q10,  vac.shelf_days, tRef);
+    const her_arr = calcHER_Arrhenius(rawRecords, vac.shelf_days, tRef, EA_J_MOL);
+    const cls     = classifyVaccine(vac, rawRecords, her_q10, her_arr, hei, ccmAuc, mkt);
+    return {
+      code:    vac.code,
+      ar:      vac.ar,
+      q10:     vac.q10,
+      ea:      vac.ea,
+      vvm:     vac.vvm,
+      shelf:   vac.shelf_days,
+      freeze:  vac.freeze_sensitive,
+      her_q10: isFinite(her_q10) ? her_q10 : 9.99,
+      her_arr: isFinite(her_arr) ? her_arr : 9.99,
+      hei,
+      ccmAuc,
+      mkt:     parseFloat(mkt.toFixed(2)),
+      risk:    cls.risk,
+      reason:  cls.reason,
+      conf:    cls.confidence,
+    };
+  });
+
+  fillResultsTable();
+  drawAllCharts();
+  buildReportPreview(mkt, hei, ccmAuc, hrsAbv10);
+  switchTab(2);
+  toast(`✅ التحليل مكتمل | MKT=${mkt.toFixed(2)}°C | ${VACCINES.length} لقاح`);
+}
+
+// ══════════════════════════════════════════════════════════════
+// UI — Upload page
+// ══════════════════════════════════════════════════════════════
+function updateUploadUI(filename) {
+  document.getElementById('device-card').style.display = 'block';
+  const sd = document.getElementById('status-dot');
+  sd.textContent = `● ${rawRecords.length} يوم ✓`;
+  sd.style.color  = '#3fb950';
+
+  const mkt = calcMKT(rawRecords, EA_J_MOL);
+
+  const rows = [
+    ['طراز الجهاز',         deviceInfo.device || 'N/A'],
+    ['الرقم التسلسلي',      deviceInfo.serial || 'N/A'],
+    ['تاريخ التفعيل',       deviceInfo.activationDate || 'N/A'],
+    ['تاريخ التقرير',       deviceInfo.reportDate || 'N/A'],
+    ['عتبة إنذار الحرارة', (deviceInfo.upperAlarmT || ALARM_THR).toFixed(1) + '°C'],
+    ['نمط t Acc',            deviceInfo.alarmMode || '—'],
+  ];
+  document.getElementById('device-info-rows').innerHTML =
+    rows.map(([l,v]) => `<div class="info-row"><span>${l}</span><span>${v}</span></div>`).join('');
+
+  const avgTs  = rawRecords.map(r => r.avgT);
+  const maxTs  = rawRecords.map(r => r.maxT);
+  const alarms = rawRecords.reduce((s,r) => s + r.alarmHeatMin, 0);
+  const maxT   = Math.max(...maxTs).toFixed(1);
+
+  document.getElementById('kpi-days').textContent  = rawRecords.length;
+  document.getElementById('kpi-mean').textContent  = mkt.toFixed(2) + '°C';
+  document.getElementById('kpi-max').textContent   = maxT + '°C';
+  document.getElementById('kpi-alarm').textContent = alarms;
+
+  buildAlerts(alarms, parseFloat(maxT));
+
+  const dz = document.getElementById('drop-zone');
+  dz.querySelector('.title').textContent = `✅ ${filename}`;
+  dz.querySelector('.sub').textContent   = `${rawRecords.length} سجل يومي — اضغط للتغيير`;
+}
+
+function buildAlerts(totalAlarm, maxT) {
+  const sec    = document.getElementById('alerts-section');
+  const alerts = [];
+  const thr    = deviceInfo.upperAlarmT || ALARM_THR;
+
+  if (totalAlarm >= deviceInfo.upperAlarmDurMin)
+    alerts.push(['critical', `🚨 إنذار حراري مُفعَّل — ${totalAlarm} دقيقة فوق ${thr}°C — مراجعة فورية`]);
+  else if (totalAlarm > 0)
+    alerts.push(['high', `⚠️ تسجيل حراري — ${totalAlarm} دقيقة فوق ${thr}°C`]);
+
+  if (maxT > 34)
+    alerts.push(['critical', `🚨 ذروة شديدة ${maxT}°C — فوق حد CCM-D الحرج (34°C)`]);
+  else if (maxT > 10)
+    alerts.push(['high', `⚠️ أعلى مسجل ${maxT}°C — فوق الحد الطبيعي (10°C)`]);
+
+  if (!alerts.length)
+    alerts.push(['ok', '✅ لا توجد إنذارات — درجات الحرارة ضمن الحدود الطبيعية']);
+
+  sec.innerHTML = alerts.map(([t,m]) =>
+    `<div class="alert alert-${t}">${m}</div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// UI — Raw data table
+// ══════════════════════════════════════════════════════════════
+function fillRawTable() {
+  const thr  = deviceInfo.upperAlarmT || ALARM_THR;
+  const rows = rawRecords.map(r => {
+    const style = r.alarmHeatMin >= deviceInfo.upperAlarmDurMin ? 'color:#ff2d55;font-weight:700'
+                : r.alarmHeatMin > 0 ? 'color:#ff9500' : '';
+    const freeze = (r.minT < FREEZE_THR) ? '<span style="color:#58a6ff">❄</span>' : '';
+    return `<tr>
+      <td class="mono">${r.date}</td>
+      <td>${r.minT.toFixed(1)}${freeze}</td>
+      <td>${r.maxT.toFixed(1)}</td>
+      <td>${r.avgT.toFixed(1)}</td>
+      <td style="${style}">${r.alarmHeatMin}</td>
+    </tr>`;
+  }).join('');
+
+  const heads = ['التاريخ','أدنى °C','أعلى °C','متوسط °C',`دق. إنذار (>${thr}°C)`];
+  document.getElementById('raw-table-wrap').innerHTML =
+    `<div class="tbl-wrap"><table>
+      <thead><tr>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// UI — Analysis results table
+// ══════════════════════════════════════════════════════════════
+function fillResultsTable() {
+  const riskCls = {
+    DISCARD:'critical', PARTIAL:'high',
+    HIGH:'high', MODERATE:'moderate', LOW:'low', SAFE:'low'
+  };
+  const heads = [
+    'اللقاح','Q10','VVM','صلاحية<br>(يوم)',
+    'HER Q10<br>(%)', 'HER Arr.<br>(%)', 'MKT<br>(°C)',
+    'HEI<br>(°C·دق)', 'CCM AUC<br>(°C·دق)',
+    'القرار','التوصية'
+  ];
+
+  const rows = resultsData.map(r => {
+    const cls     = riskCls[r.risk] || 'low';
+    const herQ_pc = (r.her_q10 * 100).toFixed(1);
+    const herA_pc = (r.her_arr * 100).toFixed(1);
+    const herQcol = r.her_q10 > 1.0 ? 'color:#ff2d55' : r.her_q10 > 0.7 ? 'color:#ff9500' : '';
+    const mktCol  = r.mkt > 8 ? 'color:#ff2d55' : r.mkt > 6 ? 'color:#ff9500' : '';
+    const frzIcon = r.freeze ? '❄' : '—';
+    return `<tr>
+      <td style="text-align:right">${r.ar}<br><span style="font-size:9px;color:var(--muted)">${frzIcon} ${r.vvm}</span></td>
+      <td>${r.q10}</td>
+      <td>${r.vvm}</td>
+      <td>${r.shelf}</td>
+      <td style="${herQcol};font-weight:600">${herQ_pc}%</td>
+      <td style="${herQcol}">${herA_pc}%</td>
+      <td style="${mktCol}">${r.mkt}</td>
+      <td>${r.hei.toLocaleString()}</td>
+      <td>${r.ccmAuc.toLocaleString()}</td>
+      <td><span class="badge badge-${cls}">${r.risk}</span></td>
+      <td style="text-align:right;font-size:10px;max-width:120px;white-space:normal">${r.reason}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('results-table-wrap').innerHTML =
+    `<div class="tbl-wrap"><table>
+      <thead><tr>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════════════════════════
+function drawAllCharts() {
+  drawHERChart();
+  drawTempChart();
+}
+
+function setupCanvas(id, H) {
+  const c   = document.getElementById(id);
+  const dpr = window.devicePixelRatio || 1;
+  const W   = c.parentElement.clientWidth - 28;
+  c.width   = W * dpr; c.height = H * dpr;
+  c.style.width = W+'px'; c.style.height = H+'px';
+  const ctx = c.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, W, H };
+}
+
+function drawHERChart() {
+  const { ctx, W, H } = setupCanvas('chart-her', 220);
+  const PAD = {t:20, r:10, b:46, l:52};
+  const cW  = W - PAD.l - PAD.r;
+  const cH  = H - PAD.t - PAD.b;
+
+  const vals   = resultsData.map(r => r.her_q10 * 100);
+  const labels = resultsData.map(r => r.code);
+  const maxVal = Math.max(...vals, 150);
+  const barW   = cW / vals.length;
+
+  // Background
+  ctx.fillStyle = '#0d1117'; ctx.fillRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle='#1c2128'; ctx.lineWidth=0.5;
+  [0,0.25,0.5,0.75,1].forEach(f => {
+    const y = PAD.t + cH*(1-f);
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.fillStyle='#8b949e'; ctx.font='8px Arial'; ctx.textAlign='right';
+    ctx.fillText(Math.round(maxVal*f)+'%', PAD.l-3, y+3);
+  });
+
+  // Threshold lines
+  const drawL = (pct, color, label) => {
+    const y = PAD.t + cH*(1 - pct/maxVal);
+    if (y < PAD.t || y > PAD.t+cH) return;
+    ctx.strokeStyle=color; ctx.lineWidth=1.4; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=color; ctx.font='8px Arial'; ctx.textAlign='left';
+    ctx.fillText(label, PAD.l+4, y-3);
+  };
+  drawL(150,'#ff2d55','150% DISCARD');
+  drawL(100,'#ff9500','100% PARTIAL');
+  drawL(70, '#ffcc00','70% HIGH');
+  drawL(30, '#3fb950','30% LOW');
+
+  // Bars
+  vals.forEach((val, i) => {
+    const r     = resultsData[i];
+    const color = RISK_COLOR[r.risk] || '#58a6ff';
+    const bH    = (val / maxVal) * cH;
+    const x     = PAD.l + i*barW + barW*0.1;
+    const bWW   = barW * 0.8;
+    const y     = PAD.t + cH - bH;
+
+    ctx.fillStyle = color+'33'; ctx.fillRect(x, PAD.t, bWW, cH);
+    ctx.fillStyle = color;      ctx.fillRect(x, y, bWW, bH);
+
+    ctx.save(); ctx.translate(x+bWW/2, PAD.t+cH+6);
+    ctx.rotate(-0.45);
+    ctx.fillStyle='#8b949e'; ctx.font='8px Arial'; ctx.textAlign='right';
+    ctx.fillText(labels[i], 0, 0); ctx.restore();
+  });
+
+  ctx.fillStyle='#8b949e'; ctx.font='9px Arial'; ctx.textAlign='center';
+  ctx.fillText('HER Q10 (%)', W/2, H-2);
+
+  // Legend
+  const leg   = document.getElementById('legend-her');
+  const shown = new Set();
+  leg.innerHTML = resultsData.map(r => {
+    if (shown.has(r.risk)) return '';
+    shown.add(r.risk);
+    const c = RISK_COLOR[r.risk];
+    return `<div class="legend-item">
+      <div class="legend-dot" style="background:${c}"></div><span>${r.risk}</span>
+    </div>`;
+  }).join('');
+}
+
+function drawTempChart() {
+  const { ctx, W, H } = setupCanvas('chart-temp', 210);
+  const PAD = {t:18, r:10, b:30, l:38};
+  const cW  = W - PAD.l - PAD.r;
+  const cH  = H - PAD.t - PAD.b;
+
+  const avgs = rawRecords.map(r => r.avgT);
+  const maxs = rawRecords.map(r => r.maxT);
+  const mins = rawRecords.map(r => r.minT);
+  const n    = avgs.length;
+  if (n < 2) return;
+
+  const minV = Math.min(...mins, FREEZE_THR) - 0.5;
+  const maxV = Math.max(...maxs, ALARM_THR) + 0.5;
+  const rng  = maxV - minV;
+
+  const xP = i => PAD.l + (i / (n-1)) * cW;
+  const yP = v => PAD.t + cH * (1 - (v-minV)/rng);
+
+  ctx.fillStyle='#0d1117'; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#1c2128'; ctx.lineWidth=0.5;
+  [0,0.25,0.5,0.75,1].forEach(f => {
+    const y = PAD.t + cH*f;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.fillStyle='#8b949e'; ctx.font='8px Arial'; ctx.textAlign='right';
+    ctx.fillText((maxV-rng*f).toFixed(1)+'°', PAD.l-3, y+3);
+  });
+
+  // Reference lines
+  const refLine = (v, color, lbl) => {
+    const y = yP(v);
+    if (y < PAD.t || y > PAD.t+cH) return;
+    ctx.strokeStyle=color; ctx.lineWidth=1.2; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=color; ctx.font='8px Arial'; ctx.textAlign='left';
+    ctx.fillText(lbl, PAD.l+3, y-2);
+  };
+  refLine(ALARM_THR, '#ff2d55', `+${ALARM_THR}°C إنذار`);
+  refLine(T_REF_C,   '#3fb950', `+${T_REF_C}°C مرجع`);
+  refLine(FREEZE_THR,'#58a6ff', `${FREEZE_THR}°C تجمد`);
+
+  // Min-Max band
+  ctx.fillStyle='#58a6ff18';
+  ctx.beginPath();
+  for (let i=0;i<n;i++) ctx[i===0?'moveTo':'lineTo'](xP(i), yP(maxs[i]));
+  for (let i=n-1;i>=0;i--) ctx.lineTo(xP(i), yP(mins[i]));
+  ctx.closePath(); ctx.fill();
+
+  // Avg line
+  ctx.strokeStyle='#58a6ff'; ctx.lineWidth=2; ctx.setLineDash([]);
+  ctx.beginPath();
+  for (let i=0;i<n;i++) ctx[i===0?'moveTo':'lineTo'](xP(i), yP(avgs[i]));
+  ctx.stroke();
+
+  // Alarm highlight
+  rawRecords.forEach((r,i) => {
+    if (r.alarmHeatMin > 0) {
+      const x  = xP(i) - cW/(2*(n-1));
+      const bw = cW/(n-1);
+      ctx.fillStyle='rgba(255,45,85,0.08)';
+      ctx.fillRect(Math.max(PAD.l, x), PAD.t, bw, cH);
+    }
+  });
+
+  // Date labels
+  const step = Math.max(1, Math.ceil(n/8));
+  ctx.fillStyle='#8b949e'; ctx.font='7px Arial'; ctx.textAlign='center';
+  rawRecords.forEach((r,i) => {
+    if (i%step===0) ctx.fillText(r.date.slice(5), xP(i), PAD.t+cH+18);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// REPORT
+// ══════════════════════════════════════════════════════════════
+function buildReportPreview(mkt, hei, ccmAuc, hrsAbv10) {
+  const d   = deviceInfo;
+  const dt  = new Date().toISOString().slice(0,10);
+  const alm = rawRecords.reduce((s,r) => s + r.alarmHeatMin, 0);
+  const mxt = Math.max(...rawRecords.map(r => r.maxT)).toFixed(1);
+  const avg = (rawRecords.reduce((s,r) => s + r.avgT, 0) / rawRecords.length).toFixed(2);
+
+  const byRisk = g => resultsData.filter(r => r.risk === g).map(r => r.ar).join('، ') || '—';
+
+  const txt =
+`══════════════════════════════════════════
+🛡️  الحارس الرقمي — CCI-FT2 Sentinel v2.1
+    تاريخ التقرير: ${dt}
+══════════════════════════════════════════
+الجهاز:    ${d.device || 'N/A'}
+السيريال:  ${d.serial || 'N/A'}
+التفعيل:   ${d.activationDate || 'N/A'}
+الفترة:    ${rawRecords[0]?.date} → ${rawRecords[rawRecords.length-1]?.date}
+نمط tAcc:  ${d.alarmMode || 'N/A'}
+──────────────────────────────────────────
+📊 إحصاء السجل:
+  أيام مرصودة:      ${rawRecords.length}
+  متوسط T_avg:      ${avg}°C
+  أعلى T_max:       ${mxt}°C
+  MKT (Arrhenius):  ${(mkt||0).toFixed(3)}°C
+  دق. إنذار حراري: ${alm}
+──────────────────────────────────────────
+🔬 المؤشرات العلمية (WHO/IVB/06.10):
+  HEI:              ${hei.toLocaleString()} °C·دقيقة
+  CCM AUC:          ${ccmAuc.toLocaleString()} °C·دقيقة
+  ساعات ≥10°C تقريباً: ${(hrsAbv10||0).toFixed(1)} ساعة
+──────────────────────────────────────────
+🎯 نتائج التقييم:
+  🔴 DISCARD/CRITICAL:  ${byRisk('DISCARD')}
+  🟠 PARTIAL/HIGH:      ${byRisk('PARTIAL') || byRisk('HIGH')}
+  🟡 MODERATE:          ${byRisk('MODERATE')}
+  🟢 LOW/SAFE:          ${byRisk('LOW')}
+══════════════════════════════════════════
+المراجع: WHO/IVB/06.10 · WHO PQS E006 · Berlinger FT2
+Ea=83.144 kJ/mol | R=8.314 J/mol·K | T_ref=5°C`;
+
+  document.getElementById('report-preview').textContent = txt;
+  return txt;
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXPORTS
+// ══════════════════════════════════════════════════════════════
+function exportResultsCSV() {
+  if (!resultsData.length) { toast('شغّل التحليل أولاً'); return; }
+  const hdr = 'اللقاح,Q10,Ea_kJ_mol,VVM,Shelf_days,HER_Q10_%,HER_Arr_%,MKT_C,HEI_deg_min,CCM_AUC,Risk,Reason\n';
+  const rows = resultsData.map(r =>
+    [r.ar, r.q10, r.ea, r.vvm, r.shelf,
+     (r.her_q10*100).toFixed(2), (r.her_arr*100).toFixed(2),
+     r.mkt, r.hei, r.ccmAuc, r.risk,
+     '"' + r.reason.replace(/"/g,'""') + '"'].join(',')
+  ).join('\n');
+  downloadBlob('\uFEFF' + hdr + rows,
+    `نتائج_الحارس_${deviceInfo.serial||'FT2'}_${new Date().toISOString().slice(0,10)}.csv`,
+    'text/csv');
+}
+
+function exportRawCSV() {
+  if (!rawRecords.length) { toast('حمّل ملف FT2 أولاً'); return; }
+  const hdr  = 'Date,Min_C,Max_C,Avg_C,AlarmMin\n';
+  const rows = rawRecords.map(r =>
+    [r.date, r.minT, r.maxT, r.avgT, r.alarmHeatMin].join(',')
+  ).join('\n');
+  downloadBlob('\uFEFF' + hdr + rows,
+    `raw_${deviceInfo.serial||'FT2'}.csv`, 'text/csv');
+}
+
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob([content], {type: mime+';charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  toast(`✅ تم تنزيل ${filename}`);
+}
+
+function shareReport() {
+  const text = document.getElementById('report-preview').textContent;
+  if (!text || text.startsWith('شغّل')) { toast('شغّل التحليل أولاً'); return; }
+  if (navigator.share) {
+    navigator.share({title:'تقرير الحارس الرقمي', text}).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(text)
+      .then(() => toast('✅ تم نسخ التقرير'))
+      .catch(() => toast('⚠️ انسخ النص يدوياً'));
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// DRAG & DROP
+// ══════════════════════════════════════════════════════════════
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try { parseFT2(ev.target.result, file.name); }
+    catch(err) { toast('❌ ' + err.message); }
+  };
+  reader.readAsText(file, 'utf-8');
+});
+
+// ══════════════════════════════════════════════════════════════
+// ANDROID BRIDGE (called from MainActivity if embedded in WebView)
+// ══════════════════════════════════════════════════════════════
+window.receiveFileContent = function(content, filename) {
+  try { parseFT2(content, filename || 'ft2_file.txt'); }
+  catch(e) { toast('❌ خطأ: ' + e.message); }
+};
+</script>
+</body>
+</html>

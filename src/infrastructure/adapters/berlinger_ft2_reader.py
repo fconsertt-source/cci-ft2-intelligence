@@ -65,11 +65,11 @@ class BerlingerFt2Reader(Ft2ReaderPort):
                         fridgetag_found = True
                     if "alarm" in lower:
                         alarm_found = True
-                    if "loc:" in lower or "location:" in lower:
+                    if "loc:" in lower or "location:" in lower or "cid:" in lower or "serial:" in lower:
                         loc_found = True
 
-                if hist_found and fridgetag_found and alarm_found and loc_found:
-                    return True
+                    if hist_found and fridgetag_found and alarm_found and loc_found:
+                        return True
 
             logger.warning(
                 "Skipping %s: not compliant with Fridge-tag 2E PQS E006-TR07 requirements "
@@ -140,10 +140,9 @@ class BerlingerFt2Reader(Ft2ReaderPort):
                                 timestamp=timestamp,
                                 temperature=temperature,
                                 vaccine_type="General",
-                                batch="BATCH_UNKNOWN",
+                                batch=batch_id or "BATCH_UNKNOWN",
                                 duration_minutes=1440.0,
-                                batch_id=batch_id,  # ← New field
-                                center_id=center_id,  # ← New field
+                                center_id=center_id,
                             )
                         )
                     except (ValueError, TypeError):
@@ -181,10 +180,9 @@ class BerlingerFt2Reader(Ft2ReaderPort):
                         timestamp=timestamp,
                         temperature=temperature,
                         vaccine_type="General",
-                        batch="BATCH_UNKNOWN",
+                        batch=batch_id or "BATCH_UNKNOWN",
                         duration_minutes=1440.0,
-                        batch_id=batch_id,  # ← New field
-                        center_id=center_id,  # ← New field
+                        center_id=center_id,
                     )
                 )
             except (ValueError, TypeError):

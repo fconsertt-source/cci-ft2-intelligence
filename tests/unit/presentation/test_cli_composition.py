@@ -62,7 +62,9 @@ def test_cli_generate_device_report_uses_composer(monkeypatch, tmp_path):
             return DummyReport()
 
     monkeypatch.setattr(
-        AppComposer, "create_generate_device_report_uc", staticmethod(lambda: DummyUC())
+        AppComposer,
+        "create_generate_device_report_uc",
+        staticmethod(lambda *args, **kwargs: DummyUC()),
     )
 
     runner = CliRunner()

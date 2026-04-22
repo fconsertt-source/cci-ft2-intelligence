@@ -10,10 +10,12 @@ from datetime import datetime, timezone
 from src.application.security.license_validator import LicenseValidator
 from src.application.use_cases.generate_device_report_uc import GenerateDeviceReportUseCase
 from src.application.use_cases.generate_pdf_report_uc import GeneratePDFReportUseCase
-from src.application.use_cases.import_ft2_bundle_uc import ImportFT2BundleUseCase
+from src.application.use_cases.import_ft2_data_uc import ImportFt2DataUseCase
 from src.domain.policies.trial_policy import TrialPolicy
 from src.domain.services.regulatory_decision_service import RegulatoryDecisionService
 from src.domain.services.thermal_degradation_estimator import ThermalDegradationEstimator
+from src.infrastructure.adapters.berlinger_ft2_reader import BerlingerFt2Reader
+from src.infrastructure.adapters.json_ft2_data_writer import JsonFt2DataWriter
 from src.infrastructure.adapters.json_vaccine_spec_repository import JsonVaccineSpecRepository
 from src.infrastructure.adapters.validation_protocol_service import ValidationProtocolService
 from src.infrastructure.repositories.device_repository import DeviceDataRepository
@@ -64,7 +66,7 @@ class AppComposer:
         validator = LicenseValidator()
         policy = TrialPolicy(
             installation_time=install_datetime,
-            trial_duration_days=365,
+            trial_duration_days=90,
         )
 
         guard = LicenseGuard(
@@ -79,9 +81,11 @@ class AppComposer:
         return guard
 
     @staticmethod
-    def create_generate_device_report_uc() -> GenerateDeviceReportUseCase:
+    def create_generate_device_report_uc(
+        data_path: str | None = None,
+    ) -> GenerateDeviceReportUseCase:
         logger.info("Building GenerateDeviceReportUseCase...")
-        repository = DeviceDataRepository()
+        repository = DeviceDataRepository(json_path=data_path) if data_path else DeviceDataRepository()
         vaccine_specs = JsonVaccineSpecRepository()
         regulatory_service = RegulatoryDecisionService()
         estimator = ThermalDegradationEstimator()
@@ -109,11 +113,21 @@ class AppComposer:
         return uc
 
     @staticmethod
-    def create_import_ft2_bundle_uc() -> ImportFT2BundleUseCase:
-        logger.info("Building ImportFT2BundleUseCase...")
-        repository = DeviceDataRepository()
-        uc = ImportFT2BundleUseCase(repository=repository, ledger_writer=None)
+    def create_import_ft2_bundle_uc() -> ImportFt2DataUseCase:
+        logger.info("Building ImportFT2BundleUseCase (ImportFt2DataUseCase alias)...")
+        reader = BerlingerFt2Reader()
+        writer = JsonFt2DataWriter()
+        uc = ImportFt2DataUseCase(reader=reader, writer=writer)
         logger.info("ImportFT2BundleUseCase built successfully")
+        return uc
+
+    @staticmethod
+    def create_import_ft2_data_uc() -> ImportFt2DataUseCase:
+        logger.info("Building ImportFt2DataUseCase...")
+        reader = BerlingerFt2Reader()
+        writer = JsonFt2DataWriter()
+        uc = ImportFt2DataUseCase(reader=reader, writer=writer)
+        logger.info("ImportFt2DataUseCase built successfully")
         return uc
 
     @staticmethod

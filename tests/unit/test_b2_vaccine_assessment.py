@@ -32,7 +32,7 @@ from src.domain.value_objects.vaccine_specification import get_vaccine_spec
 # ══════════════════════════════════════════════════════════════
 
 
-def future(days=365) -> date:
+def future(days=90) -> date:
     return date.today() + timedelta(days=days)
 
 

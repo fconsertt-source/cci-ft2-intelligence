@@ -1,570 +1,377 @@
-# ═══════════════════════════════════════════════════════════════
-# config/vaccine_library.yaml — مكتبة اللقاحات المركزية
-# نظام CCI-FT2 الإصدار 2.0
-# المصادر: WHO/IVB/06.10 · WHO TRS No.999 Annex 5 · CDC Pink Book · UNICEF · نشرات المصنّعين
-# ═══════════════════════════════════════════════════════════════
+# ============================================================
+# vaccine_library.yaml — مكتبة اللقاحات المركزية الموحدة
+# نظام المراقبة الحرارية والإدارية للقاحات
+# الإصدار: 2.1.0 | آخر تحديث: 2026-03-22
+# المصادر: WHO/IVB/06.10 · FDA EUA Memos · Pfizer/Moderna SmPCs
+# ============================================================
 
-metadata:
-  schema_version: "2.0"
-  document_version: "2.0.3"
-  last_updated: "2026-03-22"
-  primary_source: "WHO/IVB/06.10"
-  created_by: "CCI-FT2 Team"
-  review_status: "approved"
-
-# ═══════════════════════════════════════════════════════════════
-# الثوابت العامة (تُطبَّق على جميع اللقاحات ما لم يُذكر خلاف ذلك)
-# ═══════════════════════════════════════════════════════════════
-
+# ============================================================
+# القسم 1: الثوابت العامة والإعدادات الافتراضية
+# ============================================================
 defaults:
-  reference_temp_c: 5.0          # درجة الحرارة المرجعية WHO
-  critical_temp_c: 34.0          # عتبة الحرارة الحرجة (CCM Window D)
-  critical_hours: 2.0            # الساعات الحرجة فوق 34°C
-  freeze_threshold_c: -0.5       # عتبة التجمد (هامش أمان لمستشعر FT2)
-  ccm_default_limit: 600         # حد CCM الافتراضي
-  opened_vial_h: 28.0            # مهلة الفتح الافتراضية (ساعات)
-  remaining_shelf_life_min: 50  # ≥50% عند التسليم حسب TRS 1025 Annex 8
-  electronic_ccm_device_type: "Fridge-tag 2E"
+  # الثوابت الفيزيائية-الكيميائية للحسابات الحرارية
+  gas_constant_R: 8.314                    # J/mol·K (ثابت الغازات)
+  activation_energy_Ea_kJ_mol: 83.144      # kJ/mol (طاقة التنشيط للقاحات الحساسة)
+  reference_temp_K: 278.15                 # 5°C بالكلفن للحسابات
+  
+  # عوامل الحساسية الحرارية
+  default_q10: 2.0                         # للقاحات التقليدية (بروتينية/معطلة)
+  mrna_q10_factor: 4.0                     # للقاحات الرنا المرسال (محدث بناءً على بيانات الثباتية)
+  
+  # حدود المراقبة والقرار التشغيلي
+  monitoring:
+    interval_minutes: 15                   # فاصل قراءة مسجلات الحرارة
+    alarm_delay_minutes: 30                # تأخير التنبيه لتجنب الإنذارات الكاذبة
+    log_retention_years: 3                 # فترة الاحتفاظ بالسجلات
+  
+  limits:
+    heat_exposure_index_deg_min: 3000      # HEI: حد التعرض الحراري (درجة مئوية × دقيقة)
+    mkt_limit_c: 8.0                       # MKT: حد متوسط الحرارة الحركي للتخزين المبرد
+    her_limit: 0.85                        # HER: حد نسبة استهلاك العمر الافتراضي (عند Q10=4)
+    safety_margin_factor: 0.85             # عامل أمان تشغيلي (15% هامش)
+  
+  # عتبات درجة الحرارة العامة
+  temp_thresholds:
+    frozen_min_c: -90
+    frozen_max_c: -15
+    refrigerated_min_c: 2
+    refrigerated_max_c: 8
+    room_temp_max_c: 25
+    critical_alert_c: 34                   # عتبة الإنذار الحرج (نافذة CCM D)
 
-# ═══════════════════════════════════════════════════════════════
-# مكتبة اللقاحات
-# ═══════════════════════════════════════════════════════════════
-
+# ============================================================
+# القسم 2: لقاحات كوفيد-19
+# ============================================================
 vaccines:
   
-  # ──────────────────────────────────────────────────────────────
-  # لقاحات تتحمل التجمد (Freeze-Stable)
-  # ──────────────────────────────────────────────────────────────
-  
-  OPV:
-    name_ar: "شلل الأطفال الفموي"
-    name_en: "Polio Vaccine (OPV)"
-    q10_factor: 3.6
-    shelf_life_days: 126
-    freeze_sensitive: false
-    vvm_type: "VVM2"
-    ccm_limit: 300
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    storage: "2-8°C / -25°C إلى -15°C"
-    heat_stability: "+37°C لمدة يومين"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: false
-    note: "⚠️ Q10=3.6 الأعلى في EPI — الأكثر حساسية للحرارة"
-    source: "WHO/IVB/06.10 Table 1"
-    who_code: "OPV-001"
-    active: true
-
-  MEASLES:
-    name_ar: "الحصبة"
-    name_en: "Measles Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 730
-    freeze_sensitive: false
-    vvm_type: "VVM2"
-    ccm_limit: 400
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    storage: "2-8°C / تجميد مقبول"
-    heat_stability: "+37°C لمدة 7 أيام"
-    opened_vial_h: 6.0
-    protect_light: true
-    shake_test: false
-    source: "WHO/IVB/06.10"
-    who_code: "MV-002"
-    active: true
-
-  MMR:
-    name_ar: "الحصبة والنكاف والحصبة الألمانية"
-    name_en: "MMR Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 730
-    freeze_sensitive: false
-    vvm_type: "VVM2"
-    ccm_limit: 400
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    storage: "2-8°C / تجميد مقبول"
-    heat_stability: "+37°C لمدة 7 أيام"
-    opened_vial_h: 6.0
-    protect_light: true
-    shake_test: false
-    source: "WHO/IVB/06.10; CDC"
-    who_code: "MMR-003"
-    active: true
-
-  RUBELLA:
-    name_ar: "الحصبة الألمانية"
-    name_en: "Rubella Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 730
-    freeze_sensitive: false
-    vvm_type: "VVM2"
-    ccm_limit: 400
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    storage: "2-8°C"
-    opened_vial_h: 6.0
-    protect_light: false
-    shake_test: false
-    source: "WHO/IVB/06.10"
-    who_code: "RV-004"
-    active: true
-
-  BCG:
-    name_ar: "السل"
-    name_en: "BCG Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 365
-    freeze_sensitive: false
-    vvm_type: "VVM2"
-    ccm_limit: 500
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    storage: "2-8°C / تجميد مقبول"
-    heat_stability: "+37°C لمدة 4 أسابيع"
-    opened_vial_h: 4.0
-    protect_light: true
-    shake_test: false
-    note: "⚠️ يتلف بالضوء خلال دقائق بعد التركيب"
-    source: "WHO/IVB/06.10; WHO PIS BCG"
-    who_code: "BCG-005"
-    active: true
-
-  YF:
-    name_ar: "الحمى الصفراء"
-    name_en: "Yellow Fever Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 730
-    freeze_sensitive: false
-    vvm_type: "VVM2"
-    ccm_limit: 400
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 14 يوم"
-    opened_vial_h: 1.0
-    protect_light: false
-    shake_test: false
-    note: "⚠️ أقصر مهلة فتح: ساعة واحدة"
-    source: "WHO/IVB/06.10 Section 11"
-    who_code: "YF-006"
-    active: true
-
-  # ──────────────────────────────────────────────────────────────
-  # لقاحات حساسة للتجمد (Freeze-Sensitive)
-  # ──────────────────────────────────────────────────────────────
-  
-  HEPB:
-    name_ar: "التهاب الكبد B"
-    name_en: "Hepatitis B Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 1095
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 500
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 7 أيام"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    note: "⚠️ التجمد يُجمّع HBsAg نهائياً — لا يمكن عكس الضرر"
-    source: "WHO/IVB/06.10 Section 7"
-    who_code: "HEPB-007"
-    active: true
-
-  DTP:
-    name_ar: "الثلاثي البكتيري"
-    name_en: "DTP Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 548
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 400
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 14 يوم"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    note: "⚠️ الأعلى حساسية للتجمد في EPI — يحتوي ألومنيوم"
-    source: "WHO/IVB/06.10 Section 6"
-    who_code: "DTP-008"
-    active: true
-
-  DTAP:
-    name_ar: "الثلاثي غير الخلوي"
-    name_en: "DTaP Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 730
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 500
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 14 يوم"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    source: "CDC Pink Book"
-    who_code: "DTAP-009"
-    active: true
-
-  TT:
-    name_ar: "التيتانوس"
-    name_en: "Tetanus Toxoid"
-    q10_factor: 2.0
-    shelf_life_days: 1825
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 600
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 30 يوم"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    note: "الأطول صلاحية والأعلى ثباتاً حرارياً"
-    source: "WHO/IVB/06.10"
-    who_code: "TT-010"
-    active: true
-
-  TD:
-    name_ar: "التيتانوس والدفتيريا للبالغين"
-    name_en: "Td Vaccine (Adult)"
-    q10_factor: 2.0
-    shelf_life_days: 1095
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 500
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 30 يوم"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    source: "WHO/IVB/06.10"
-    who_code: "TD-011"
-    active: true
-
-  DT:
-    name_ar: "الدفتيريا والتيتانوس للأطفال"
-    name_en: "DT Vaccine (Pediatric)"
-    q10_factor: 2.0
-    shelf_life_days: 1095
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 500
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 30 يوم"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    source: "WHO/IVB/06.10"
-    who_code: "DT-012"
-    active: true
-
-  PENTA:
-    name_ar: "الخماسي (DTP+HepB+Hib)"
-    name_en: "Pentavalent Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 730
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 400
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 14 يوم"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    note: "⚠️ أعلى خطورة عند التجمد — يحتوي مكونات متعددة"
-    source: "WHO/IVB/06.10; UNICEF"
-    who_code: "PENTA-013"
-    active: true
-
-  PCV:
-    name_ar: "المكورات الرئوية"
-    name_en: "Pneumococcal Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 730
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 400
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 4 أيام"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    source: "WHO/IVB/06.10; Pfizer/GSK"
-    who_code: "PCV-014"
-    active: true
-
-  IPV:
-    name_ar: "شلل الأطفال المعطّل"
-    name_en: "Inactivated Polio Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 730
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 400
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 4 أيام"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    source: "WHO/IVB/06.10; CDC"
-    who_code: "IPV-015"
-    active: true
-
-  HPV:
-    name_ar: "فيروس الورم الحليمي"
-    name_en: "HPV Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 1095
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 500
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+37°C لمدة 3 أيام"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    source: "WHO/IVB/06.10; MFR"
-    who_code: "HPV-016"
-    active: true
-
-  INFLUENZA:
-    name_ar: "الإنفلونزا الموسمية"
-    name_en: "Seasonal Influenza Vaccine"
-    q10_factor: 2.0
-    shelf_life_days: 365
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 300
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+25°C لمدة 12 ساعة فقط"
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: true
-    note: "⚠️ الأقل استقراراً حرارياً — صلاحية موسمية"
-    source: "CDC Pink Book"
-    who_code: "FLU-017"
-    active: true
-
-  MENA:
-    name_ar: "السحايا A (MenAfriVac)"
-    name_en: "MenAfriVac"
-    q10_factor: 2.0
-    shelf_life_days: 1095
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 600
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    heat_stability: "+40°C لمدة 3 أيام (CTC معتمد)"
-    opened_vial_h: 6.0
-    protect_light: false
-    shake_test: true
-    ectc_approved: true
-    ectc_max_temp_c: 40.0
-    ectc_max_days: 3
-    note: "✅ معتمد CTC من WHO — يمكن استخدامه خارج سلسلة التبريد"
-    source: "WHO TRS No.999 Annex 5; WHO/IVB/13.04"
-    who_code: "MENA-018"
-    active: true
-
-  # ──────────────────────────────────────────────────────────────
-  # لقاحات كوفيد-19
-  # ──────────────────────────────────────────────────────────────
-  
+  # ----------------------------------------------------------
+  # فايزر-بيونتيك (Comirnaty) - عروض متعددة حسب العمر
+  # ----------------------------------------------------------
   COVID_PFIZER:
-    name_ar: "كوفيد-19 فايزر (Comirnaty)"
-    name_en: "COVID-19 Pfizer (Comirnaty)"
-    q10_factor: 2.0
-    shelf_life_days: 365
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 500
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    storage_special: "-90°C إلى -60°C | بعد ذوبان: 2-8°C لـ 10 أسابيع"
-    opened_vial_h: 12.0
-    protect_light: false
-    shake_test: false
-    note: "⚠️ قيم Q10 تقديرية — راجع SmPC دائماً"
-    source: "Pfizer SmPC; WHO EUL"
-    who_code: "CVX-PFZ"
+    meta:
+      name_ar: "كوفيد-19 فايزر (Comirnaty) - عروض متعددة"
+      name_en: "COVID-19 Pfizer (Comirnaty) - Multiple Presentations"
+      who_code: "CVX-PFZ-MULTI"
+      manufacturer: "Pfizer Inc. / BioNTech SE"
+      platform: "mRNA-LNP"
+      last_updated: "2026-03-22"
+      active: true
+    
+    # الثوابت الحرارية الخاصة بـ mRNA
+    thermal_properties:
+      q10_factor: 4.0                      # حساسية عالية للحرارة (محدث من 2.0)
+      activation_energy_kJ_mol: 83.144     # متوافق مع مرجعية WHO
+      heat_sensitive: true                 # الحساسية الرئيسية: الحرارة (ليس التجميد)
+      light_sensitive: true                # حساس للضوء المباشر والأشعة فوق البنفسجية
+      vvm_type: "لا ينطبق (No VVM)"        # لا يحتوي على مؤشر حراري بصري
+    
+    # حدود المراقبة الحرارية (مع عامل الأمان 15%)
+    monitoring_limits:
+      heat_exposure_index_deg_min: 3000          # HEI: حد التعرض الحراري
+      mkt_limit_c: 8.0                           # MKT: للتخزين المبرد (2-8°C)
+      her_limit_operational: 0.72                # 0.85 × 0.85 عامل الأمان
+      her_limit_theoretical: 0.85                # الحد النظري قبل عامل الأمان
+    
+    # درجات الحرارة المرجعية
+    reference_temps:
+      reference_c: 5.0                           # درجة المرجع للحسابات
+      room_temp_max_c: 25.0                      # الحد الأقصى لدرجة حرارة الغرفة
+      room_temp_max_hours: 12.0                  # المدة المسموحة عند 8-25°C قبل التخفيف
+    
+    # ========================================================
+    # مراحل التخزين والتعامل (مفصلة حسب حالة اللقاح)
+    # ========================================================
+    storage_phases:
+      
+      # المرحلة 1: التخزين فائق البرودة (قبل الذوبان)
+      ultra_low_temp:
+        id: "ULT"
+        temp_range_c: [-90, -60]
+        shelf_life_months: 18
+        shelf_life_days: 548
+        transport_allowed: true
+        dynamic_kinetic_movement:
+          enabled: true
+          note: "عند النقل من ULT إلى التبريد: يُسجَّل تاريخ انتهاء جديد (10 أسابيع) فوراً"
+        note: "التخزين في ثلاجات ULT معتمدة أو حاويات شحن حرارية مع داي آيس"
+      
+      # المرحلة 2: التخزين المبرد بعد الذوبان (قبل التخفيف)
+      thawed_refrigerated:
+        id: "REF"
+        temp_range_c: [2, 8]
+        shelf_life_weeks: 10
+        shelf_life_days: 70
+        shelf_life_hours: 1680
+        note: "يُسجَّل تاريخ انتهاء الـ 10 أسابيع على الكرتون فور النقل من ULT. لا تعيد التجميد."
+      
+      # المرحلة 3: درجة حرارة الغرفة قبل التخفيف (للقوارير المذابة غير المثقوبة)
+      room_temp_before_dilution:
+        id: "RT_PRE"
+        temp_range_c: [8, 25]
+        max_hours: 12
+        cumulative: true                         # المدة تراكمية عبر فترات متعددة
+        note: "فقط للقوارير المذابة غير المثقوبة. المدة تراكمية."
+      
+      # المرحلة 4: بعد التخفيف/الثقب (للاستخدام الفوري)
+      after_dilution:
+        id: "POST_DIL"
+        temp_range_c: [2, 25]
+        max_hours: 12
+        discard_rule: "discard_after_12h_or_end_of_session"
+        note: "بعد التخفيف فقط. يُسجَّل وقت التخفيف. لا يُستخدم بعد 12 ساعة مهما كان المتبقي."
+      
+      # ⚠️ مرحلة محظورة للعروض البرتقالية والعنابية
+      prohibited_storage:
+        temp_range_c: [-25, -15]
+        applies_to_caps: ["orange", "maroon"]
+        note: "لا تخزن العروض البرتقالية (5-11 سنة) أو العنابية (6 أشهر-4 سنوات) عند -25°م إلى -15°م"
+    
+    # ========================================================
+    # الجرعات والتخفيف حسب الفئة العمرية (محدد بالغطاء)
+    # ========================================================
+    dosing_by_cap_color:
+      
+      maroon:  # 6 أشهر - 4 سنوات
+        age_range: "6m-4y"
+        dose_mcg: 3
+        series_doses: 3
+        dose_volume_ml: 0.2
+        diluent_ml: 1.3
+        diluent_type: "0.9% Sodium Chloride Injection, USP"
+        doses_per_vial: 10
+        dilution_required: true
+        shelf_life_post_dilution_hours: 12
+        note: "ثلاث جرعات: الجرعة 1، ثم الجرعة 2 بعد 3-8 أسابيع، ثم الجرعة 3 بعد 8 أسابيع على الأقل من الجرعة 2"
+      
+      orange:  # 5 - 11 سنة
+        age_range: "5y-11y"
+        dose_mcg: 10
+        series_doses: 2
+        dose_volume_ml: 0.2
+        diluent_ml: 1.3
+        diluent_type: "0.9% Sodium Chloride Injection, USP"
+        doses_per_vial: 10
+        dilution_required: true
+        shelf_life_post_dilution_hours: 12
+        note: "جرعتان بفاصل 3 أسابيع. قد تُعطى جرعة ثالثة للممنوعين مناعوياً بعد 28 يوماً من الجرعة 2"
+      
+      purple:  # 12+ سنة (تحتاج تخفيف)
+        age_range: "12y+_dilute"
+        dose_mcg: 30
+        series_doses: 2
+        dose_volume_ml: 0.3
+        diluent_ml: 1.8
+        diluent_type: "0.9% Sodium Chloride Injection, USP"
+        doses_per_vial: 6
+        dilution_required: true
+        shelf_life_post_dilution_hours: 12
+        note: "التركيبة القياسية للبالغين والمراهقين. تحتاج تخفيف قبل الاستخدام"
+      
+      gray:  # 12+ سنة (جاهزة للاستخدام - لا تخفيف)
+        age_range: "12y+_ready"
+        dose_mcg: 30
+        series_doses: 2
+        dose_volume_ml: 0.3
+        diluent_ml: 0
+        diluent_type: "N/A"
+        doses_per_vial: 1
+        dilution_required: false
+        shelf_life_post_first_puncture_hours: 12
+        note: "تركيبة جاهزة للاستخدام، لا تحتاج تخفيف. تُستخدم خلال 12 ساعة من أول ثقب"
+    
+    # تعليمات التحضير والإعطاء
+    preparation:
+      mix_instruction: "قلب القارورة برفق 10 مرات قبل التخفيف - لا ترج بعنف"
+      inspect_before_use: "افحص السائل: يجب أن يكون أبيض إلى أبيض مائل للصفرة، بدون جسيمات غريبة أو تغير لون"
+      discard_if:
+        - "السائل متغير اللون"
+        - "يحتوي على جسيمات غير عادية"
+        - "انتهت مدة الـ 12 ساعة بعد التخفيف"
+        - "لا يكفي لسحب جرعة كاملة (0.2 أو 0.3 مل)"
+      syringe_recommendation: "استخدم محاقن منخفضة الحجم الميت (low dead-volume) لاستخلاص 10 جرعات من القارورة"
+    
+    # تحذيرات عامة حرجة
+    warnings:
+      critical:
+        - "لا تعيد تجميد القوارير بعد الذوبان مطلقًا"
+        - "لا تستخدم العروض المختلفة بالتبادل (كل لون/غطاء لفئة عمرية محددة)"
+        - "المخفف المسموح به فقط: 0.9% Sodium Chloride Injection, USP (لا تستخدم باكتيريوستاتيك أو أي مخفف آخر)"
+        - "اللقاح لا يحتوي على VVM: الاعتماد الكامل على مراقبة درجة الحرارة وحساب HER/MKT/HEI"
+        - "سجّل جميع تواريخ انتهاء الصلاحية الديناميكية على العبوة فور تغيير ظروف التخزين"
+      
+      handling:
+        - "احفظ في العبوة الأصلية لحماية من الضوء"
+        - "تجنب التعرض المباشر للشمس أو الأشعة فوق البنفسجية"
+        - "استخدم معدات الوقاية الشخصية عند التعامل مع الداي آيس أو الحاويات فائقة البرودة"
+    
+    # المصادر المرجعية
+    references:
+      - "Pfizer EUA Fact Sheet for Healthcare Providers (Orange Cap, 5-11y) Revised 8 December 2022"
+      - "Pfizer EUA Fact Sheet (Maroon Cap, 6m-4y) June 2022"
+      - "Pfizer EUA Fact Sheet (Purple/Gray Cap, 12y+) Revised 2023"
+      - "FDA EUA Review Memorandum BLA 125742 / EUA 27034 (November 2020)"
+      - "WHO Training Manual on Pfizer-BioNTech Vaccine Management (Arabic, August 2021)"
+      - "CDC Storage and Handling Summary for Pfizer-BioNTech COVID-19 Vaccine (2023)"
+      - "Pfizer Press Release: EUA for Children 6 Months through 4 Years (June 2022)"
+    
+    # روابط سريعة للمراجع
+    links:
+      fact_sheets: "https://www.cvdvaccine.com"
+      who_training: "https://www.who.int/publications/m/item/training-manual-pfizer-biontech-vaccine"
+      cdc_handling: "https://www.cdc.gov/vaccines/covid-19/clinical-considerations/covid-19-vaccines-us.html"
+    
+    # كود التعريف الداخلي
+    internal_codes:
+      who_code: "CVX-PFZ-MULTI"
+      cvx_code: "208"  # حسب نظام CVX CDC
+      ndc_prefix: "59267-"
+    
+    # حالة النشاط
     active: true
 
+
+  # ----------------------------------------------------------
+  # موديرنا (Spikevax) - للمقارنة والتوسع المستقبلي
+  # ----------------------------------------------------------
   COVID_MODERNA:
-    name_ar: "كوفيد-19 مودرنا (Spikevax)"
-    name_en: "COVID-19 Moderna (Spikevax)"
-    q10_factor: 2.0
-    shelf_life_days: 270
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 500
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    storage_special: "-25°C إلى -15°C | بعد ذوبان: 2-8°C لـ 30 يوم"
-    opened_vial_h: 24.0
-    protect_light: false
-    shake_test: false
-    note: "⚠️ قيم Q10 تقديرية — راجع SmPC دائماً"
-    source: "Moderna SmPC; WHO EUL"
-    who_code: "CVX-MOD"
+    meta:
+      name_ar: "كوفيد-19 موديرنا (Spikevax)"
+      name_en: "COVID-19 Moderna (Spikevax)"
+      who_code: "CVX-MOD"
+      manufacturer: "ModernaTX, Inc."
+      platform: "mRNA-LNP"
+      last_updated: "2026-03-22"
+      active: true
+    
+    thermal_properties:
+      q10_factor: 4.0                      # أيضاً mRNA
+      heat_sensitive: true
+      light_sensitive: true
+      vvm_type: "لا ينطبق (No VVM)"
+    
+    monitoring_limits:
+      heat_exposure_index_deg_min: 3000
+      mkt_limit_c: 8.0
+      her_limit_operational: 0.72
+    
+    storage_phases:
+      frozen_storage:
+        temp_range_c: [-50, -15]           # موديرنا أقل برودة من فايزر
+        shelf_life_months: 9
+        shelf_life_days: 270
+      thawed_refrigerated:
+        temp_range_c: [2, 8]
+        shelf_life_days: 30
+      room_temp_before_use:
+        temp_range_c: [8, 25]
+        max_hours: 12
+      after_first_puncture:
+        temp_range_c: [2, 25]
+        max_hours: 6                       # أقل من فايزر
+    
+    dosing:
+      adult_dose_mcg: 100
+      adult_dose_volume_ml: 0.5
+      pediatric_dose_mcg: 50               # للأعمار 6 أشهر - 5 سنوات (حسب التحديثات)
+      pediatric_dose_volume_ml: 0.25
+      dilution_required: false             # موديرنا جاهزة للاستخدام
+      doses_per_vial: 10                   # أو 11 حسب نوع المحقن
+    
+    preparation:
+      mix_instruction: "رج القارورة بلطف قبل كل سحب - لا ترج بعنف"
+      inspect_before_use: "افحص السائل: أبيض إلى أبيض مائل للصفرة، بدون جسيمات"
+    
+    warnings:
+      - "لا تعيد تجميد القوارير بعد الذوبان"
+      - "لا ترج بعنف (قد يتلف الجسيمات الشحمية)"
+      - "استخدم خلال 6 ساعات بعد أول ثقب"
+    
+    references:
+      - "Moderna EUA Fact Sheets (2022-2023)"
+      - "FDA EUA Review Memorandum Moderna (2020)"
+    
+    internal_codes:
+      who_code: "CVX-MOD"
+      cvx_code: "207"
+    
     active: true
 
-  COVID_ASTRAZENECA:
-    name_ar: "كوفيد-19 أسترازينيكا (Vaxzevria)"
-    name_en: "COVID-19 AstraZeneca (Vaxzevria)"
-    q10_factor: 2.0
-    shelf_life_days: 180
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 400
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    opened_vial_h: 6.0
-    protect_light: false
-    shake_test: false
-    source: "AstraZeneca SmPC"
-    who_code: "CVX-AZ"
-    active: true
 
-  COVID_JNJ:
-    name_ar: "كوفيد-19 جانسن (J&J)"
-    name_en: "COVID-19 Janssen (J&J)"
-    q10_factor: 2.0
-    shelf_life_days: 135
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 400
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    opened_vial_h: 6.0
-    protect_light: false
-    shake_test: false
-    source: "Janssen SmPC"
-    who_code: "CVX-JNJ"
-    active: true
-
-  COVID_SINOPHARM:
-    name_ar: "كوفيد-19 سينوفارم"
-    name_en: "COVID-19 Sinopharm"
-    q10_factor: 2.0
-    shelf_life_days: 730
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 500
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: false
-    source: "Sinopharm SmPC; WHO EUL"
-    who_code: "CVX-SNP"
-    active: true
-
-  COVID_SINOVAC:
-    name_ar: "كوفيد-19 سينوفاك"
-    name_en: "COVID-19 Sinovac"
-    q10_factor: 2.0
-    shelf_life_days: 365
-    freeze_sensitive: true
-    vvm_type: "VVM30"
-    ccm_limit: 500
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    opened_vial_h: 28.0
-    protect_light: false
-    shake_test: false
-    source: "Sinovac SmPC; WHO EUL"
-    who_code: "CVX-SNV"
-    active: true
-
-  # ──────────────────────────────────────────────────────────────
-  # لقاح افتراضي (Fallback)
-  # ──────────────────────────────────────────────────────────────
+# ============================================================
+# القسم 3: أدوات مساعدة للحسابات (اختياري - للتكامل مع البرمجيات)
+# ============================================================
+calculation_helpers:
   
-  GENERAL:
-    name_ar: "لقاح عام (افتراضي)"
-    name_en: "General Vaccine (Fallback)"
-    q10_factor: 2.0
-    shelf_life_days: 730
-    freeze_sensitive: false
-    vvm_type: "VVM2"
-    ccm_limit: 600
-    reference_temp_c: 5.0
-    critical_temp_c: 34.0
-    critical_hours: 2.0
-    opened_vial_h: 28.0
-    source: "افتراضي — يُستخدم عند عدم التعرف على نوع اللقاح"
-    who_code: "GEN-000"
-    active: true
+  # معادلة MKT (متوسط الحرارة الحركي) - نموذج أرينيوس
+  mkt_arrhenius:
+    formula: "MKT = (Ea/R) / [-ln( Σ(exp(-Ea/(R×T_K)) × Δt) / ΣΔt )] - 273.15"
+    units: "°C"
+    inputs:
+      Ea: "activation_energy_kJ_mol × 1000  # تحويل إلى J/mol"
+      R: "gas_constant_R"
+      T_K: "قراءات الحرارة بالكلفن"
+      Δt: "فاصل القياس بالدقائق"
+  
+  # معادلة HER (نسبة التعرض الحراري) - نموذج Q10
+  her_q10:
+    formula: "HER = Σ[ Q10^((T-Tref)/10) × Δt ] / shelf_life_hours"
+    units: "كسر (0.0 - 1.0+)"
+    decision_rules:
+      acceptable: "< 0.72  # مع عامل الأمان"
+      review: "0.72 - 0.85"
+      reject: "> 0.85"
+  
+  # معادلة HEI (مؤشر التعرض الحراري) - خطي بسيط
+  hei_linear:
+    formula: "HEI = Σ[ max(0, T_avg - 8) × Δt_minutes ]"
+    units: "درجة مئوية × دقيقة"
+    limit: 3000  # حد تحفظي
+  
+  # تحويلات مساعدة
+  conversions:
+    celsius_to_kelvin: "K = °C + 273.15"
+    hours_to_minutes: "min = h × 60"
+    weeks_to_days: "days = weeks × 7"
 
-# ═══════════════════════════════════════════════════════════════
+
+# ============================================================
 # سجل التغييرات (Change Log)
-# ═══════════════════════════════════════════════════════════════
-
+# ============================================================
 changelog:
+  - version: "2.1.0"
+    date: "2026-03-22"
+    changes:
+      - "إضافة هيكل مفصل لمراحل تخزين فايزر (ULT, REF, RT_PRE, POST_DIL)"
+      - "تحديث q10_factor لفايزر وموديرنا من 2.0 إلى 4.0 (حساسية mRNA)"
+      - "استبدال ccm_limit بـ heat_exposure_index_deg_min (HEI) لتوافق أفضل مع الممارسات"
+      - "إضافة عامل أمان تشغيلي 15% (safety_margin_factor: 0.85)"
+      - "تفصيل الجرعات حسب لون الغطاء (maroon/orange/purple/gray) لتجنب أخطاء الإعطاء"
+      - "إضافة حقول preparation, warnings, references, links لتحسين التطبيق الميداني"
+      - "إضافة قسم calculation_helpers لدعم التكامل مع أنظمة المراقبة"
+      - "تحسين التوثيق والتعليقات لتسهيل الصيانة والتدقيق"
+  
   - version: "2.0.3"
     date: "2026-03-22"
     changes:
-      - "إضافة reference_temp_c لجميع اللقاحات"
-      - "إضافة critical_temp_c لجميع اللقاحات"
-      - "إضافة critical_hours لجميع اللقاحات"
+      - "إضافة reference_temp_c, critical_temp_c, critical_hours لجميع اللقاحات"
       - "إضافة opened_vial_h لجميع اللقاحات"
       - "إصلاح اختبارات VaccineSpecification"
-  
-  - version: "2.0.2"
-    date: "2026-03-21"
-    changes:
-      - "تحديث OPV: q10_factor من 2.0 إلى 3.6"
-      - "تحديث OPV: shelf_life_days من 225 إلى 126"
-      - "تحديث BCG: shelf_life_days من 730 إلى 365"
-      - "إضافة freeze_sensitive للقاحات الحساسة"
-  
-  - version: "2.0.1"
-    date: "2026-03-20"
-    changes:
-      - "إضافة لقاحات كوفيد-19"
-      - "إضافة حقل who_code"
-      - "إضافة حقل active"
   
   - version: "2.0.0"
     date: "2026-03-15"
     changes:
       - "الإصدار الأول من vaccine_library.yaml"
       - "نقل VACCINE_CATALOGUE من الكود إلى YAML"
+
+
+# ============================================================
+# ملاحظات تنفيذية للمطورين
+# ============================================================
+implementation_notes: |
+  1. عند تحميل هذا الملف، تحقق من صحة YAML باستخدام مكتبة مثل `pyyaml` أو `ruamel.yaml`.
+  2. للحسابات الحرارية، استخدم الثوابت من قسم `defaults` ما لم يُحدد خلاف ذلك في قسم اللقاح.
+  3. عامل الأمان (0.85) يُطبق على حدود HER و HEI و MKT للحصول على العتبات التشغيلية.
+  4. مرحلة `storage_phases` تُستخدم لتحديد صلاحية اللقاح ديناميكياً حسب ظروف التخزين الفعلية.
+  5. حقل `dosing_by_cap_color` ضروري لمنع أخطاء الإعطاء عبر التحقق من لون الغطاء قبل التحضير.
+  6. يُوصى بتخزين نسخة مضغوطة (JSON) من هذا الملف للتحميل السريع في التطبيقات الميدانية.
+  7. جميع التواريخ بصيغة ISO 8601 (YYYY-MM-DD) للتوافق مع أنظمة السجلات.

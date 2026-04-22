@@ -1,0 +1,52 @@
+# --- Core Runtime Dependencies ---
+# (تم استخراجها من الـ dependencies الفعلية المطلوبة للتشغيل)
+
+# الأساسيات
+psycopg2-binary>=2.9.0
+python-dotenv>=1.0.0
+PyYAML>=6.0.0
+
+# المكتبات العلمية والتحليل (HER/CCM)
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+weasyprint==68.1
+
+# Core PDF Generation
+reportlab>=4.0.0
+Pillow>=10.0.0
+
+# Arabic RTL Support
+arabic-reshaper>=3.0.0
+python-bidi>=0.6.0
+
+# Visualization
+matplotlib>=3.10.0
+
+# CLI
+typer>=0.12.0
+click>=8.1.0
+
+# PDF Analysis
+pdfminer.six>=20240706
+pypdf>=6.0.0
+
+# Security & Crypto
+cryptography>=45.0.0
+cffi>=2.0.0
+pycparser>=3.0
+
+# Utilities
+python-dateutil>=2.9.0
+packaging>=25.0
+charset-normalizer>=3.4.0
+six>=1.17.0
+filelock>=3.12.0
+
+# Logging & Monitoring
+# (نعتمد على المكتبة القياسية)
+
+# Network/Healthcheck
+# (نستخدم مكتبات خفيفة للـ health endpoint)jinja2>=3.1.0
+jinja2>=3.1.0
+
