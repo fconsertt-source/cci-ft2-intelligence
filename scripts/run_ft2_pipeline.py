@@ -8,7 +8,7 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, FrozenSet, List, Optional
+from typing import Callable, List, Optional
 
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -20,10 +20,13 @@ from src.application.dtos.evaluate_cold_chain_safety_request import (
 from src.application.dtos.ft2_entry_dto import FT2EntryDTO
 from src.application.use_cases.evaluate_cold_chain_safety_use_case import (
     EvaluateColdChainSafetyUseCase)
+from src.domain.services.exposure_analysis_service import ExposureAnalysisService
+from src.domain.services.judgment_engine import JudgmentEngine
 from src.domain.services.rules_engine import calculate_center_stats
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
 from src.infrastructure.adapters.ft2_reader.services.ft2_linker import FT2Linker
 from src.infrastructure.logging import get_logger
+from src.infrastructure.registry.runtime_center_registry import RuntimeCenterRegistry
 from src.infrastructure.utils.yaml_loader import load_yaml
 from src.presentation.messages.message_map import MessageProvider
 from src.presentation.reporting.csv_reporter import generate_centers_report
@@ -31,10 +34,10 @@ from src.presentation.reporting.csv_reporter import generate_centers_report
 # ➕ Phase 1 Imports — Lifecycle + SSOT
 from src.application.use_cases.manage_file_lifecycle import ManageFileLifecycleUseCase
 from src.application.services.center_impact_service import CenterImpactService
-from src.application.ports.i_center_registry import ICenterRegistry
 from src.infrastructure.repositories.file_registry_impl import FileRegistryImpl
 from src.infrastructure.lifecycle.file_archiver import FileArchiver
 from src.infrastructure.security.file_hash import compute_file_hash
+from src.infrastructure.ingestion.csv_session_file_reader import CsvSessionFileReader
 
 # ➕ Phase 2 Imports — Fault Isolation + Validation
 from src.infrastructure.services.circuit_breaker import FileCircuitBreaker
@@ -134,6 +137,10 @@ def filter_entries_by_date(
 logger = get_logger(__name__)
 
 
+def _system_now() -> datetime:
+    return datetime.now()
+
+
 def setup_directories():
     dirs = ['data/input_raw', 'data/input_ft2', 'data/output', 'data/reports', 'config', 'data/ft2_sessions']
     for d in dirs:
@@ -199,6 +206,8 @@ def run_pipeline(
     force: bool = False,
     from_date: Optional[datetime] = None,
     to_date: Optional[datetime] = None,
+    run_timestamp: Optional[datetime] = None,
+    now_provider: Optional[Callable[[], datetime]] = None,
 ):
     # ✅ التحقق من صحة نطاق التاريخ قبل أي معالجة
     validate_date_range(from_date, to_date)
@@ -213,7 +222,9 @@ def run_pipeline(
             from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'), delta
         )
 
-    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    now = now_provider or _system_now
+    run_ts = run_timestamp or now()
+    run_id = run_ts.strftime("%Y%m%d_%H%M%S")
     metrics = PipelineRunMetrics(run_id=run_id)
 
     setup_directories()
@@ -226,46 +237,6 @@ def run_pipeline(
             if unit.device_id and unit.device_id.startswith('Device_'):
                 unit.device_id = unit.device_id.replace('Device_', '')
 
-    # 2. تهيئة RuntimeCenterRegistry
-    # ✅ الإصلاح: تطبيق جميع الدوال المجردة المطلوبة من ICenterRegistry بالتوقيعات الصحيحة
-    class RuntimeCenterRegistry(ICenterRegistry):
-        def __init__(self, centers: List[CenterDTO]):
-            self._centers = centers
-            # فهرس device_id → CenterDTO (للاستخدام الداخلي في Pipeline)
-            self._device_to_center: Dict[str, CenterDTO] = {
-                str(unit.device_id): center
-                for center in centers
-                for unit in center.equipment_units
-                if unit.device_id
-            }
-            # فهرس device_id → center_id (str)
-            self._device_to_center_id: Dict[str, str] = {
-                str(unit.device_id): center.id
-                for center in centers
-                for unit in center.equipment_units
-                if unit.device_id
-            }
-
-        # ✅ دالة مساعدة داخلية (غير مجردة) للوصول إلى CenterDTO
-        def get_center_by_device_id(self, device_id: str) -> Optional[CenterDTO]:
-            return self._device_to_center.get(str(device_id))
-
-        # ✅ الدالة المجردة 1: إرجاع FrozenSet كما تحدده الواجهة
-        def get_all_device_ids(self) -> FrozenSet[str]:
-            return frozenset(self._device_to_center.keys())
-
-        # ✅ الدالة المجردة 2
-        def get_center_id_for_device(self, device_id: str) -> Optional[str]:
-            return self._device_to_center_id.get(str(device_id))
-
-        # ✅ الدالة المجردة 3
-        def get_registered_center_count(self) -> int:
-            return len(self._centers)
-
-        # دالة مساعدة داخلية إضافية
-        def all_centers(self) -> List[CenterDTO]:
-            return self._centers
-
     center_registry = RuntimeCenterRegistry(centers)
     file_registry = FileRegistryImpl(registry_path=Path("data/registry/processed_files.json"))
     archiver = FileArchiver(base_data_path=Path("data"))
@@ -277,20 +248,16 @@ def run_pipeline(
     # 3. تهيئة المعالجة التزايدية
     from src.infrastructure.registry.session_registry import SessionRegistry
     from src.application.services.incremental_processor import IncrementalPipelineProcessor
-    from src.domain.validators.cold_chain_continuity import ColdChainContinuityValidator
     from src.infrastructure.output.centers_report_manager import CentersReportManager
 
     session_registry = SessionRegistry(Path("data/registry/session_registry.json"))
     parquet_storage = ParquetStorageRepository(Path("data/ft2_sessions"))
-    incremental_processor = IncrementalPipelineProcessor(session_registry, parquet_storage)
+    incremental_processor = IncrementalPipelineProcessor(
+        session_registry,
+        parquet_storage,
+        file_reader=CsvSessionFileReader(),
+    )
     report_manager = CentersReportManager(Path(os.path.join(output_dir, "centers_report.tsv")))
-
-    # 4. بناء device_map
-    device_map = {}
-    for center in centers:
-        for unit in center.equipment_units:
-            if unit.device_id:
-                device_map[unit.device_id] = unit
 
     # 5. تصنيف الملفات
     logger.info("🔍 تصنيف الملفات قبل المعالجة...")
@@ -363,7 +330,10 @@ def run_pipeline(
             from_date.strftime('%Y-%m-%d'), to_date.strftime('%Y-%m-%d'),
         )
 
-    use_case = EvaluateColdChainSafetyUseCase()
+    use_case = EvaluateColdChainSafetyUseCase(
+        exposure_service=ExposureAnalysisService(),
+        judgment_engine=JudgmentEngine(),
+    )
 
     for center in centers:
         for unit in center.equipment_units:
@@ -418,7 +388,7 @@ def run_pipeline(
                     "category_display": getattr(unit, 'category_display', ''),
                     "decision_reasons": " | ".join(getattr(unit, 'decision_reasons', [])),
                     "supervisor_name": getattr(center, 'supervisor_name', 'مشرف التطعيم'),
-                    "report_id": f"FT2-{center.id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                    "report_id": f"FT2-{center.id}-{run_ts.strftime('%Y%m%d%H%M%S')}",
                     "language": getattr(center, 'language', 'ar'),
                     "date_range_from": from_date.strftime('%Y-%m-%d') if from_date else None,
                     "date_range_to": to_date.strftime('%Y-%m-%d') if to_date else None,
@@ -466,7 +436,7 @@ def run_pipeline(
                         file_hash=file_hash,
                         device_id=device_id,
                         run_id=run_id,
-                        processed_at=datetime.now()
+                        processed_at=run_ts
                     )
                 except Exception as e:
                     logger.warning("فشل تسجيل الملف: %s - %s", path.name, str(e))
@@ -525,7 +495,7 @@ def run_pipeline(
         )
 
     metrics.affected_centers_count = affected_count
-    metrics.finished_at = datetime.now()
+    metrics.finished_at = now()
 
     # Phase 3: Print final metrics summary
     metrics.print_bilingual_summary(logger)

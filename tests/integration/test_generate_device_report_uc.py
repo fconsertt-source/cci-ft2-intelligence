@@ -172,7 +172,7 @@ def test_generate_device_report_executes_successfully(mock_guard, tmp_path):
     # ✅ استخدام Mocks صريحة بدلاً من الاعتماد على الحاوية
     from src.application.ports.device_repository_port import \
         DeviceRepositoryPort
-    from src.application.ports.vaccine_specification_port import \
+    from src.domain.ports.vaccine_specification_port import \
         VaccineSpecificationPort
     from src.application.ports.validation_protocol_port import \
         ValidationProtocolPort

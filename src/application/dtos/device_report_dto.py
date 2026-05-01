@@ -2,38 +2,20 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-from enum import Enum
 
+from src.domain.enums import ReportDecision, VVMStage
 from .thermal_excursion_dto import ThermalExcursionDTO
-
-
-class ReportDecision(str, Enum):
-    ACCEPTED = "ACCEPTED"
-    REJECTED_HEAT_C = "REJECTED_HEAT_C"
-    REJECTED_FREEZE = "REJECTED_FREEZE"
-    REJECTED_EXPIRED = "REJECTED_EXPIRED"
-    REJECTED_THAW = "REJECTED_THAW"
-    PARTIAL = "PARTIAL"
-    SAFE = "SAFE"
-    UNKNOWN = "UNKNOWN"
-
-
-class VVMStage(str, Enum):
-    A = "A"
-    B = "B"
-    C = "C"
-    D = "D"
 
 
 @dataclass(frozen=True)
 class DeviceReportDTO:
     """Immutable DTO for device report data."""
     device_id: str
-    center_id: str
-    center_name: str
-    temperature_ranges: Dict[str, float]
-    decision: ReportDecision
-    vvm_stage: VVMStage
+    center_id: str = ""
+    center_name: str = ""
+    temperature_ranges: Dict[str, float] = field(default_factory=lambda: {"min": 0.0, "max": 0.0})
+    decision: ReportDecision = ReportDecision.UNKNOWN
+    vvm_stage: VVMStage = VVMStage.A
     alert_level: str = ""
     stability_budget_consumed_pct: float = 0.0
     thaw_remaining_hours: float = 0.0
@@ -73,8 +55,10 @@ class DeviceReportDTO:
         """Validation after initialization."""
         if not self.device_id:
             raise ValueError("device_id cannot be empty")
-        if not self.center_id:
-            raise ValueError("center_id cannot be empty")
+        if self.center_id and not self.center_name:
+            raise ValueError("center_name cannot be empty when center_id is provided")
+        if self.center_name and not self.center_id:
+            raise ValueError("center_id cannot be empty when center_name is provided")
         if self.stability_budget_consumed_pct < 0 or self.stability_budget_consumed_pct > 100:
             raise ValueError("stability_budget_consumed_pct must be between 0 and 100")
         if not isinstance(self.decision, ReportDecision):

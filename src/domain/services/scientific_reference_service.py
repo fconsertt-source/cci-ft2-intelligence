@@ -1,16 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import yaml
-
 from src.domain.engines.reference_exposure_engine import ReferenceExposureEngine
-from src.domain.value_objects.reference_engine_result import ReferenceEngineResult
 from src.domain.value_objects.temperature_entry import TemperatureEntry
-from src.domain.value_objects.vaccine_specification import VaccineSpecification, get_vaccine_spec
-from src.infrastructure.repositories.yaml_vaccine_spec_repository import YamlVaccineSpecRepository
+from src.domain.value_objects.vaccine_specification import get_vaccine_spec
+from src.domain.ports.vaccine_specification_port import VaccineSpecificationPort
 
 
 class ScientificReferenceService:
@@ -18,22 +14,25 @@ class ScientificReferenceService:
     Audit-only service for parallel scientific reference analysis.
     """
 
-    def __init__(self, library_path: Path = Path("config/vaccine_library.yaml")) -> None:
-        self._repository = YamlVaccineSpecRepository(library_path=library_path)
-        self._engine = ReferenceExposureEngine()
-        self._constants = self._load_constants()
+    def __init__(
+        self,
+        spec_port: Optional[VaccineSpecificationPort] = None,
+        constants: Optional[Dict[str, Any]] = None,
+        library_path=None,
+    ) -> None:
+        self._spec_port = spec_port
+        self._constants = constants or self._default_constants()
+        self._engine = ReferenceExposureEngine(
+            ea_kj_mol=float(self._constants.get("ea_kj_mol", 83.144)),
+            reference_temp_c=float(self._constants.get("reference_temp_c", 37.0)),
+        )
 
-    def _load_constants(self) -> Dict[str, Any]:
-        path = Path("config/scientific_constants.yaml")
-        if not path.exists():
-            return {
-                "ea_kj_mol": 83.144,
-                "reference_temp_c": 5.0,
-                "gas_constant_j_mol_k": 8.314,
-            }
-        with path.open("r", encoding="utf-8") as f:
-            data = yaml.safe_load(f) or {}
-        return data.get("scientific_constants", {})
+    def _default_constants(self) -> Dict[str, Any]:
+        return {
+            "ea_kj_mol": 83.144,
+            "reference_temp_c": 37.0,
+            "gas_constant_j_mol_k": 8.314,
+        }
 
     def analyze(
         self,
@@ -42,7 +41,9 @@ class ScientificReferenceService:
         supply_date: Optional[datetime] = None,
     ) -> Dict[str, Any]:
         vaccine_key = (vaccine_type or "GENERAL").upper().strip()
-        spec = self._repository.get_spec(vaccine_key)
+        spec = None
+        if self._spec_port is not None:
+            spec = self._spec_port.get_spec(vaccine_key)
         if spec is None:
             spec = get_vaccine_spec(vaccine_key)
 

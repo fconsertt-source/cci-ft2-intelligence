@@ -5,6 +5,7 @@ from typing import Optional
 
 from src.application.ports.vaccine_repository_port import VaccineRepositoryPort
 from src.domain.entities.vaccine_batch import VaccineBatch
+from src.infrastructure.utils.error_translator import translate_infrastructure_errors
 
 
 class JsonVaccineRepository(VaccineRepositoryPort):
@@ -46,6 +47,7 @@ class JsonVaccineRepository(VaccineRepositoryPort):
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
+    @translate_infrastructure_errors
     def get_batch(self, batch_id: str) -> Optional[VaccineBatch]:
         file_path = self.storage_path / f"{batch_id}.json"
         if not file_path.exists():

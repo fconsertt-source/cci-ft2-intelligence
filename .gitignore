@@ -89,3 +89,7 @@ pipeline.log
 changelog_temp.txt
 test_env/
 *.bak
+/data
+/baseline_outputs
+/src/shared/fonts
+/src/shared/fonts

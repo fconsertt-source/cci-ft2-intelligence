@@ -14,8 +14,15 @@ class ReferenceExposureEngine:
     Parallel reference exposure engine implementing the scientific audit path.
     """
 
-    def __init__(self, ea_kj_mol: float = 83.144) -> None:
-        self._her_calculator = ArrheniusHERCalculator(ea_kj_mol=ea_kj_mol)
+    def __init__(
+        self,
+        ea_kj_mol: float = 83.144,
+        reference_temp_c: float = 37.0,
+    ) -> None:
+        self._her_calculator = ArrheniusHERCalculator(
+            ea_kj_mol=ea_kj_mol,
+            reference_temp_c=reference_temp_c,
+        )
         self._mkt_calculator = MKTCalculator(ea_kj_mol=ea_kj_mol)
 
     def analyze(
@@ -23,7 +30,12 @@ class ReferenceExposureEngine:
         entries: Iterable[TemperatureEntry],
         spec: VaccineSpecification,
     ) -> ReferenceEngineResult:
-        her_result = self._her_calculator.calculate(entries, spec.shelf_life_hours)
+        if spec.degradation_hours_at_37C <= 0.0:
+            raise ValueError(
+                f"Invalid degradation_days_at_37C for {spec.vaccine_type}: {spec.degradation_days_at_37C}"
+            )
+
+        her_result = self._her_calculator.calculate(entries, spec.degradation_hours_at_37C)
         mkt_c = self._mkt_calculator.calculate(entries)
 
         return ReferenceEngineResult(
@@ -31,8 +43,8 @@ class ReferenceExposureEngine:
             her_ratio=her_result.her_ratio,
             mkt_c=mkt_c,
             ea_kj_mol=self._her_calculator.ea_j_mol / 1000.0,
-            reference_temp_c=spec.reference_temp_c,
-            shelf_life_days=spec.shelf_life_days,
+            reference_temp_c=self._her_calculator.reference_temp_c,
+            shelf_life_days=spec.degradation_days_at_37C,
             rationale=spec.rationale,
             source=spec.regulatory_source or "WHO/IVB/06.10",
             traceability={

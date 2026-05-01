@@ -9,6 +9,7 @@ from src.application.ports.logger_port import LoggerPort
 from src.application.services.device_center_mapper import \
     DeviceCenterMapper  # ← الإضافة الوحيدة
 from src.application.dtos.ft2_entry_dto import FT2EntryDTO
+from src.domain.exceptions import BaseSystemException
 
 
 class ImportFt2DataUseCase:
@@ -66,9 +67,9 @@ class ImportFt2DataUseCase:
             if self._logger:
                 self._logger.info("Successfully wrote data to destination.")
 
-        except Exception as e:
+        except BaseSystemException as e:
             if self._logger:
-                self._logger.error("An error occurred during data import: %s", e)
+                self._logger.error("Infrastructure or domain failure during data import: %s", e.internal_details or e.user_message)
             raise
 
     def _enrich_with_center_context(

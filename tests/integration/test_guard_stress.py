@@ -21,7 +21,7 @@ def mock_dependencies():
     """Mocks صريحة لجميع Dependencies الـ 6"""
     from src.application.ports.device_repository_port import \
         DeviceRepositoryPort
-    from src.application.ports.vaccine_specification_port import \
+    from src.domain.ports.vaccine_specification_port import \
         VaccineSpecificationPort
     from src.application.ports.validation_protocol_port import \
         ValidationProtocolPort
@@ -33,6 +33,7 @@ def mock_dependencies():
     mock_repo = Mock(spec=DeviceRepositoryPort)
     mock_record = Mock()
     mock_record.vaccine_type = "Hepatitis_B"
+    mock_record.temperature = 5.0  # Add temperature field
     mock_repo.get_device_history.return_value = [mock_record]
 
     mock_spec = Mock()

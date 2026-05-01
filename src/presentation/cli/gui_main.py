@@ -41,6 +41,7 @@ except ImportError:
 # استيراد AppComposer كمركز تكوين
 try:
     from src.application.app_composer import AppComposer
+    from src.domain.exceptions import BaseSystemException
 
     COMPOSER_AVAILABLE = True
 except ImportError:
@@ -515,8 +516,11 @@ class GuardianGUI:
 
                         self.cycle_data["reports_generated"].append(str(report_path))
                         reports_count += 1
+                    except BaseSystemException as e:
+                        logger.error("فشل توليد تقرير للجهاز %s: [%s] %s", device_id, e.code, e.internal_details or e.user_message)
+                        continue
                     except Exception as e:
-                        logger.error("فشل توليد تقرير للجهاز %s: %s", device_id, e)
+                        logger.exception("CRITICAL UNHANDLED ERROR – failed to generate report for %s", device_id)
                         continue
 
                 messagebox.showinfo(
@@ -527,11 +531,18 @@ class GuardianGUI:
             self._save_cycle()
             self.status_var.set(self._get_text("status.ready"))
 
-        except Exception as e:
-            logger.exception("فشل توليد التقرير")
+        except BaseSystemException as e:
+            logger.error("[%s] %s", e.code, e.internal_details or e.user_message)
             messagebox.showerror(
                 self._get_text("error.title"),
-                f"{self._get_text('error.pdf_generation_failed')}: {str(e)}",
+                e.user_message,
+            )
+            self.status_var.set(self._get_text("status.error"))
+        except Exception:
+            logger.exception("CRITICAL UNHANDLED ERROR")
+            messagebox.showerror(
+                self._get_text("error.title"),
+                "حدث خطأ داخلي غير متوقع. يرجى الاتصال بالدعم الفني.",
             )
             self.status_var.set(self._get_text("status.error"))
 
@@ -545,7 +556,11 @@ class GuardianGUI:
                 json.dump(self.cycle_data, f, indent=2, ensure_ascii=False)
             self.status_var.set(self._get_text("msg.cycle_saved"))
         except Exception as e:
-            messagebox.showerror(self._get_text("error.title"), str(e))
+            logger.exception("فشل حفظ دورة التشغيل")
+            messagebox.showerror(
+                self._get_text("error.title"),
+                "فشل حفظ دورة التشغيل. يرجى التحقق من الأذونات أو المسار ثم حاول مرة أخرى.",
+            )
 
     def _load_cycle(self):
         file = filedialog.askopenfilename(

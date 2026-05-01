@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from src.application.ports.device_repository_port import DeviceRepositoryPort
-from src.application.ports.vaccine_specification_port import \
+from src.domain.ports.vaccine_specification_port import \
     VaccineSpecificationPort
 from src.application.ports.validation_protocol_port import \
     ValidationProtocolPort

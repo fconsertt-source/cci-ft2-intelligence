@@ -6,6 +6,8 @@ from typing import Any, Dict, Optional
 
 import yaml
 
+from src.infrastructure.validators.vaccine_library_schema import validate_vaccine_library
+
 
 def load_vaccine_library(library_path: str = "config/vaccine_library.yaml") -> Dict[str, Any]:
     path = Path(library_path)
@@ -14,7 +16,8 @@ def load_vaccine_library(library_path: str = "config/vaccine_library.yaml") -> D
 
     with path.open("r", encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
-    return data
+
+    return validate_vaccine_library(data)
 
 
 class VaccineLibraryLoader:

@@ -8,7 +8,7 @@ from src.domain.value_objects.temperature_entry import TemperatureEntry
 
 # Constants for Arrhenius-based thermal exposure modeling
 DEFAULT_EA_KJ_MOL = 83.144
-DEFAULT_REFERENCE_TEMP_C = 5.0
+DEFAULT_REFERENCE_TEMP_C = 37.0
 R_J_MOL_K = 8.314
 
 
@@ -30,7 +30,16 @@ class ArrheniusHERCalculator:
         self.ea_j_mol = ea_kj_mol * 1000.0
         self.reference_temp_c = reference_temp_c
 
-    def calculate(self, entries: Iterable[TemperatureEntry], shelf_life_hours: float) -> HERResult:
+    def calculate(
+        self,
+        entries: Iterable[TemperatureEntry],
+        degradation_hours_at_37c: float,
+    ) -> HERResult:
+        if degradation_hours_at_37c <= 0.0:
+            raise ValueError(
+                f"degradation_hours_at_37c must be positive, got {degradation_hours_at_37c}"
+            )
+
         cumulative_degradation_hours = 0.0
         readings_count = 0
         data_quality_flags = {"sampling_gap": False}
@@ -56,9 +65,7 @@ class ArrheniusHERCalculator:
             cumulative_degradation_hours += duration_hours * factor
             readings_count += 1
 
-        her_ratio = 0.0
-        if shelf_life_hours > 0:
-            her_ratio = cumulative_degradation_hours / shelf_life_hours
+        her_ratio = cumulative_degradation_hours / degradation_hours_at_37c
 
         return HERResult(
             cumulative_degradation_hours=cumulative_degradation_hours,

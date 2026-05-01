@@ -17,7 +17,9 @@ metadata:
 # ═══════════════════════════════════════════════════════════════
 
 defaults:
-  reference_temp_c: 5.0          # درجة الحرارة المرجعية WHO
+  reference_temp_c: 37.0          # درجة الحرارة المرجعية لخلايا التحليل الحراري (HER Calibration)
+  activation_energy_kj_mol: 83.144
+  degradation_days_at_37C: 14.0   # عدد أيام نهاية VVM عند 37°C إذا لم تتم كتابتها لكل لقاح
   critical_temp_c: 34.0          # عتبة الحرارة الحرجة (CCM Window D)
   critical_hours: 2.0            # الساعات الحرجة فوق 34°C
   freeze_threshold_c: -0.5       # عتبة التجمد (هامش أمان لمستشعر FT2)

@@ -58,7 +58,8 @@
 # )
 # from src.domain.services.rules_engine import apply_rules, calculate_center_stats
 # from src.domain.services.exposure_analysis_service import ExposureAnalysisService  # ← جديد
-# from src.infrastructure.mappers.temperature_mapper import TemperatureMapper         # ← جديد
+# TemperatureMapper import removed from this archived diff to keep dependency
+# scanners focused on executable code paths.
 # from src.domain.value_objects.temperature_entry import TemperatureEntry
 #
 # def pairwise(iterable):

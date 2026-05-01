@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional
 
 from src.domain.entities.device_identity import DeviceIdentity
+from src.domain.exceptions import BaseSystemException
 from src.shared.path_utils import normalize_user_path
 
 
@@ -106,13 +107,13 @@ class ImportFT2BundleUseCase:
                 ledger_entry_id=ledger_entry_id,
             )
 
-        except Exception as e:
+        except BaseSystemException as e:
             return ImportFT2BundleResponse(
                 success=False,
                 device_identity=device_identity,
                 txt_imported=False,
                 pdf_imported=False,
-                error_message=str(e),
+                error_message=e.user_message,
             )
 
     def _import_txt(self, path: Path, device: DeviceIdentity) -> bool:

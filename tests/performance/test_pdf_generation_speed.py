@@ -8,6 +8,7 @@ from datetime import datetime
 import pytest
 
 # ✅ استيراد من المسار الصحيح
+from src.application.dtos.device_report_dto import DeviceReportDTO, ReportDecision, VVMStage
 from src.application.dtos.device_report_dto import DeviceReportDTO
 
 
@@ -26,6 +27,11 @@ def create_realistic_dto() -> DeviceReportDTO:
 
     return DeviceReportDTO(
         device_id="TEST-REALISTIC",
+        center_id="CENTER-REALISTIC",
+        center_name="Realistic Test Center",
+        temperature_ranges={"min": 2.0, "max": 8.0},
+        decision=ReportDecision.SAFE,
+        vvm_stage=VVMStage.A,
         vaccine_type="Pfizer-BioNTech",
         total_records=len(readings),
         excursions=(),

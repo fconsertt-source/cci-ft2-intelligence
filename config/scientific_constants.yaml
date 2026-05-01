@@ -1,6 +1,6 @@
 scientific_constants:
   ea_kj_mol: 83.144
   gas_constant_j_mol_k: 8.314
-  reference_temp_c: 5.0
+  reference_temp_c: 37.0
   model: "Arrhenius + MKT"
   provenance: "WHO/IVB/06.10"

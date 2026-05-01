@@ -20,7 +20,7 @@ class EncryptedLicenseRepository:
         return HKDF(
             algorithm=SHA256(),
             length=32,
-            salt=b"cci-ft2-salt",
+            salt=b"cci-ft2-license-salt",
             info=b"cci-ft2-license-key",
         ).derive(self._fingerprint.encode())
 

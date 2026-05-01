@@ -7,15 +7,14 @@ import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 from src.application.ports.device_repository_port import DeviceRepositoryPort
 from src.application.ports.ledger_writer_port import LedgerWriterPort
-from src.application.ports.vaccine_specification_port import \
+from src.domain.ports.vaccine_specification_port import \
     VaccineSpecificationPort
 from src.application.ports.validation_protocol_port import ValidationProtocolPort
 from src.application.ports.i_license_guard import ILicenseGuard
-from src.infrastructure.utils.config_loader import ConfigLoader
 from src.application.use_cases.requests import GenerateDeviceReportRequest
 from src.application.dtos import DeviceReportDTO, ThermalExcursionDTO
 from src.application.dtos.device_report_dto import ReportDecision, VVMStage
@@ -30,6 +29,14 @@ from src.domain.services.thermal_degradation_estimator import \
 _DEFAULT_SHELF_LIFE_HOURS = 730 * 24  # سنتان
 
 
+class ConfigLoader:
+    """Default application-side config reader used when no adapter is injected."""
+
+    @staticmethod
+    def get(key_path: str, default: Any = None) -> Any:
+        return default
+
+
 class GenerateDeviceReportUseCase:
     def __init__(
         self,
@@ -41,6 +48,7 @@ class GenerateDeviceReportUseCase:
         license_guard: ILicenseGuard,
         ledger_writer: Optional[LedgerWriterPort] = None,
         data_path: Optional[Path] = None,
+        config_getter: Optional[Callable[[str, Any], Any]] = None,
     ):
         self._repo = device_repository
         self._specs = vaccine_specifications
@@ -50,6 +58,12 @@ class GenerateDeviceReportUseCase:
         self._guard = license_guard
         self._ledger_writer = ledger_writer
         self._data_path = data_path or Path("data")
+        self._config_getter = config_getter
+
+    def _get_config(self, key_path: str, default: Any = None) -> Any:
+        if self._config_getter is not None:
+            return self._config_getter(key_path, default)
+        return ConfigLoader.get(key_path, default)
 
     def execute(
         self, request: Optional[GenerateDeviceReportRequest] = None, **kwargs
@@ -88,7 +102,7 @@ class GenerateDeviceReportUseCase:
         if not isinstance(advisory_info, dict):
             advisory_info = {}
 
-        required_shelf_life_pct = ConfigLoader.get(
+        required_shelf_life_pct = self._get_config(
             "thresholds.remaining_shelf_life_percentage", 50
         )
         remaining_pct = advisory_info.get("remaining_shelf_life", 0.0)
@@ -171,7 +185,7 @@ class GenerateDeviceReportUseCase:
                 exc.aefi_report_recommended for exc in excursions
             ),
             flexible_vvm_policy_applied=(
-                ConfigLoader.get("thresholds.flexible_vvm_allowed", False)
+                self._get_config("thresholds.flexible_vvm_allowed", False)
                 and spec.vaccine_type.upper() == "OPV"
             ),
             remaining_shelf_life_ok=advisory_info.get("remaining_shelf_life_ok", True),

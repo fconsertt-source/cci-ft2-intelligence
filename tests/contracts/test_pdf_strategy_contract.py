@@ -5,13 +5,18 @@
 import pytest
 
 # ✅ استيراد من المسار الصحيح
-from src.application.dtos.device_report_dto import DeviceReportDTO
+from src.application.dtos.device_report_dto import DeviceReportDTO, ReportDecision, VVMStage
 
 
 def create_minimal_dto() -> DeviceReportDTO:
     """إنشاء DTO أدنى للاختبار"""
     return DeviceReportDTO(
         device_id="TEST-001",
+        center_id="CENTER-001",
+        center_name="Test Center",
+        temperature_ranges={"min": 2.0, "max": 8.0},
+        decision=ReportDecision.SAFE,
+        vvm_stage=VVMStage.A,
         vaccine_type="Pfizer-BioNTech",
         total_records=0,
         excursions=(),

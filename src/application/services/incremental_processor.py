@@ -1,30 +1,53 @@
+import csv
 import re
-from pathlib import Path
 from datetime import datetime
-import pandas as pd
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional
 
-from src.infrastructure.registry.session_registry import SessionRegistry
-from src.infrastructure.storage.parquet_repository import ParquetStorageRepository
-from src.infrastructure.storage.exceptions import SessionNotFoundError
+from src.application.ports.session_file_reader_port import SessionFileReaderPort
+from src.application.ports.session_registry_port import SessionRegistryPort
+from src.application.ports.session_storage_port import SessionStoragePort
 
 
-def _to_dataframe(data) -> pd.DataFrame:
-    """
-    تحويل آمن لأي نوع بيانات إلى DataFrame.
-    يدعم: DataFrame، list، tuple، generator، iterator.
-    """
-    if isinstance(data, pd.DataFrame):
-        return data
-    # generator أو أي iterable آخر → list أولاً ثم DataFrame
-    return pd.DataFrame(list(data))
+class _StdlibCsvSessionFileReader(SessionFileReaderPort):
+    """Backward-compatible default reader for callers that do not inject one."""
+
+    def read_rows(self, csv_path: Path) -> Iterable[Dict[str, Any]]:
+        with Path(csv_path).open("r", newline="", encoding="utf-8-sig") as f:
+            sample = f.read(4096)
+            f.seek(0)
+            try:
+                dialect = csv.Sniffer().sniff(sample, delimiters=",\t") if sample else csv.excel
+            except csv.Error:
+                dialect = csv.excel
+            reader = csv.DictReader(f, dialect=dialect)
+            for row in reader:
+                yield dict(row)
+
+
+def _timestamp_key(row: Dict[str, Any]) -> str:
+    return str(row.get("timestamp", ""))
+
+
+def _sort_and_deduplicate(rows: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    deduplicated: Dict[str, Dict[str, Any]] = {}
+    for row in sorted(rows, key=_timestamp_key):
+        deduplicated[_timestamp_key(row)] = row
+    return list(deduplicated.values())
 
 
 class IncrementalPipelineProcessor:
-    """محرك المعالجة التزايدية الآمنة - يدعم _converted.csv"""
+    """Safe incremental processing without DataFrame or infrastructure coupling."""
 
-    def __init__(self, registry: SessionRegistry, storage: ParquetStorageRepository):
+    def __init__(
+        self,
+        registry: SessionRegistryPort,
+        storage: SessionStoragePort,
+        file_reader: Optional[SessionFileReaderPort] = None,
+    ):
         self.registry = registry
         self.storage = storage
+        self.file_reader = file_reader or _StdlibCsvSessionFileReader()
 
     def extract_metadata(self, csv_path: Path) -> dict:
         """استخراج device_id من اسم الملف"""
@@ -46,7 +69,7 @@ class IncrementalPipelineProcessor:
             "device_id": device_id,
             "report_timestamp": report_dt,
             "filename": csv_path.name,
-            "full_path": str(csv_path)
+            "full_path": str(csv_path),
         }
 
     def process_file(self, csv_path: Path, force: bool = False) -> dict:
@@ -55,38 +78,26 @@ class IncrementalPipelineProcessor:
         device_id = meta["device_id"]
         file_ts = meta["report_timestamp"]
 
-        # ✅ الإصلاح: --force يتجاوز فحص SessionRegistry تماماً
         if not force and not self.registry.is_new_data(device_id, file_ts):
             return {"status": "skipped", "reason": "already_processed", **meta}
 
-        # قراءة البيانات الجديدة
-        new_df = pd.read_csv(csv_path)
-        new_df = new_df.sort_values("timestamp").drop_duplicates(subset=["timestamp"], keep="last")
+        new_rows = _sort_and_deduplicate(self.file_reader.read_rows(csv_path))
+        existing_rows: List[Dict[str, Any]] = []
+        if self.storage.get_session_metadata(device_id):
+            existing_rows = list(self.storage.read_session(device_id))
 
-        # قراءة البيانات السابقة
-        # ✅ الإصلاح: الإمساك بـ SessionNotFoundError المخصصة من ParquetStorageRepository
-        try:
-            raw_existing = self.storage.read_session(device_id)
-            existing_df = _to_dataframe(raw_existing)
-        except (SessionNotFoundError, FileNotFoundError):
-            # جلسة جديدة — لا بيانات سابقة
-            existing_df = pd.DataFrame()
+        merged = _sort_and_deduplicate([*existing_rows, *new_rows])
 
-        # دمج آمن
-        if not existing_df.empty:
-            merged = pd.concat([existing_df, new_df], ignore_index=True)
-            merged = merged.sort_values("timestamp").drop_duplicates(subset=["timestamp"], keep="last")
-        else:
-            merged = new_df
+        self.storage.write_session(device_id, iter(merged))
+        self.registry.mark_processed(device_id, file_ts, csv_path.name, len(new_rows))
 
-        # حفظ الجلسة — write_session يستقبل Iterator[Dict] لذا نمرر iter()
-        self.storage.write_session(device_id, iter(merged.to_dict("records")))
-        self.registry.mark_processed(device_id, file_ts, csv_path.name, len(new_df))
+        timestamps = [_timestamp_key(row) for row in merged]
+        time_range = (min(timestamps), max(timestamps)) if timestamps else (None, None)
 
         return {
             "status": "processed",
             "device_id": device_id,
-            "new_readings": len(new_df),
+            "new_readings": len(new_rows),
             "total_readings": len(merged),
-            "time_range": (merged["timestamp"].min(), merged["timestamp"].max())
+            "time_range": time_range,
         }

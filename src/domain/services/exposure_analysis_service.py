@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import logging
 from typing import Dict, List, Optional, TYPE_CHECKING
-from datetime import datetime
+from datetime import datetime, timezone
 from src.domain.value_objects.analysis_result import AnalysisResult
 
 if TYPE_CHECKING:
@@ -91,6 +91,8 @@ class ExposureAnalysisService:
                     q10_factor=self._q10_value,
                     shelf_life_days=self._shelf_life_hours / 24.0,
                     reference_temp_c=self._reference_temp,
+                    activation_energy_kj_mol=83.144,
+                    degradation_days_at_37C=self._shelf_life_hours / 24.0,
                 )
             else:
                 spec = VACCINE_CATALOGUE["GENERAL"]
@@ -130,6 +132,8 @@ class ExposureAnalysisService:
                     q10_factor=self._q10_value,
                     shelf_life_days=self._shelf_life_hours / 24.0,
                     reference_temp_c=self._reference_temp,
+                    activation_energy_kj_mol=83.144,
+                    degradation_days_at_37C=self._shelf_life_hours / 24.0,
                 )
             else:
                 spec = VACCINE_CATALOGUE["GENERAL"]

@@ -29,7 +29,9 @@ class DeviceCenterMapper:
             self._equipment_map = data.get("equipment_registry", {})
         except FileNotFoundError:
             logger.warning("ملف الخريطة غير موجود: %s", path)
-        except Exception as e:
+        except yaml.YAMLError as e:
+            logger.error("فشل تحليل خريطة الأجهزة: %s", e)
+        except (OSError, UnicodeDecodeError) as e:
             logger.error("فشل تحميل خريطة الأجهزة: %s", e)
 
     def get_center_context(self, device_id: str) -> Optional[Dict]:

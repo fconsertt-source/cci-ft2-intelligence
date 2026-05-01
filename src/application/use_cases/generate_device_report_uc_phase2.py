@@ -9,6 +9,7 @@ from src.application.ports.i_report_generator import IReportGenerator
 from src.application.ports.i_ledger_service import ILedgerService
 from src.application.dtos.device_report_dto import DeviceReportDTO
 from src.application.ports.performance_monitor_port import PerformanceMonitorPort
+from src.domain.exceptions import BaseSystemException
 
 
 @dataclass
@@ -74,8 +75,8 @@ class GenerateDeviceReportUCPhase2:
                     hash=result["hash"]
                 )
 
-            except Exception as e:
+            except BaseSystemException as e:
                 return GenerateDeviceReportResponse(
                     success=False,
-                    error_message=str(e)
+                    error_message=e.user_message,
                 )

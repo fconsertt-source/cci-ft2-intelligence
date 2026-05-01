@@ -11,32 +11,32 @@ class MockTempEntry:
 
 class TestArrheniusHERCalculator:
     def setup_method(self):
-        # Ea = 83.144 kJ/mol, Tref = 5.0 °C
+        # Ea = 83.144 kJ/mol, Tref = 37.0 °C
         self.calc = ArrheniusHERCalculator()
 
     def test_baseline_temperature_gives_factor_one(self):
-        """إذا كانت الحرارة تساوي تماماً الدرجة المرجعية (5°C)، فإن معدل التحلل يجب أن يكون 1.0"""
-        entries = [MockTempEntry(5.0, 60.0)]  # ساعة واحدة عند 5 مئوية
-        shelf_life_hours = 100.0
+        """إذا كانت الحرارة تساوي تماماً الدرجة المرجعية (37°C)، فإن معدل التحلل يجب أن يكون 1.0"""
+        entries = [MockTempEntry(37.0, 60.0)]  # ساعة واحدة عند 37 مئوية
+        degradation_hours = 100.0
         
-        result = self.calc.calculate(entries, shelf_life_hours)
+        result = self.calc.calculate(entries, degradation_hours_at_37c=degradation_hours)
         
         # مدة التحلل يجب أن تتطابق مع المدة الزمنية الحقيقية (1 ساعة)
         assert math.isclose(result.cumulative_degradation_hours, 1.0, rel_tol=1e-5)
-        assert math.isclose(result.her_ratio, 1.0 / 100.0, rel_tol=1e-5)
+        assert math.isclose(result.her_ratio, 1.0 / degradation_hours, rel_tol=1e-5)
 
     def test_higher_temperature_accelerates_degradation(self):
-        """الحرارة المرتفعة (25°C) يجب أن تسرع التحلل بشكل كبير جداً مقارنة بـ 5°C"""
-        entries =[MockTempEntry(25.0, 60.0)]  # ساعة واحدة عند 25 مئوية
-        result = self.calc.calculate(entries, shelf_life_hours=100.0)
+        """الحرارة المرتفعة (45°C) يجب أن تسرع التحلل مقارنة بـ 37°C"""
+        entries =[MockTempEntry(45.0, 60.0)]  # ساعة واحدة عند 45 مئوية
+        result = self.calc.calculate(entries, degradation_hours_at_37c=100.0)
         
-        # بناءً على Q10 ≈ 3-4، يجب أن يكون التحلل أكبر بكثير من 1.0 ساعة
-        assert result.cumulative_degradation_hours > 5.0
+        # درجة أعلى من المرجع يجب أن تعيد عامل تحلل أكبر من 1.0 ساعة
+        assert result.cumulative_degradation_hours > 1.0
 
     def test_lower_temperature_decelerates_degradation(self):
-        """الحرارة المنخفضة (0°C) يجب أن تبطئ التحلل مقارنة بـ 5°C"""
-        entries =[MockTempEntry(0.0, 60.0)]  # ساعة واحدة عند صفر مئوية
-        result = self.calc.calculate(entries, shelf_life_hours=100.0)
+        """الحرارة المنخفضة (25°C) يجب أن تبطئ التحلل مقارنة بـ 37°C"""
+        entries =[MockTempEntry(25.0, 60.0)]  # ساعة واحدة عند 25 مئوية
+        result = self.calc.calculate(entries, degradation_hours_at_37c=100.0)
         
         # التحلل يجب أن يكون أقل من 1.0 ساعة
         assert result.cumulative_degradation_hours < 1.0

@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from itertools import tee
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 from src.application.dtos.evaluate_cold_chain_safety_request import (
@@ -114,10 +114,21 @@ class DomainCenterContext:
 
 
 class EvaluateColdChainSafetyUseCase:
+    def __init__(
+        self,
+        exposure_service: Optional[ExposureAnalysisService] = None,
+        judgment_engine: Optional[JudgmentEngine] = None,
+        scientific_service: Optional[ScientificReferenceService] = None,
+        config=None,
+    ):
+        self._exposure = exposure_service or ExposureAnalysisService()
+        self._judgment = judgment_engine or JudgmentEngine()
+        self._scientific = scientific_service or ScientificReferenceService()
+        self._config = config or get_config()
+
     def execute(self, request: EvaluateColdChainSafetyRequest) -> EvaluateColdChainSafetyResponse:
-        config = get_config()
-        enable_supply_date = config.get_feature('CCI_ENABLE_SUPPLY_DATE', False)
-        enable_heat_duration = config.get_feature('CCI_ENABLE_HEAT_DURATION', False)
+        enable_supply_date = self._config.get_feature('CCI_ENABLE_SUPPLY_DATE', False)
+        enable_heat_duration = self._config.get_feature('CCI_ENABLE_HEAT_DURATION', False)
 
         ctx = DomainCenterContext.from_request(request)
 
@@ -131,7 +142,7 @@ class EvaluateColdChainSafetyUseCase:
         if request.vaccine_inventory and enable_supply_date:
             supply_date = request.vaccine_inventory.get('supply_date')
 
-        analysis = ExposureAnalysisService().analyze(
+        analysis = self._exposure.analyze(
             readings=ctx.ft2_entries,
             spec=request.vaccine_spec,
             supply_date=supply_date,
@@ -142,14 +153,14 @@ class EvaluateColdChainSafetyUseCase:
 
         # ── 1.a Parallel Reference Audit (audit-only, non-blocking) ──
         reference_audit = {}
-        if config.get_feature('CCI_ENABLE_REFERENCE_AUDIT', False):
+        if self._config.get_feature('CCI_ENABLE_REFERENCE_AUDIT', False):
             vaccine_type = None
             if request.vaccine_spec is not None:
                 vaccine_type = request.vaccine_spec.vaccine_type
             elif request.vaccine_inventory is not None:
                 vaccine_type = request.vaccine_inventory.get('vaccine_type')
 
-            reference_audit = ScientificReferenceService().analyze(
+            reference_audit = self._scientific.analyze(
                 entries=ctx.ft2_entries,
                 vaccine_type=vaccine_type,
                 supply_date=supply_date,
@@ -180,8 +191,7 @@ class EvaluateColdChainSafetyUseCase:
             "SAFE": VaccineDecision.SAFE,
         }
 
-        judgment_engine = JudgmentEngine()
-        judgment = judgment_engine.judge(
+        judgment = self._judgment.judge(
             decision=decision_map.get(ctx.decision, VaccineDecision.SAFE),
             decision_reason=" | ".join(ctx.decision_reasons),
             her_ratio=analysis.her_ratio,
