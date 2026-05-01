@@ -1,4 +1,4 @@
-# src/core/calculators/vvm_q10_model.py
+# src/domain/calculators/vvm_q10_model.py
 
 import math
 from typing import List, Tuple
@@ -17,9 +17,6 @@ class VVMQ10Model:
         """
         Initializes the VVM Q10 Model with vaccine-specific parameters.
 
-        Args:
-        Initializes the model with specific vaccine characteristics.
-        
         Args:
             q10_value: Typically 2.0 or higher depending on vaccine sensitivity.
             ideal_temp: Reference ideal storage temperature (e.g., 5.0°C).
@@ -43,6 +40,11 @@ class VVMQ10Model:
         """
         if not isinstance(actual_temp, (int, float)):
             raise ValueError("Actual temperature must be a number.")
+
+        # ARCHITECTURAL GUARD: Per Scientific Model Approval Section 2,
+        # freeze conditions (< 0°C) MUST bypass this model.
+        if actual_temp < 0:
+            return 1.0  # Return base factor; handled strictly by FreezeRule
 
         if actual_temp <= self.ideal_temp:
             return 1.0

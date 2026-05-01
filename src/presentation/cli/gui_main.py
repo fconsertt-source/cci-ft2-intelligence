@@ -12,55 +12,52 @@ import tkinter as tk
 from datetime import datetime, timezone
 from pathlib import Path
 from tkinter import filedialog, messagebox, simpledialog, ttk
-import os
-import sys
-import signal
-import subprocess
-from importlib import util
 
 # إعداد التسجيل
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# استيراد مساعد الاستيراد الآمن
+# استيراد LanguageManager بأمان
 try:
-    from src.utils.import_helpers import safe_import, check_module_available
+    from src.shared.language_manager import lang
+
+    LANG_AVAILABLE = True
+except ImportError as e:
+    LANG_AVAILABLE = False
+    lang = None
+    logger.error("فشل استيراد LanguageManager: %s", e)
+
+
+# استيراد Repository
+try:
+    from src.infrastructure.repositories.device_repository import \
+        DeviceDataRepository
+
+    REPO_AVAILABLE = True
 except ImportError:
-    # تعريف دالة مبسطة في حال عدم توفر ملف المساعد
-    def safe_import(module_path, attr=None, fallback=None, **kwargs):
-        try:
-            mod = __import__(module_path, fromlist=[attr] if attr else [])
-            if attr:
-                return getattr(mod, attr)
-            return mod
-        except (ImportError, AttributeError):
-            return fallback
-    
-    def check_module_available(module_path):
-        return util.find_spec(module_path) is not None
+    REPO_AVAILABLE = False
+    logger.warning("DeviceDataRepository غير متوفر")
 
-# استيراد LanguageManager بأمان باستخدام safe_import
-lang = safe_import("src.shared.language_manager", "lang", fallback=None)
-LANG_AVAILABLE = lang is not None
-if not LANG_AVAILABLE:
-    logger.warning("LanguageManager غير متاح، سيتم استخدام النصوص الاحتياطية")
+# استيراد AppComposer كمركز تكوين
+try:
+    from src.application.app_composer import AppComposer
+    from src.domain.exceptions import BaseSystemException
 
-# التحقق من توفر Use Case
-UC_AVAILABLE = check_module_available("src.application.use_cases.generate_device_report_uc")
-
-# التحقق من توفر Repository
-REPO_AVAILABLE = check_module_available("src.infrastructure.repositories.device_repository")
-
-# استيراد AppComposer بأمان
-AppComposer = safe_import("src.application.app_composer", "AppComposer", fallback=None)
-COMPOSER_AVAILABLE = AppComposer is not None
+    COMPOSER_AVAILABLE = True
+except ImportError:
+    COMPOSER_AVAILABLE = False
+    logger.warning("AppComposer غير متوفر")
 
 
 class GuardianGUI:
     def __init__(self):
         self.root = tk.Tk()
         self._init_language()
-        self.root.title(self._get_text("app.title"))
+        self.root.title(
+            lang.get_raw("app.title")
+            if LANG_AVAILABLE and lang
+            else self._get_text("app.title")
+        )
         self.root.geometry("1200x800")
 
         self.cycle_id = f"CC-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
@@ -79,9 +76,8 @@ class GuardianGUI:
 
         self.ui_refs = {}
         self._build_ui()
-        
         # perform a quick health check on start-up
-        if COMPOSER_AVAILABLE and AppComposer:
+        if COMPOSER_AVAILABLE:
             healthy = (
                 AppComposer.health_check()
                 if hasattr(AppComposer, "health_check")
@@ -97,6 +93,8 @@ class GuardianGUI:
     # ========================== دعم اللغة ==========================
     def _init_language(self):
         """تهيئة اللغة الافتراضية (العربية) مع fallback للإنجليزية."""
+        import os
+
         requested_lang = os.environ.get("CCI_LANG", "ar")
         self.current_lang = "en"
         if not LANG_AVAILABLE or not lang:
@@ -110,14 +108,14 @@ class GuardianGUI:
             lang.set_language(self.current_lang)
             logger.info("تم تحميل الترجمة العربية بنجاح")
         except Exception as e:
-            logger.warning(f"فشل تحميل العربية: {e}")
+            logger.warning("فشل تحميل العربية: %s", e)
             try:
                 lang.load_language("en", translations_dir=locales_dir)
                 self.current_lang = "en"
                 lang.set_language(self.current_lang)
                 logger.info("تم تحميل الترجمة الإنجليزية كبديل")
             except Exception as e2:
-                logger.error(f"فشل تحميل أي لغة: {e2}")
+                logger.error("فشل تحميل أي لغة: %s", e2)
 
     def _get_text(self, key: str, **kwargs) -> str:
         """الحصول على نص مترجم مع fallback آمن."""
@@ -139,13 +137,21 @@ class GuardianGUI:
 
     def _ensure_ft2_data_available(self) -> bool:
         """التحقق من توفر بيانات FT2 قبل المتابعة — آمن في وضع Headless"""
+        import os
+
         if not os.path.exists(getattr(self, "data_path", "")):
             try:
+                # استخدام نسخة معزولة من messagebox لتسهولة الاختبار
                 import tkinter.messagebox as msg
+
                 msg.showwarning(
                     "بيانات مفقودة", "ملف FT2 غير موجود. يرجى التحقق من المسار."
                 )
             except Exception:
+                # في بيئات بدون واجهة رسوميات نحافظ على السجل فقط
+                import logging
+
+                logger = logging.getLogger(__name__)
                 logger.warning(
                     "ft2_file_missing", extra={"path": getattr(self, "data_path", None)}
                 )
@@ -162,21 +168,27 @@ class GuardianGUI:
 
         try:
             # تحميل اللغة إذا لم تكن محملة مسبقاً
-            if hasattr(lang, '_translations') and lang_code not in lang._translations:
+            if lang_code not in lang._translations:
                 locales_dir = Path(__file__).parent.parent.parent / "shared" / "locales"
                 lang.load_language(lang_code, translations_dir=locales_dir)
 
             lang.set_language(lang_code)
             self.current_lang = lang_code
-            logger.info(f"تم تبديل اللغة إلى: {lang_code}")
-            
+            logger.info("تم تبديل اللغة إلى: %s", lang_code)
             # إعادة تشغيل الواجهة باللغة الجديدة
             self.root.destroy()
+            import os
+            import subprocess
+            import sys
+
             env = {
                 **os.environ,
                 "CCI_LANG": lang_code,
                 "PYTHONPATH": str(Path(__file__).parent.parent.parent.parent),
             }
+            import signal
+
+            env["CCI_PARENT_PID"] = str(os.getpid())
             subprocess.Popen(
                 [sys.executable, __file__], env=env, start_new_session=True
             )
@@ -187,8 +199,14 @@ class GuardianGUI:
 
     def _refresh_ui_texts(self):
         """تحديث جميع النصوص في الواجهة بعد تغيير اللغة."""
-        self.root.title(self._get_text("app.title"))
+        # عنوان النافذة
+        self.root.title(
+            lang.get_raw("app.title")
+            if LANG_AVAILABLE and lang
+            else self._get_text("app.title")
+        )
 
+        # الهيدر
         if "header" in self.ui_refs:
             self.ui_refs["header"].config(text=self._get_text("app.title"))
         if "cycle_info" in self.ui_refs:
@@ -196,8 +214,10 @@ class GuardianGUI:
                 text=f"Cycle ID: {self.cycle_id} | {datetime.now().strftime('%Y-%m-%d %H:%M')}"
             )
 
+        # القوائم (إعادة بناء)
         self._build_menu()
 
+        # الأزرار
         btn_mapping = {
             "btn_general": "dashboard.general_data",
             "btn_units": "dashboard.units",
@@ -210,17 +230,20 @@ class GuardianGUI:
             if ref_name in self.ui_refs:
                 self.ui_refs[ref_name].config(text=self._get_text(text_key))
 
+        # إطار النتائج
         if "results_frame" in self.ui_refs:
             self.ui_refs["results_frame"].config(
                 text=self._get_text("dashboard.results")
             )
 
+        # جدول النتائج
         if hasattr(self, "results_tree"):
             self.results_tree.heading("Unit", text=self._get_text("unit.name"))
             self.results_tree.heading("Vaccine", text=self._get_text("vaccine.name"))
             self.results_tree.heading("Status", text=self._get_text("status.safe"))
             self.results_tree.heading("Decision", text=self._get_text("decision.pass"))
 
+        # شريط الحالة
         if "status_bar" in self.ui_refs:
             self.status_var.set(self._get_text("status.ready"))
 
@@ -254,6 +277,7 @@ class GuardianGUI:
     def _build_menu(self):
         menubar = tk.Menu(self.root)
 
+        # ملف
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(
             label=self._get_text("menu.save_cycle"), command=self._save_cycle
@@ -267,22 +291,19 @@ class GuardianGUI:
         )
         menubar.add_cascade(label=self._get_text("menu.file"), menu=file_menu)
 
-        # زر toggle للغة
-        if LANG_AVAILABLE and lang and hasattr(lang, '_shape_arabic'):
-            toggle_label = (
-                "English"
-                if self.current_lang == "ar"
-                else lang._shape_arabic("عربي")
-            )
-        else:
-            toggle_label = "English" if self.current_lang == "ar" else "عربي"
-            
+        # زر toggle للغة - يتبدل تلقائياً
+        toggle_label = (
+            "English"
+            if self.current_lang == "ar"
+            else (lang._shape_arabic("عربي") if LANG_AVAILABLE and lang else "عربي")
+        )
         target_lang = "en" if self.current_lang == "ar" else "ar"
         menubar.add_command(
             label=toggle_label, command=lambda: self._switch_lang(target_lang)
         )
         self.ui_refs["lang_toggle"] = menubar
 
+        # مساعدة
         help_menu = tk.Menu(menubar, tearoff=0)
         help_menu.add_command(
             label=self._get_text("menu.about"), command=self._show_about
@@ -312,6 +333,7 @@ class GuardianGUI:
             )
             self.ui_refs[ref].pack(side=tk.LEFT, padx=5)
 
+        # زر التحقق
         self.ui_refs["btn_verify"] = tk.Button(
             btn_frame,
             text=self._get_text("dashboard.verify"),
@@ -325,6 +347,7 @@ class GuardianGUI:
         )
         self.ui_refs["btn_verify"].pack(side=tk.LEFT, padx=5)
 
+        # زر توليد التقرير
         self.ui_refs["btn_generate"] = tk.Button(
             btn_frame,
             text=self._get_text("dashboard.generate_pdf"),
@@ -337,40 +360,6 @@ class GuardianGUI:
             cursor="hand2",
         )
         self.ui_refs["btn_generate"].pack(side=tk.LEFT, padx=5)
-
-        # إطار النتائج
-        self.ui_refs["results_frame"] = ttk.LabelFrame(
-            frame, text=self._get_text("dashboard.results")
-        )
-        self.ui_refs["results_frame"].pack(fill=tk.BOTH, expand=True, pady=10)
-
-        columns = ("Unit", "Vaccine", "Status", "Decision")
-        self.results_tree = ttk.Treeview(
-            self.ui_refs["results_frame"],
-            columns=columns,
-            show="headings"
-        )
-        self.results_tree.heading("#0", text="ID")
-        self.results_tree.heading("Unit", text=self._get_text("unit.name"))
-        self.results_tree.heading("Vaccine", text=self._get_text("vaccine.name"))
-        self.results_tree.heading("Status", text=self._get_text("status.safe"))
-        self.results_tree.heading("Decision", text=self._get_text("decision.pass"))
-
-        self.results_tree.column("#0", width=100)
-        self.results_tree.column("Unit", width=150)
-        self.results_tree.column("Vaccine", width=150)
-        self.results_tree.column("Status", width=100)
-        self.results_tree.column("Decision", width=100)
-
-        self.results_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        scrollbar = ttk.Scrollbar(
-            self.ui_refs["results_frame"],
-            orient=tk.VERTICAL,
-            command=self.results_tree.yview
-        )
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.results_tree.configure(yscrollcommand=scrollbar.set)
 
     def _build_status_bar(self):
         self.status_var = tk.StringVar(value=self._get_text("status.ready"))
@@ -417,36 +406,22 @@ class GuardianGUI:
             )
             return
 
-        if not COMPOSER_AVAILABLE or not AppComposer:
+        # ensure composer is available before proceeding
+        if not COMPOSER_AVAILABLE:
             messagebox.showerror(self._get_text("error.title"), "AppComposer غير متوفر")
             return
 
-        # استيراد محلي لتجنب الاعتماديات غير الضرورية
-        try:
-            from src.application.use_cases.generate_device_report_uc import (
-                GenerateDeviceReportRequest,
-            )
-        except ImportError:
-            messagebox.showerror(
-                self._get_text("error.title"), 
-                "GenerateDeviceReportRequest غير متوفر"
-            )
-            return
+        from src.application.use_cases.generate_device_report_uc import \
+            GenerateDeviceReportRequest
 
         try:
+            # build the use case through the composition root
             use_case = AppComposer.create_generate_device_report_uc()
+            # repository may be needed for auxiliary operations (listing ids etc.)
             repository = getattr(use_case, "_repo", None)
             if repository is None:
                 # fallback to direct instantiation if composer doesn't expose it
-                if REPO_AVAILABLE:
-                    from src.infrastructure.repositories.device_repository import DeviceDataRepository
-                    repository = DeviceDataRepository()
-                else:
-                    messagebox.showerror(
-                        self._get_text("error.title"),
-                        "DeviceDataRepository غير متوفر"
-                    )
-                    return
+                repository = DeviceDataRepository()
 
             choice = messagebox.askquestion(
                 self._get_text("dashboard.generate_pdf"),
@@ -511,13 +486,6 @@ class GuardianGUI:
                     )
                     return
 
-                if not hasattr(repository, 'get_all_device_ids'):
-                    messagebox.showerror(
-                        self._get_text("error.title"),
-                        "Repository لا يدعم get_all_device_ids"
-                    )
-                    return
-
                 all_device_ids = repository.get_all_device_ids(
                     date_from=date_from, date_to=date_to
                 )
@@ -548,8 +516,11 @@ class GuardianGUI:
 
                         self.cycle_data["reports_generated"].append(str(report_path))
                         reports_count += 1
+                    except BaseSystemException as e:
+                        logger.error("فشل توليد تقرير للجهاز %s: [%s] %s", device_id, e.code, e.internal_details or e.user_message)
+                        continue
                     except Exception as e:
-                        logger.error(f"فشل توليد تقرير للجهاز {device_id}: {e}")
+                        logger.exception("CRITICAL UNHANDLED ERROR – failed to generate report for %s", device_id)
                         continue
 
                 messagebox.showinfo(
@@ -560,11 +531,18 @@ class GuardianGUI:
             self._save_cycle()
             self.status_var.set(self._get_text("status.ready"))
 
-        except Exception as e:
-            logger.exception("فشل توليد التقرير")
+        except BaseSystemException as e:
+            logger.error("[%s] %s", e.code, e.internal_details or e.user_message)
             messagebox.showerror(
                 self._get_text("error.title"),
-                f"{self._get_text('error.pdf_generation_failed')}: {str(e)}",
+                e.user_message,
+            )
+            self.status_var.set(self._get_text("status.error"))
+        except Exception:
+            logger.exception("CRITICAL UNHANDLED ERROR")
+            messagebox.showerror(
+                self._get_text("error.title"),
+                "حدث خطأ داخلي غير متوقع. يرجى الاتصال بالدعم الفني.",
             )
             self.status_var.set(self._get_text("status.error"))
 
@@ -578,7 +556,11 @@ class GuardianGUI:
                 json.dump(self.cycle_data, f, indent=2, ensure_ascii=False)
             self.status_var.set(self._get_text("msg.cycle_saved"))
         except Exception as e:
-            messagebox.showerror(self._get_text("error.title"), str(e))
+            logger.exception("فشل حفظ دورة التشغيل")
+            messagebox.showerror(
+                self._get_text("error.title"),
+                "فشل حفظ دورة التشغيل. يرجى التحقق من الأذونات أو المسار ثم حاول مرة أخرى.",
+            )
 
     def _load_cycle(self):
         file = filedialog.askopenfilename(
@@ -586,15 +568,12 @@ class GuardianGUI:
             filetypes=[(self._get_text("filetype.json"), "*.json")],
         )
         if file:
-            try:
-                with open(file, "r", encoding="utf-8") as f:
-                    self.cycle_data = json.load(f)
-                    self.cycle_id = self.cycle_data["cycle_id"]
-                messagebox.showinfo(
-                    self._get_text("msg.success"), self._get_text("msg.cycle_loaded")
-                )
-            except Exception as e:
-                messagebox.showerror(self._get_text("error.title"), str(e))
+            with open(file, "r", encoding="utf-8") as f:
+                self.cycle_data = json.load(f)
+                self.cycle_id = self.cycle_data["cycle_id"]
+            messagebox.showinfo(
+                self._get_text("msg.success"), self._get_text("msg.cycle_loaded")
+            )
 
     # ========================== أزرار مساعدة ==========================
     def _open_general_data(self):
@@ -627,10 +606,17 @@ class GuardianGUI:
         )
 
     def _on_closing(self):
-        title = self._get_text("msg.quit")
+        title = (
+            lang.get_raw("msg.quit")
+            if LANG_AVAILABLE and lang
+            else self._get_text("msg.quit")
+        )
         msg = self._get_text("msg.quit_confirm")
         if messagebox.askokcancel(title, msg):
             self._save_cycle()
+            import os
+            import signal
+
             self.root.destroy()
             os.kill(os.getpid(), signal.SIGKILL)
 

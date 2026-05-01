@@ -27,9 +27,9 @@ so they travel with every other DTO produced by the use‑case.
 
 from __future__ import annotations
 
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Iterable, List, Optional, Mapping, Any
-from dataclasses import dataclass, asdict
+from typing import Any, Iterable, List, Mapping, Optional
 
 # ----------------------------------------------------------------------
 #  Configuration – what to ignore while walking the tree
@@ -52,6 +52,7 @@ IGNORE_DIRS = {
 }
 IGNORE_FILES = {".DS_Store", "Thumbs.db"}
 
+
 # ----------------------------------------------------------------------
 #  DTO – immutable, implements the BaseDTO protocol
 # ----------------------------------------------------------------------
@@ -62,31 +63,34 @@ class ProjectTreeDTO:
     The class implements ``to_dict()`` so it can be consumed by the Guard
     writer exactly like every other DTO in the code‑base.
     """
-    root: str                # absolute path that was scanned
-    tree_markdown: str       # Markdown fenced‑code block
-    tree_plain: str          # plain‑text version
+
+    root: str  # absolute path that was scanned
+    tree_markdown: str  # Markdown fenced‑code block
+    tree_plain: str  # plain‑text version
 
     def to_dict(self) -> Mapping[str, Any]:
         """Return a JSON‑serialisable mapping (required by GuardWriter)."""
         return asdict(self)
 
+
 # ----------------------------------------------------------------------
 #  Low‑level helpers (ignore logic, tree walk)
 # ----------------------------------------------------------------------
-def _should_ignore(path: Path) -> bool:
+def _should_ignore(path: Path, extra_ignore_dirs: set[str] | None = None) -> bool:
     """
     Returns True if *path* or any of its parent directories belong to the
     ignore lists.
     """
+    effective_ignore_dirs = IGNORE_DIRS.union(extra_ignore_dirs or set())
     parts = {p.name for p in path.parents} | {path.name}
-    return any(ign in parts for ign in IGNORE_DIRS) or path.name in IGNORE_FILES
+    return any(ign in parts for ign in effective_ignore_dirs) or path.name in IGNORE_FILES
 
 
-def _iter_children(root: Path) -> Iterable[Path]:
+def _iter_children(root: Path, extra_ignore_dirs: set[str] | None = None) -> Iterable[Path]:
     """Yield children of *root* in a deterministic (sorted) order."""
     try:
         for child in sorted(root.iterdir(), key=lambda p: p.name.lower()):
-            if _should_ignore(child):
+            if _should_ignore(child, extra_ignore_dirs):
                 continue
             yield child
     except PermissionError:
@@ -100,6 +104,7 @@ def _tree_lines(
     is_last: bool = True,
     depth: int = 0,
     max_depth: Optional[int] = None,
+    extra_ignore_dirs: set[str] | None = None,
 ) -> List[str]:
     """
     Recursively build a list of lines that represent the tree.
@@ -122,7 +127,7 @@ def _tree_lines(
             return lines
 
         child_prefix = f"{prefix}{'    ' if is_last else '│   '}"
-        children = list(_iter_children(root))
+        children = list(_iter_children(root, extra_ignore_dirs))
         for idx, child in enumerate(children):
             child_is_last = idx == len(children) - 1
             lines.extend(
@@ -132,6 +137,7 @@ def _tree_lines(
                     is_last=child_is_last,
                     depth=depth + 1,
                     max_depth=max_depth,
+                    extra_ignore_dirs=extra_ignore_dirs,
                 )
             )
     return lines
@@ -153,6 +159,7 @@ def generate_project_tree_dto(
     *,
     markdown: bool = True,
     max_depth: Optional[int] = None,
+    extra_ignore_dirs: set[str] | None = None,
 ) -> ProjectTreeDTO:
     """
     Build the ProjectTreeDTO for *start_dir*.
@@ -165,6 +172,8 @@ def generate_project_tree_dto(
         When True the ``tree_markdown`` field contains a fenced‑code block.
     max_depth : int | None
         Stop recursing deeper than *max_depth* levels.
+    extra_ignore_dirs : set[str] | None
+        Additional directory names to ignore during the scan.
 
     Returns
     -------
@@ -176,7 +185,13 @@ def generate_project_tree_dto(
         raise FileNotFoundError(f"{start_dir} does not exist or is not a directory")
 
     # Build the line list once – reuse for both representations
-    raw_lines = _tree_lines(start_path, is_last=True, depth=0, max_depth=max_depth)
+    raw_lines = _tree_lines(
+        start_path, 
+        is_last=True, 
+        depth=0, 
+        max_depth=max_depth,
+        extra_ignore_dirs=extra_ignore_dirs
+    )
 
     tree_md = _render_tree(raw_lines, markdown=True) if markdown else ""
     tree_plain = _render_tree(raw_lines, markdown=False)

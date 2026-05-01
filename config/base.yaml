@@ -1,0 +1,11 @@
+app:
+  name: "CCI-FT2 Intelligence"
+  version: "0.5.0"
+  env: "${CCI_ENV:development}"
+  data_root: "${CCI_DATA_ROOT:data}"
+  log_level: "${CCI_LOG_LEVEL:INFO}"
+
+reporting:
+  default_language: "ar"
+  output_dir: "data/output/reports"
+  temp_dir: "data/temp"

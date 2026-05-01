@@ -2,13 +2,13 @@
 # Architectural Roadmap v2 — Post Phase 4 Validation
 ## Tag: v0.4.0 (2026-02-06)
 
-> 🔒 **Architectural Freeze Marker**  
-> This document captures the architecture at its point of maximum proven integrity.  
-> Any deviation MUST be explicitly justified in writing and approved by Architecture Guardians.  
+> 🔒 **Architectural Freeze Marker**
+> This document captures the architecture at its point of maximum proven integrity.
+> Any deviation MUST be explicitly justified in writing and approved by Architecture Guardians.
 > Silent evolution is strictly forbidden.
 
 ## Core Principle
-**Phase 4 was not "building features" — it was architectural proof under pressure.**  
+**Phase 4 was not "building features" — it was architectural proof under pressure.**
 Any future evolution MUST preserve this proof — not erode it.
 
 ---
@@ -75,16 +75,16 @@ This is no longer a "phase" — it is a permanent condition for all future work.
 | Guards prevent drift under real usage | All 4 guards passed during CLI execution + commit |
 
 ### Key Architectural Lessons Learned
-1. **Contractual Ports are non-negotiable**  
+1. **Contractual Ports are non-negotiable**
    `generator=None` was rejected — Ports MUST be explicit contracts (`ReportGeneratorPort`)
-   
-2. **Guards must cover dependency direction**  
+
+2. **Guards must cover dependency direction**
    The new `check_layer_dependencies.py` guard was critical to catch reverse dependencies
 
-3. **Mock adapters are sufficient for validation**  
+3. **Mock adapters are sufficient for validation**
    `MockReportGenerator` proved boundaries without introducing real infrastructure complexity
 
-4. **Structure must match documentation**  
+4. **Structure must match documentation**
    Moving `src/reporting/` → `src/presentation/reporting/` closed the "documentation ≠ reality" gap
 
 ---
@@ -92,7 +92,7 @@ This is no longer a "phase" — it is a permanent condition for all future work.
 ## 🚀 Phase 5: Controlled Evolution (NOT Automatic)
 
 ### ⚠️ Critical Condition
-Phase 5 **does NOT start automatically** after Phase 4.  
+Phase 5 **does NOT start automatically** after Phase 4.
 It begins ONLY when:
 
 1. ✅ Phase 4 is formally tagged (`v0.4.0`)
@@ -139,7 +139,7 @@ No ad-hoc wiring outside Composition Root.
 | Phase 4 | ✅ **COMPLETED** (v0.4.0) | Formal freeze as architectural reference |
 | Phase 5 | ⏸️ **HOLD** | Begin ONLY after Phase 1 debt resolved + scope documented |
 
-> **The architectural reference is now hardened.**  
+> **The architectural reference is now hardened.**
 > Any future work must prove it does not erode this hardness — not assume it "won't break anything."
 EOF
 

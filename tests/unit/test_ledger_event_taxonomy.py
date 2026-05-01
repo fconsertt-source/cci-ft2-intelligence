@@ -11,17 +11,12 @@ import json
 
 import pytest
 
-from src.domain.enums.ledger_event import (
-    LedgerEvent,
-    get_event_category,
-    get_event_priority,
-)
-
+from src.domain.enums.ledger_event import (LedgerEvent, get_event_category,
+                                           get_event_priority)
 # the project no longer has a subpackage 'ledger'; adapter lives at top of adapters
 # and the concrete implementation is HashChainedLedgerWriter
-from src.infrastructure.adapters.ledger_writer_adapter import (
-    HashChainedLedgerWriter as LedgerWriterAdapter,
-)
+from src.infrastructure.adapters.ledger_writer_adapter import \
+    HashChainedLedgerWriter as LedgerWriterAdapter
 
 
 class TestLedgerEventEnum:
@@ -170,7 +165,7 @@ class TestLedgerWriterWithTaxonomy:
         writer = LedgerWriterAdapter(ledger_path)
 
         # only include supported fields; extras removed
-        event_hash = writer.append(
+        event_hash = writer.append(  # noqa: F841
             event_type=LedgerEvent.PDF_GENERATED,
             file_hash="dummy-hash-000",
             ft2_serial="130600112764",
@@ -181,7 +176,7 @@ class TestLedgerWriterWithTaxonomy:
         assert ledger_path.exists()
         # count manually since writer doesn't expose method
         with open(ledger_path, "r", encoding="utf-8") as f:
-            assert sum(1 for l in f if l.strip()) == 1
+            assert sum(1 for line in f if line.strip()) == 1
 
         # التحقق من المحتوى داخل السطر الأول
         with open(ledger_path, "r", encoding="utf-8") as f:
@@ -211,7 +206,7 @@ class TestLedgerWriterWithTaxonomy:
         # التحقق من السلسلة (manually via LedgerEntry.verify_chain)
         # count lines in ledger for entry count
         with open(ledger_path, "r", encoding="utf-8") as f:
-            lines = [l for l in f if l.strip()]
+            lines = [line for line in f if line.strip()]
         assert len(lines) == 3
         previous = None
         from src.domain.ledger.models import LedgerEntry
@@ -248,7 +243,7 @@ class TestLedgerWriterWithTaxonomy:
             writer.append(event_type=event_type, **kwargs)
 
         with open(ledger_path, "r", encoding="utf-8") as f:
-            assert sum(1 for l in f if l.strip()) == 5
+            assert sum(1 for line in f if line.strip()) == 5
 
         # التحقق من الفئات باستخدام الـ enum مباشرة
         categories = []

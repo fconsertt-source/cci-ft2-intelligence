@@ -8,10 +8,11 @@ from datetime import datetime
 class ThermalRecord:
     """
     Domain entity representing a thermal measurement event.
-    
+
     Identity principle: A thermal record cannot exist without
     belonging to a specific physical device — device_id is intrinsic identity.
     """
+
     device_id: str
     timestamp: datetime
     temperature: float

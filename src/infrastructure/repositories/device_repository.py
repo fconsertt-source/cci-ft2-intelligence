@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-"""Higher‑level repository implementation used by use‑cases and UI.
-
-This class currently delegates to the JSON adapter, but the abstraction
-makes it easier to swap out storage later without touching the callers.
-"""
-
 import json
 from datetime import datetime, timezone
 from typing import List, Optional
 
 from src.application.ports.device_repository_port import DeviceRepositoryPort
-from src.infrastructure.adapters.json_device_repository import JsonDeviceRepository
+from src.infrastructure.adapters.json_device_repository import \
+    JsonDeviceRepository
+
+"""Higher‑level repository implementation used by use‑cases and UI.
+
+This class currently delegates to the JSON adapter, but the abstraction
+makes it easier to swap out storage later without touching the callers.
+"""
 
 
 class DeviceDataRepository(JsonDeviceRepository, DeviceRepositoryPort):

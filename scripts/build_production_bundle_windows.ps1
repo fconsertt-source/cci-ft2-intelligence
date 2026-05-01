@@ -16,7 +16,7 @@ Set-Location $ProjectRoot
 Write-Host "`n📁 Project Root: $ProjectRoot" -ForegroundColor DarkGray
 
 # Gate script (deterministic)
-$GateScript = Join-Path $ProjectRoot "scripts\build_readiness_gate.py"
+$GateScript = Join-Path $ProjectRoot "scripts\pre_release_check.py" # Updated to use pre_release_check.py
 
 # =========================================
 # Paths
@@ -68,7 +68,7 @@ if (-not (Test-Path $tkDir)) { Write-Error "Tk directory not found: $tkDir"; exi
 # =========================================
 # Step 1: Run Build Readiness Gate
 # =========================================
-Write-Host "`n🛡️ Running Build Readiness Gate v2.1..." -ForegroundColor Cyan
+Write-Host "`n🛡️ Running Pre-Release Check Gate..." -ForegroundColor Cyan # Updated message
 python $GateScript
 $gateExitCode = $LASTEXITCODE
 

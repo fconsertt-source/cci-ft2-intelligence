@@ -99,7 +99,7 @@ class FilesystemAdapter:
             if tmp_path.exists():
                 try:
                     tmp_path.unlink()
-                except:
+                except OSError:
                     pass
             # ✅ لف الخطأ بـ RuntimeError لتوافق الاختبارات
             raise RuntimeError(f"Atomic move failed: {e}")

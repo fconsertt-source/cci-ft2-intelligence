@@ -1,0 +1,22 @@
+center_id	center_name	equipment_id	equipment_name	device_id	decision	has_warning	alert_level	vvm_stage	stability_budget_consumed_pct	thaw_remaining_hours	category_display	recommended_action	num_ft2_entries	has_freeze	has_ccm_violation	avg_temperature	min_temperature	max_temperature	decision_reasons
+TEST_CENTER_01	مركز التطعيم التجريبي	Cold_Box	حافظة طعوم	130600112767	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+TEST_CENTER_01	مركز التطعيم التجريبي	Cold_Room	غرفة التبريد	130600112769	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+TEST_CENTER_01	مركز التطعيم التجريبي	Storage_Refrigerator	ثلاجة حفظ الطعوم	130600112764	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+TEST_CENTER_01	مركز التطعيم التجريبي	SUMMARY	[مجموع المركز — 3 معدة]	—	UNKNOWN	NO	GREEN		0.00	N/A	General	مراجعة يدوية (UNKNOWN)	0	—	—	—	—	—	
+TEST_CENTER_02		Cold_Room	غرفة التبريد	130600113438	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+TEST_CENTER_02		SUMMARY	[مجموع المركز — 1 معدة]	—	UNKNOWN	NO	GREEN		0.00	N/A	General	مراجعة يدوية (UNKNOWN)	0	—	—	—	—	—	
+TEST_CENTER_03	TEST_CENTER_03	Device_130600112758	ثلاجة	130600112758	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+TEST_CENTER_03	TEST_CENTER_03	Device_130600205054	غرفة تبريد	130600205054	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+TEST_CENTER_03	TEST_CENTER_03	SUMMARY	[مجموع المركز — 2 معدة]	—	UNKNOWN	NO	GREEN		0.00	N/A	General	مراجعة يدوية (UNKNOWN)	0	—	—	—	—	—	
+بنغازي	بنغازي	Device_130600113437	غرفة تبريد	130600113437	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+بنغازي	بنغازي	SUMMARY	[مجموع المركز — 1 معدة]	—	UNKNOWN	NO	GREEN		0.00	N/A	General	مراجعة يدوية (UNKNOWN)	0	—	—	—	—	—	
+ضي الهلال	الزاوية	Device_130600112663	غرفة تبريد	130600112663	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+ضي الهلال	الزاوية	SUMMARY	[مجموع المركز — 1 معدة]	—	UNKNOWN	NO	GREEN		0.00	N/A	General	مراجعة يدوية (UNKNOWN)	0	—	—	—	—	—	
+TEST_CENTER_04		Cold_Room	غرفة التبريد	130600112748	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+TEST_CENTER_04		SUMMARY	[مجموع المركز — 1 معدة]	—	UNKNOWN	NO	GREEN		0.00	N/A	General	مراجعة يدوية (UNKNOWN)	0	—	—	—	—	—	
+TEST_CENTER_05		Cold_Room	غرفة التبريد	130600112939	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+TEST_CENTER_05		SUMMARY	[مجموع المركز — 1 معدة]	—	UNKNOWN	NO	GREEN		0.00	N/A	General	مراجعة يدوية (UNKNOWN)	0	—	—	—	—	—	
+TEST_CENTER_06		Cold_Room	غرفة التبريد	130600205389	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+TEST_CENTER_06		SUMMARY	[مجموع المركز — 1 معدة]	—	UNKNOWN	NO	GREEN		0.00	N/A	General	مراجعة يدوية (UNKNOWN)	0	—	—	—	—	—	
+TEST_CENTER_07		Cold_Room	غرفة التبريد	160600190685	NO_DATA	NO	NONE	NONE	0.00	N/A	General	التحقق من سلامة الجهاز	0	NO	NO	N/A	N/A	N/A	
+TEST_CENTER_07		SUMMARY	[مجموع المركز — 1 معدة]	—	UNKNOWN	NO	GREEN		0.00	N/A	General	مراجعة يدوية (UNKNOWN)	0	—	—	—	—	—	

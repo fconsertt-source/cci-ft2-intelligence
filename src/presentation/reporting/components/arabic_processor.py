@@ -1,8 +1,13 @@
 """Arabic text processing utilities (reshaping + bidi)."""
 
 ARABIC_LIBS_AVAILABLE = False
-arabic_reshaper = None  # will be replaced if import succeeds
-get_display = lambda s: s
+arabic_reshaper = None
+
+
+def get_display(s):
+    """Fallback display function when bidi is not available."""
+    return s
+
 
 try:
     import arabic_reshaper as _reshaper

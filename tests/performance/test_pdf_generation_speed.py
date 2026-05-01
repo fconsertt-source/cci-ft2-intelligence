@@ -8,7 +8,8 @@ from datetime import datetime
 import pytest
 
 # ✅ استيراد من المسار الصحيح
-from src.domain.dtos.device_report_dto import DeviceReportDTO
+from src.application.dtos.device_report_dto import DeviceReportDTO, ReportDecision, VVMStage
+from src.application.dtos.device_report_dto import DeviceReportDTO
 
 
 def create_realistic_dto() -> DeviceReportDTO:
@@ -26,6 +27,11 @@ def create_realistic_dto() -> DeviceReportDTO:
 
     return DeviceReportDTO(
         device_id="TEST-REALISTIC",
+        center_id="CENTER-REALISTIC",
+        center_name="Realistic Test Center",
+        temperature_ranges={"min": 2.0, "max": 8.0},
+        decision=ReportDecision.SAFE,
+        vvm_stage=VVMStage.A,
         vaccine_type="Pfizer-BioNTech",
         total_records=len(readings),
         excursions=(),
@@ -39,7 +45,8 @@ def create_realistic_dto() -> DeviceReportDTO:
 def test_pdf_generation_performance():
     """اختبار الزمن + الحجم + الذاكرة معاً"""
     try:
-        from src.infrastructure.pdf.unified_pdf_generator import UnifiedPDFGenerator
+        from src.infrastructure.pdf.unified_pdf_generator import \
+            UnifiedPDFGenerator
     except ImportError:
         pytest.skip("UnifiedPDFGenerator not available yet")
 
@@ -76,8 +83,8 @@ def test_pdf_generation_performance():
     assert peak_mb < MAX_PEAK_MEMORY_MB, f"Peak memory too high: {peak_mb:.2f}MB"
 
     # 📊 Log للأداء للتتبع الأسبوعي
-    print(f"\n=== PDF Performance ===")
+    print("\n=== PDF Performance ===")
     print(f"Time: {elapsed:.2f}s (threshold: {FINAL_THRESHOLD}s)")
     print(f"Size: {size_mb:.2f}MB (limit: {MAX_REASONABLE_SIZE_MB}MB)")
     print(f"Peak Memory: {peak_mb:.2f}MB (limit: {MAX_PEAK_MEMORY_MB}MB)")
-    print(f"========================\n")
+    print("========================\n")

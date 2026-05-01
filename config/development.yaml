@@ -1,0 +1,7 @@
+logging:
+  level: "DEBUG"
+  file: "logs/pipeline_dev.log"
+
+storage:
+  ledger_path: "data/ledger/dev_ledger.jsonl"
+  auto_archive: false

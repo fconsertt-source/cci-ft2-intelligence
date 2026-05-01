@@ -2,7 +2,6 @@
 """Tests for shared.path_utils utilities."""
 
 
-
 from src.shared import path_utils
 
 

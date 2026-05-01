@@ -8,7 +8,7 @@ VIOLATIONS = []
 for py_file in Path("src/application").rglob("*.py"):
     content = py_file.read_text()
     tree = ast.parse(content)
-    
+
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom):
             if node.module and node.module.startswith("src.presentation"):

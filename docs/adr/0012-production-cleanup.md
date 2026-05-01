@@ -1,7 +1,7 @@
 # ADR-0012: Production Cleanup and Test Hardening
 
-**Date:** 2026-02-26  
-**Status:** Accepted  
+**Date:** 2026-02-26
+**Status:** Accepted
 **Author:** Engineering Team
 
 ## Context

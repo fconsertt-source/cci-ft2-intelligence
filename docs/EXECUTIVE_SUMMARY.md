@@ -1,7 +1,7 @@
 # Executive Summary & Unified Assessment
 
-**System:** Digital Sentinel - Cold Chain Monitor (CCI-FT2-Intelligence)  
-**Version:** v1.0.0-Production-Trial  
+**System:** Digital Sentinel - Cold Chain Monitor (CCI-FT2-Intelligence)
+**Version:** v1.0.0-Production-Trial
 **Assessment Date:** 2026-02-27
 
 ## Vision & Strategic Alignment

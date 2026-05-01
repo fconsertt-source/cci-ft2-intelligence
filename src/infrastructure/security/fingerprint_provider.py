@@ -23,12 +23,21 @@ class SystemFingerprintProvider(FingerprintProviderProtocol):
         return platform.node().lower()
 
     def get_os_uuid(self) -> str:
-        # Linux: /proc/sys/kernel/random/uuid
+        # Stable UUID stored on first run to avoid /proc regeneration
+        stable_path = os.path.expanduser("~/.cci_ft2/os.uuid")
+        if os.path.exists(stable_path):
+            with open(stable_path, "r", encoding="utf-8") as f:
+                return f.read().strip()
+        # First time: generate and store
         uuid_path = "/proc/sys/kernel/random/uuid"
         if os.path.exists(uuid_path):
             with open(uuid_path, "r", encoding="utf-8") as f:
-                return f.read().strip()
-        return str(uuid.getnode())
+                val = f.read().strip()
+        else:
+            val = str(uuid.getnode())
+        with open(stable_path, "w") as f:
+            f.write(val)
+        return val
 
     def get_install_timestamp(self) -> str:
         # Will be set on first run and stored in ~/.cci_ft2/install.time

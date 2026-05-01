@@ -3,11 +3,10 @@ import uuid
 from pathlib import Path
 from typing import List
 
-from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
+from src.application.dtos.ft2_entry_dto import FT2EntryDTO
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
-from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import (
-    FT2Reading as FT2Entry,
-)
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import \
+    FT2Reading as FT2Entry
 
 
 class DefaultFt2Reader:

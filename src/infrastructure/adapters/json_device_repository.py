@@ -4,12 +4,14 @@ from datetime import datetime, timezone
 from typing import List, Optional
 
 from src.domain.entities.thermal_record import ThermalRecord
+from src.infrastructure.utils.error_translator import translate_infrastructure_errors
 
 
 class JsonDeviceRepository:
     def __init__(self, json_path: str):
         self._path = json_path
 
+    @translate_infrastructure_errors
     def get_device_history(
         self,
         device_id: str,

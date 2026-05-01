@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تقرير سلامة سلسلة التبريد بمعدة التبريد - CCI-FT2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+        @page { size: A4; margin: 15mm; }
+        body { font-family: 'Tajawal', sans-serif; direction: rtl; text-align: right; line-height: 1.4; }
+        .header { background: #006400; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header h1 { margin: 0; font-size: 22px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: #006400; color: white; }
+        .safe { background: #d4edda; color: #155724; }
+        .chart-container { display: flex; justify-content: space-between; gap: 20px; margin: 20px 0; }
+        .chart { width: 48%; border: 1px solid #ddd; padding: 10px; border-radius: 8px; }
+        .signature { margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .signature-line { width: 45%; border-top: 2px solid #000; text-align: center; padding-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>تقرير سلامة سلسلة التبريد بمعدة التبريد</h1>
+        <p>نظام مراقبة سلسلة التبريد FT2 • CCI-FT2 Intelligence</p>
+    </div>
+
+    <h2 style="text-align:center; color:#006400;">{{ center_name }}</h2>
+    <p style="text-align:center; font-size:14px;">رقم التقرير: {{ report_id }} | التاريخ: {{ generated_at }}</p>
+
+    <!-- معلومات المركز -->
+    <table>
+        <tr><th>اسم المركز</th><td>{{ center_name }}</td></tr>
+        <tr><th>رقم الجهاز</th><td>{{ device_id }}</td></tr>
+        <tr><th>نوع المعدة</th><td>{{ equipment_type }}</td></tr>
+        <tr><th>الرقم التسلسلي</th><td>{{ equipment_code }}</td></tr>
+        <tr><th>القرار النهائي</th><td class="{{ 'safe' if decision == 'ACCEPTED' else '' }}">{{ decision }}</td></tr>
+    </table>
+
+    <!-- جدول الحكم -->
+    <h3 style="color:#006400;">جدول التأثير الحراري</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align: right;">#</th>
+                <th style="text-align: right;">نوع التطعيم</th>
+                <th style="text-align: center;">الفئة</th>
+                <th style="text-align: center;">VVM</th>
+                <th style="text-align: right;">حالة التنبيه</th>
+                <th style="text-align: right;">ميزانية الاستقرار</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align: right; direction: ltr; unicode-bidi: embed;">1</td>
+                <td style="text-align: right;">{{ vaccine_type }}</td>
+                <td style="text-align: center;">{{ category_display }}</td>
+                <td style="text-align: center;">{{ vvm_stage }}</td>
+                <td style="text-align: right;">● سليم</td>
+                <td style="text-align: right;">{{ stability_budget_consumed_pct }}%</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Charts -->
+    <div class="chart-container">
+        <div class="chart">
+            <h4>مخطط ميزانية الاستقرار</h4>
+            <img src="{{ stability_budget_chart }}" style="width:100%;"/>
+        </div>
+        <div class="chart">
+            <h4>مخطط الاتجاه الحراري</h4>
+            <img src="{{ temp_timeline_chart }}" style="width:100%;"/>
+        </div>
+    </div>
+
+    <!-- الصفحة الثانية - التوقيع -->
+    <div style="page-break-before: always; margin-top: 80px;">
+        <div class="signature">
+            <div class="signature-line">
+                <strong>مشرف التطعيم بالبلدية</strong><br>
+                {{ supervisor_name }}<br>
+                التاريخ: ________________
+            </div>
+            <div class="signature-line">
+                <strong>مسؤول النظام CCI-FT2</strong><br>
+                التاريخ: ________________
+            </div>
+        </div>
+        <p style="text-align:center; margin-top:40px; font-size:12px; color:#666;">
+            تم إنشاء هذا التقرير بواسطة نظام CCI-FT2 Intelligence<br>
+            رقم التقرير: {{ report_id }}
+        </p>
+    </div>
+</body>
+</html>

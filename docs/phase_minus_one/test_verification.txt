@@ -1,0 +1,51 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.2, pluggy-1.6.0
+benchmark: 5.2.3 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+rootdir: /home/amer11974/projects/cci-ft2-intelligence-clean
+configfile: pytest.ini
+plugins: snapshot-0.9.0, cov-7.0.0, benchmark-5.2.3, xdist-3.5.0, env-1.5.0, mock-3.15.1
+collected 674 items / 3 errors
+
+==================================== ERRORS ====================================
+_______ ERROR collecting tests/unit/presentation/test_gui_composition.py _______
+ImportError while importing test module '/home/amer11974/projects/cci-ft2-intelligence-clean/tests/unit/presentation/test_gui_composition.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/presentation/test_gui_composition.py:5: in <module>
+    from src.presentation.cli import gui_main
+src/presentation/cli/gui_main.py:11: in <module>
+    import tkinter as tk
+E   ModuleNotFoundError: No module named 'tkinter'
+_____________ ERROR collecting tests/unit/test_gui_ft2_behavior.py _____________
+ImportError while importing test module '/home/amer11974/projects/cci-ft2-intelligence-clean/tests/unit/test_gui_ft2_behavior.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_gui_ft2_behavior.py:1: in <module>
+    from src.presentation.cli import gui_main
+src/presentation/cli/gui_main.py:11: in <module>
+    import tkinter as tk
+E   ModuleNotFoundError: No module named 'tkinter'
+_______________ ERROR collecting tests/unit/test_gui_language.py _______________
+ImportError while importing test module '/home/amer11974/projects/cci-ft2-intelligence-clean/tests/unit/test_gui_language.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unit/test_gui_language.py:3: in <module>
+    from src.presentation.cli import gui_main
+src/presentation/cli/gui_main.py:11: in <module>
+    import tkinter as tk
+E   ModuleNotFoundError: No module named 'tkinter'
+=========================== short test summary info ============================
+ERROR tests/unit/presentation/test_gui_composition.py
+ERROR tests/unit/test_gui_ft2_behavior.py
+ERROR tests/unit/test_gui_language.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 3 errors during collection !!!!!!!!!!!!!!!!!!!!
+============================== 3 errors in 8.87s ===============================

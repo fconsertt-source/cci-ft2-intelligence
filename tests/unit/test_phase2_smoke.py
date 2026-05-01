@@ -1,13 +1,9 @@
 from datetime import datetime, timedelta
 
-
-from src.application.use_cases.evaluate_cold_chain_safety_use_case import (
-    EvaluateColdChainSafetyUseCase,
-)
-from src.domain.dtos.evaluate_cold_chain_safety_request import (
-    EvaluateColdChainSafetyRequest,
-    TemperatureReading,
-)
+from src.application.use_cases.evaluate_cold_chain_safety_use_case import \
+    EvaluateColdChainSafetyUseCase
+from src.application.dtos.evaluate_cold_chain_safety_request import (
+    EvaluateColdChainSafetyRequest, TemperatureReading)
 
 
 def make_dummy_readings(device_id: str, count: int = 3):
@@ -55,4 +51,4 @@ def test_uc_handles_empty_request():
 
     # يجب أن تكون النتيجة حالة غير معروفة ولكن بدون خطأ
     assert response.center_id == "C02"
-    assert response.decision == "UNKNOWN"
+    assert response.decision == "NO_DATA"

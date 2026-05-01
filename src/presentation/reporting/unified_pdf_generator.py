@@ -1,23 +1,32 @@
-"""Compatibility module for legacy visual report tests.
-This module exposes a simple ``UnifiedPDFGenerator`` class so that
-patching in older tests continues to work even though the real implementation
-has moved to the adapters layer.
+# src/presentation/reporting/unified_pdf_generator.py
+"""
+DEPRECATED: UnifiedPDFGenerator moved to Clean Architecture.
+
+This file is a compatibility shim. Use the new Clean Architecture approach:
+
+    from src.application.app_composer import AppComposer
+    pdf_uc = AppComposer.create_generate_pdf_report_uc()
+    pdf_bytes = pdf_uc.execute_device_report(dto)
+
+For legacy code, use:
+
+    from src.infrastructure.pdf.arabic_font_manager import UnifiedPDFGeneratorWrapper
+    wrapper = UnifiedPDFGeneratorWrapper()
+    pdf_bytes = wrapper.render(dto)
+
+This shim will be removed in Phase 7.
 """
 
-# reuse existing ReportType enum from domain; this keeps the compatibility
-# layer thin and ensures scripts/tests that expect ``ReportType`` continue to
-# work.
-from src.domain.enums.report_scope import ReportType
-from src.infrastructure.adapters.reporting.unified_pdf_generator_wrapper import (
-    UnifiedPDFGeneratorWrapper,
+import warnings
+from typing import Any
+
+warnings.warn(
+    "UnifiedPDFGenerator is deprecated. Use Clean Architecture with GeneratePDFReportUseCase instead.",
+    DeprecationWarning,
+    stacklevel=2
 )
 
+# Re-export for compatibility
+from src.infrastructure.pdf.arabic_font_manager import UnifiedPDFGeneratorWrapper as UnifiedPDFGenerator
 
-class UnifiedPDFGenerator(UnifiedPDFGeneratorWrapper):
-    """Legacy name for the unified wrapper (kept for compatibility)."""
-
-    pass
-
-
-# expose ReportType for importers of this module
-__all__ = ["UnifiedPDFGenerator", "ReportType"]
+__all__ = ["UnifiedPDFGenerator"]

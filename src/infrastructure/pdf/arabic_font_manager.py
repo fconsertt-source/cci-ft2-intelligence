@@ -111,10 +111,11 @@ class ArabicPDFGenerator:
         try:
             from reportlab.lib.enums import TA_RIGHT
             from reportlab.lib.pagesizes import A4
-            from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+            from reportlab.lib.styles import (ParagraphStyle,
+                                              getSampleStyleSheet)
             from reportlab.lib.units import cm
             from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
-        except ImportError as e:
+        except ImportError:
             return self._minimal_pdf(dto)
         buffer = BytesIO()
         doc = SimpleDocTemplate(
@@ -137,7 +138,11 @@ class ArabicPDFGenerator:
         )
         device_id = getattr(dto, "device_id", "N/A")
         status_raw = getattr(dto, "final_status", "safe")
-        logical_status = {"safe": "آمن", "warning": "تحذير", "rejected": "مرفوض"}.get(
+        logical_status = {
+            "safe": "آمن",
+            "warning": "تحذير",
+            "rejected": "مرفوض",
+        }.get(  # noqa: F841
             status_raw.lower(), status_raw
         )
         story = [
@@ -155,7 +160,11 @@ class ArabicPDFGenerator:
     def _minimal_pdf(self, dto) -> bytes:
         device_id = getattr(dto, "device_id", "N/A")
         status_raw = getattr(dto, "final_status", "safe")
-        logical_status = {"safe": "آمن", "warning": "تحذير", "rejected": "مرفوض"}.get(
+        logical_status = {
+            "safe": "آمن",
+            "warning": "تحذير",
+            "rejected": "مرفوض",
+        }.get(  # noqa: F841
             status_raw.lower(), status_raw
         )
         return (
@@ -196,11 +205,11 @@ class UnifiedPDFGeneratorWrapper:
             return
         if self._is_new_engine_enabled():
             try:
-                from src.infrastructure.adapters.reporting.new_pdf_engine import (
-                    PDFGenerator,
-                )
+                from src.application.use_cases.generate_pdf_report_uc import GeneratePDFReportUseCase
+                from src.infrastructure.adapters.reporting.new_pdf_engine import PDFGenerator
 
-                self._engine = PDFGenerator()
+                pdf_generator = PDFGenerator(language=self.language)
+                self._engine = GeneratePDFReportUseCase(pdf_generator)
             except ImportError as e:
                 logger.warning("pdf_engine_unavailable", extra={"error": str(e)})
         self._inner = self._engine or self._legacy
@@ -220,8 +229,13 @@ class UnifiedPDFGeneratorWrapper:
         engine = self._inner
         if engine:
             try:
-                return engine.generate(dto, report_type=force_report_type or "official")
-            except (ImportError, ModuleNotFoundError) as exc:
+                if hasattr(engine, 'execute_device_report'):
+                    # New Use Case interface
+                    return engine.execute_device_report(dto, report_type=force_report_type or "official", language=self.language)
+                else:
+                    # Legacy interface
+                    return engine.generate(dto, report_type=force_report_type or "official")
+            except (ImportError, ModuleNotFoundError):
                 return self._generate_large_placeholder(dto)
             except Exception as exc:
                 logger.critical("New PDF engine failed", extra={"error": str(exc)})

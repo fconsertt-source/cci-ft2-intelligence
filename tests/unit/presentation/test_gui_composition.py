@@ -2,6 +2,8 @@
 """Ensure the GUI uses AppComposer rather than manual DI."""
 import pytest
 
+pytest.importorskip("tkinter", reason="GUI tests require python3-tk")
+
 from src.presentation.cli import gui_main
 
 
@@ -42,7 +44,7 @@ def test_gui_generates_use_case_via_composer(monkeypatch):
         staticmethod(fake_create),
     )
 
-    gui = gui_main.GuardianGUI()
+    gui = gui_main.GuardianGUI()  # noqa: F841
     use_case = gui_main.AppComposer.create_generate_device_report_uc()
     assert called.get("called", False)
     assert isinstance(use_case, DummyUC)

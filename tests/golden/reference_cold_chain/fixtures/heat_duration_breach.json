@@ -1,0 +1,38 @@
+{
+  "scenario": "heat_duration_breach",
+  "coverage_target": "Reference path should detect prolonged heat exposure and expose only additive reference_* metrics.",
+  "input": {
+    "center_id": "CENTER_HEAT",
+    "temperature_ranges": {
+      "min": 2.0,
+      "max": 8.0
+    },
+    "vaccine_profile": "heat_sensitive_profile",
+    "readings": [
+      {
+        "timestamp": "2024-01-01T10:00:00",
+        "value": 7.5
+      },
+      {
+        "timestamp": "2024-01-01T10:15:00",
+        "value": 9.2
+      },
+      {
+        "timestamp": "2024-01-01T10:30:00",
+        "value": 9.4
+      },
+      {
+        "timestamp": "2024-01-01T10:45:00",
+        "value": 9.1
+      }
+    ]
+  },
+  "expected_reference": {
+    "primary_path_preserved": true,
+    "reference_extra_stats": {
+      "reference_decision": "WARNING",
+      "reference_has_freeze": false,
+      "reference_has_heat_duration_breach": true
+    }
+  }
+}

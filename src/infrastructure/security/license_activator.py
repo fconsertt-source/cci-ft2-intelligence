@@ -1,8 +1,10 @@
 # src/infrastructure/security/license_activator.py
 from __future__ import annotations
-from pathlib import Path
+
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Optional
+
 
 class LicenseActivator:
     """
@@ -10,7 +12,7 @@ class LicenseActivator:
     - On first run: creates install.time if missing
     - Always verifies license.dat exists and is valid
     """
-    
+
     def __init__(self, license_dir: Path = Path.home() / ".cci_ft2"):
         self._license_dir = license_dir
         self._install_time_path = license_dir / "install.time"
@@ -19,7 +21,9 @@ class LicenseActivator:
     def ensure_installed(self) -> None:
         """Create install.time on first run."""
         if not self._install_time_path.exists():
-            install_time = datetime.now(timezone.utc).replace(microsecond=0).isoformat() + "Z"
+            install_time = (
+                datetime.now(timezone.utc).replace(microsecond=0).isoformat() + "Z"
+            )
             self._install_time_path.write_text(install_time)
             # Log: First run detected
 

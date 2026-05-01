@@ -21,8 +21,8 @@ class FT2Entry:
         return self.alarms.get("0", {}).get("t_acc", 0) > 0
 
     @property
-    def has_ccm_violation(self) -> bool:
-        """هل يوجد انتهاك CCM في هذا اليوم؟"""
+    def has_ft2_tacc_alarm(self) -> bool:
+        """إنذار تراكم CCM من جهاز FT2 — t_acc > 600 دقيقة"""
         return self.alarms.get("1", {}).get("t_acc", 0) > 600
 
     @property
@@ -52,7 +52,7 @@ class FT2Entry:
             "sensor_timeout": self.sensor_timeout,
             "events": self.events,
             "has_freezing": self.has_freezing,
-            "has_ccm_violation": self.has_ccm_violation,
+            "has_ft2_tacc_alarm": self.has_ft2_tacc_alarm,
             "freeze_minutes": self.freeze_minutes,
             "ccm_minutes": self.ccm_minutes,
             "temperature_range": self.temperature_range,

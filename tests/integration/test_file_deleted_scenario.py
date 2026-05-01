@@ -13,7 +13,8 @@ from datetime import datetime, timezone
 import pytest
 
 from src.domain.enums.ledger_event import LedgerEvent
-from src.infrastructure.adapters.ledger_writer_adapter import LedgerWriterAdapter
+from src.infrastructure.adapters.ledger_writer_adapter import \
+    LedgerWriterAdapter
 
 
 @pytest.fixture
@@ -53,7 +54,7 @@ class TestFileDeletedScenario:
     def test_file_deleted_records_in_ledger(self, ledger_writer, temp_ledger_path):
         """التأكد من تسجيل حدث FILE_DELETED في Ledger"""
         # تسجيل حدث الحذف
-        hash_value = ledger_writer.append(
+        hash_value = ledger_writer.append(  # noqa: F841
             event_type=LedgerEvent.FILE_DELETED,
             file_hash="deleted_file_hash_abc123",
             event_id="delete-event-001",
@@ -144,7 +145,7 @@ class TestFileDeletedScenario:
         """التأكد من اكتمال البيانات الوصفية لحدث FILE_DELETED"""
         timestamp_before = datetime.now(timezone.utc).isoformat()
 
-        hash_value = ledger_writer.append(
+        hash_value = ledger_writer.append(  # noqa: F841
             event_type=LedgerEvent.FILE_DELETED,
             file_hash="test_hash",
             event_id="delete-test-001",

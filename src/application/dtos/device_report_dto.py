@@ -1,101 +1,97 @@
-# src/domain/dtos/device_report_dto.py
-#!/usr/bin/env python3
-"""Device Report DTO — كائن نقل بيانات التقرير (عقد صارم)"""
+# src/application/dtos/device_report_dto.py
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from enum import Enum
-from typing import Dict, Optional, Tuple
+from typing import List, Dict, Any, Optional
+from datetime import datetime
 
-
-class ReportStatus(Enum):
-    """حالة الجهاز النهائية"""
-
-    SAFE = "safe"
-    WARNING = "warning"
-    DISCARD = "discard"
-    UNKNOWN = "unknown"
-
-
-@dataclass(frozen=True)
-class ThermalExcursionDTO:
-    """انحراف حراري واحد"""
-
-    timestamp: str
-    temperature: float
-    duration_minutes: float
-    impact_level: str
-
-
-@dataclass(frozen=True)
-class AdvisorySection:
-    """قسم التوصيات"""
-
-    freeze_events: int
-    heat_events: int
-    total_heat_hours: float
-    max_temp_exceeded_count: int
-    remaining_potency_estimate: float
-
-
-@dataclass(frozen=True)
-class ValidationProtocol:
-    """بروتوكول التحقق"""
-
-    required: bool
-    method: str
-    timeframe_hours: int
-    responsible: str
-    documentation_required: bool
+from src.domain.enums import ReportDecision, VVMStage
+from .thermal_excursion_dto import ThermalExcursionDTO
 
 
 @dataclass(frozen=True)
 class DeviceReportDTO:
-    """
-    عقد تقرير الجهاز - صارم وغير قابل للتعديل
-
-    ⚠️ أي تغيير في هذا العقد يتطلب:
-    1. تحديث Contract Test
-    2. تحديث Golden Master
-    3. توثيق في CHANGELOG
-    """
-
+    """Immutable DTO for device report data."""
     device_id: str
-    vaccine_type: str
-    total_records: int
-    excursions: Tuple[ThermalExcursionDTO, ...]  # ✅ tuple وليس list
-    final_status: str
-    scientific_rationale: str
-    advisory_section: Optional[AdvisorySection] = None
-    validation_required: Optional[ValidationProtocol] = None
-    generated_at: Optional[str] = None
-    operator: Optional[str] = None
-    cycle_id: Optional[str] = None
-
-    # ✅ حقول إضافية للاستراتيجيات
-    status: Optional[ReportStatus] = None
-    readings: Tuple = field(default_factory=tuple)
+    center_id: str = ""
+    center_name: str = ""
+    temperature_ranges: Dict[str, float] = field(default_factory=lambda: {"min": 0.0, "max": 0.0})
+    decision: ReportDecision = ReportDecision.UNKNOWN
+    vvm_stage: VVMStage = VVMStage.A
+    alert_level: str = ""
+    stability_budget_consumed_pct: float = 0.0
+    thaw_remaining_hours: float = 0.0
+    aefi_reporting_required: bool = False
+    flexible_vvm_policy_applied: bool = False
+    remaining_shelf_life_ok: bool = True
+    decision_reasons: List[str] = field(default_factory=list)
+    readings: List[Dict[str, Any]] = field(default_factory=list)
+    stats: Dict[str, Any] = field(default_factory=dict)
+    generated_at: datetime = field(default_factory=datetime.now)
+    # Legacy fields for backward compatibility
+    vaccine_type: str = ""
+    total_records: int = 0
+    excursions: List[ThermalExcursionDTO] = field(default_factory=list)
+    final_status: str = ""
+    scientific_rationale: str = ""
+    advisory_section: Dict[str, Any] = field(default_factory=dict)
+    validation_required: Optional[Any] = None
+    operator: str = ""
+    cycle_id: str = ""
     ledger_hash: str = ""
 
-    def __post_init__(self):
-        """التحقق من الصحة عند الإنشاء"""
-        if self.generated_at is None:
-            object.__setattr__(
-                self, "generated_at", datetime.now(timezone.utc).isoformat()
-            )
-        if not self.device_id or not self.device_id.strip():
-            raise ValueError("device_id cannot be empty")
-        if self.ledger_hash and len(self.ledger_hash) != 64:
-            raise ValueError("ledger_hash must be SHA-256 (64 chars)")
-
     def get_batch_counts(self) -> Dict[str, int]:
-        """عدّ الدفعات حسب الحالة"""
+        """Count excursions by impact level for batch reporting."""
         counts = {"safe": 0, "warning": 0, "discard": 0}
-        for e in self.excursions:
-            # ✅ بدون مسافات زائدة
-            if e.impact_level == "SAFE":
+        for excursion in self.excursions:
+            impact = excursion.impact_level.lower()
+            if impact == "safe":
                 counts["safe"] += 1
-            elif e.impact_level == "PARTIAL":
+            elif impact == "partial":
                 counts["warning"] += 1
-            elif e.impact_level == "DISCARD":
+            elif impact == "discard":
                 counts["discard"] += 1
         return counts
+
+    def __post_init__(self):
+        """Validation after initialization."""
+        if not self.device_id:
+            raise ValueError("device_id cannot be empty")
+        if self.center_id and not self.center_name:
+            raise ValueError("center_name cannot be empty when center_id is provided")
+        if self.center_name and not self.center_id:
+            raise ValueError("center_id cannot be empty when center_name is provided")
+        if self.stability_budget_consumed_pct < 0 or self.stability_budget_consumed_pct > 100:
+            raise ValueError("stability_budget_consumed_pct must be between 0 and 100")
+        if not isinstance(self.decision, ReportDecision):
+            raise ValueError(f"Invalid decision: {self.decision}")
+        if not isinstance(self.vvm_stage, VVMStage):
+            raise ValueError(f"Invalid VVM stage: {self.vvm_stage}")
+        if 'min' in self.temperature_ranges and 'max' in self.temperature_ranges:
+            if self.temperature_ranges['min'] > self.temperature_ranges['max']:
+                raise ValueError("Minimum temperature cannot be greater than maximum temperature in temperature_ranges")
+
+    @classmethod
+    def create_golden_baseline(cls) -> "DeviceReportDTO":
+        """Factory method للـ Golden Baseline – يعمل مع الـ enums المحلية"""
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+
+        return cls(
+            device_id="GOLDEN-TEST-001",
+            center_id="CENTER-GOLDEN-001",
+            center_name="مركز الاختبار الذهبي (Golden Test Center)",
+            temperature_ranges={"min": 2.0, "max": 8.0},
+            decision=ReportDecision.SAFE,           # استخدام الـ Enum المحلي
+            vvm_stage=VVMStage.B,                   # B موجود في الـ Enum الحالي
+            vaccine_type="Pfizer-BioNTech",
+            total_records=100,
+            excursions=[],
+            final_status="safe",
+            scientific_rationale="Golden baseline validation for all PDF strategies",
+            generated_at=datetime.now(ZoneInfo("UTC")).isoformat(),
+            decision_reasons=["جميع القراءات ضمن النطاق المسموح – Golden Baseline"],
+            readings=[],
+            stats={},
+            alert_level="",
+            stability_budget_consumed_pct=0.0,
+            thaw_remaining_hours=0.0,
+        )

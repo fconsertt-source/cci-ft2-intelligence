@@ -1,10 +1,11 @@
 from __future__ import annotations
+
 from src.application.ports.i_reporter import IReporter
 
 
 class GenerateReportUseCase:
     """Use Case for generating reports — depends ONLY on Ports."""
-    
+
     def __init__(self, generator: IReporter):
         self._generator = generator
 

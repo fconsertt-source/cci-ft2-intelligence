@@ -4,21 +4,19 @@
 Usage: run from repo root. Returns exit code 1 on violations.
 """
 import os
-import sys
 import re
+import sys
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
-TARGET_DIRS = [
-    os.path.join(ROOT, 'scripts'),
-    os.path.join(ROOT, 'src', 'presentation')
-]
+TARGET_DIRS = [os.path.join(ROOT, 'scripts'), os.path.join(ROOT, 'src', 'presentation')]
 
 # Allowlisted legacy tool directories (explicit, minimal)
-ALLOWED_LEGACY = [
-    os.path.join(ROOT, 'tools', 'legacy')
-]
+ALLOWED_LEGACY = [os.path.join(ROOT, 'tools', 'legacy')]
 
-PATTERN = re.compile(r"\bfrom\s+src\.core\.entities|\bimport\s+src\.core\.entities|src\.core\.entities\.")
+PATTERN = re.compile(
+    r"\bfrom\s+src\.core\.entities|\bimport\s+src\.core\.entities|src\.core\.entities\."
+)
+
 
 def scan_file(path):
     with open(path, 'r', encoding='utf-8') as f:
@@ -26,6 +24,7 @@ def scan_file(path):
             if PATTERN.search(line):
                 return i, line.strip()
     return None
+
 
 def main():
     violations = []
@@ -54,10 +53,13 @@ def main():
         print("ERROR: Found forbidden imports of src.core.entities in guarded paths:")
         for p, ln, s in violations:
             print(f" - {p}:{ln}: {s}")
-        print("\nPlease convert usage to DTOs and mappers; see docs/adr/0004-phase3-plan.md")
+        print(
+            "\nPlease convert usage to DTOs and mappers; see docs/adr/0004-phase3-plan.md"
+        )
         sys.exit(1)
 
     print("OK: No forbidden imports found in guarded paths.")
+
 
 if __name__ == '__main__':
     main()

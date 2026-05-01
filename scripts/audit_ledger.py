@@ -29,12 +29,12 @@ def main():
     ledger_path = project_root / "data" / "ledger" / "verification_ledger.jsonl"
 
     if not ledger_path.exists():
-        logger.warning(f"Ledger not found: {ledger_path}")
+        logger.warning("Ledger not found: %s", ledger_path)
         logger.info("✅ Empty ledger is considered valid")
         sys.exit(0)
 
-    logger.info(f"🔍 Auditing Ledger: {ledger_path}")
-    logger.info(f"📅 Timestamp: {datetime.now(timezone.utc).isoformat()}")
+    logger.info("🔍 Auditing Ledger: %s", ledger_path)
+    logger.info("📅 Timestamp: %s", datetime.now(timezone.utc).isoformat())
 
     # تهيئة Ledger للتحقق
     ledger = configure_ledger(ledger_path)
@@ -71,7 +71,7 @@ def main():
         logger.info("   🔗 No tampering detected")
 
         state = ledger.get_chain_state()
-        logger.info(f"   📊 Entries: {state.entry_count}")
+        logger.info(" 📊 Entries: %d", state.entry_count)
         logger.info(
             f"   🔐 Last Hash: {state.last_entry_hash[:16] if state.last_entry_hash else 'None'}..."
         )

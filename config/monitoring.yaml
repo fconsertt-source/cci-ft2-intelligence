@@ -1,0 +1,21 @@
+# Monitoring Configuration for Phase 4
+monitoring:
+  enabled: true
+  metrics_endpoint: "/metrics"
+  health_endpoint: "/health"
+  prometheus:
+    enabled: true
+    port: 9090
+  grafana:
+    enabled: true
+    port: 3000
+
+alerts:
+  temperature_threshold: 8.0
+  ledger_size_limit: 1000000
+  performance_threshold_ms: 5000
+
+logging:
+  structured: true
+  level: INFO
+  format: json

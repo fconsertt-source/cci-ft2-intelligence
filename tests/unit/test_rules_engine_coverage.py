@@ -3,14 +3,9 @@
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
-
-from src.domain.services.rules_engine import (
-    ExpiryRule,
-    FreezeRule,
-    HeatCriticalRule,
-    TemperatureWarningRule,
-    ThawRule,
-)
+from src.domain.services.rules_engine import (ExpiryRule, FreezeRule,
+                                              HeatCriticalRule,
+                                              TemperatureWarningRule, ThawRule)
 
 
 def make_center(**kwargs):
@@ -33,7 +28,7 @@ def make_stats(**kwargs):
     return {
         "has_freeze": kwargs.get("has_freeze", False),
         "freeze_duration": kwargs.get("freeze_duration", 0),
-        "has_ccm_violation": kwargs.get("has_ccm_violation", False),
+        "has_heat_duration_breach": kwargs.get("has_heat_duration_breach", False),
         "heat_duration": kwargs.get("heat_duration", 0),
         "max_temp": kwargs.get("max_temp", 5.0),
         "min_temp": kwargs.get("min_temp", 3.0),
@@ -97,19 +92,19 @@ class TestHeatCriticalRule:
     def test_exceeds_critical_limit_returns_rejected(self):
         rule = HeatCriticalRule()
         center = make_center(critical_temp_limit=10.0)
-        stats = make_stats(max_temp=12.0, has_ccm_violation=False)
+        stats = make_stats(max_temp=12.0, has_heat_duration_breach=False)
         assert rule.evaluate(center, stats) == "REJECTED_HEAT_C"
 
     def test_ccm_violation_returns_rejected(self):
         rule = HeatCriticalRule()
         center = make_center(critical_temp_limit=10.0)
-        stats = make_stats(max_temp=5.0, has_ccm_violation=True, heat_duration=700)
+        stats = make_stats(max_temp=5.0, has_heat_duration_breach=True, heat_duration=700)
         assert rule.evaluate(center, stats) == "REJECTED_HEAT_C"
 
     def test_within_limits_returns_none(self):
         rule = HeatCriticalRule()
         center = make_center(critical_temp_limit=10.0)
-        stats = make_stats(max_temp=5.0, has_ccm_violation=False)
+        stats = make_stats(max_temp=5.0, has_heat_duration_breach=False)
         result = rule.evaluate(center, stats)
         assert result is None
 

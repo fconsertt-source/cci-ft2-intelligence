@@ -16,6 +16,7 @@ reportlab = "^4.2"
 pandas = "^2.2"
 "pdfminer.six" = "^20231228"
 filelock = "^3.12"
+psutil = "^5.9"  # Performance monitoring (optional fallback path)
 
 # ---------- مجموعة التطوير ----------
 click = "8.1.7"
@@ -28,8 +29,12 @@ pytest-snapshot = "^0.9"
 syrupy = "^4.7"
 
 [tool.poetry.scripts]
-ft2-cli = "src.cli:main"
+ft2-cli = "src.presentation.cli.cli:main"
 
 [build-system]
 requires = ["poetry-core>=1.8"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.bandit]
+exclude_dirs = ["venv", "test_env", "__pycache__", "tests", "scripts", "dist", "build"]
+skips = ["B101", "B311"]  # B101 للـ assert (مسموح في الاختبارات)

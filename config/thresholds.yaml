@@ -1,0 +1,19 @@
+# config/thresholds.yaml — configuration-driven thresholds for safety-critical rules
+# Source: TRS 1025 Annex 8, WHO PQS E006-TR07, Polio VVM Guide 2000
+metadata:
+  schema_version: "1.0"
+  last_updated: "2026-04-09"
+  source:
+    - "TRS 1025 Annex 8"
+    - "PQS E006-TR07"
+    - "Polio VVM Guide 2000"
+
+thresholds:
+  remaining_shelf_life_percentage: 50
+  fridgetag_alarm_enabled: true
+  flexible_vvm_allowed: true
+
+# === إعدادات V1.4 - Circular Prompt ===
+remaining_shelf_life_percentage: 50
+fridgetag_alarm_enabled: true
+flexible_vvm_allowed: true

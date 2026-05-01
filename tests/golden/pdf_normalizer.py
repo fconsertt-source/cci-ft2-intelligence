@@ -21,7 +21,7 @@ def normalize_pdf_bytes(pdf_bytes: bytes) -> bytes:
     # العمل على نص لتسهيل المعالجة (PDF يستخدم latin-1 للـ metadata)
     try:
         text = pdf_bytes.decode("latin-1", errors="ignore")
-    except:
+    except UnicodeDecodeError:
         return pdf_bytes  # Fallback إذا فشل فك الترميز
 
     # ========================================================================
@@ -89,7 +89,7 @@ def normalize_pdf_bytes(pdf_bytes: bytes) -> bytes:
     # ========================================================================
     try:
         return text.encode("latin-1")
-    except:
+    except UnicodeEncodeError:
         return pdf_bytes
 
 

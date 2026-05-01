@@ -100,15 +100,15 @@ def process_single_file(
     event_id = None
 
     try:
-        logger.info(f"Processing: {file_path.name}")
+        logger.info("Processing: %s", file_path.name)
 
         # 1. استخراج device_id
         device_id = file_path.stem.split("_")[0] if "_" in file_path.stem else "unknown"
-        logger.debug(f"  Device ID: {device_id}")
+        logger.debug(" Device ID: %s", device_id)
 
         # 2. حساب البصمة قبل المعالجة
         file_hash = calculate_sha256(file_path)
-        logger.debug(f"  SHA-256: {file_hash[:16]}...")
+        logger.debug(" SHA-256: %s...", file_hash[:16])
 
         # 3. تسجيل حدث FILE_INGESTED في Ledger
         event_id = f"ft2-ingest-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}-{file_path.stem}"
@@ -119,7 +119,7 @@ def process_single_file(
             ft2_serial=device_id,
             source_path=str(file_path),
         )
-        logger.debug(f"  Logged: FILE_INGESTED")
+        logger.debug("  Logged: FILE_INGESTED")
 
         # 4. استخراج البيانات
         data = extract_ft2_data(file_path)
@@ -128,7 +128,7 @@ def process_single_file(
         output_name = f"{file_path.stem}_processed.csv"
         output_path = csv_output_dir / output_name
         convert_to_csv(data, output_path)
-        logger.debug(f"  CSV: {output_path.name}")
+        logger.debug(" CSV: %s", output_path.name)
 
         # 6. تسجيل حدث FILE_VALIDATED
         ledger.append(
@@ -141,7 +141,7 @@ def process_single_file(
 
         # 7. أرشفة الملف الأصلي
         archive_path = archive_file(file_path, device_id, archive_root)
-        logger.debug(f"  Archived: {archive_path.name}")
+        logger.debug(" Archived: %s", archive_path.name)
 
         # 8. التحقق من سلامة الأرشفة (hash بعد النقل)
         archived_hash = calculate_sha256(archive_path)
@@ -159,13 +159,13 @@ def process_single_file(
             source_path=str(file_path),
             destination_path=str(archive_path),
         )
-        logger.debug(f"  Logged: FILE_ARCHIVED")
+        logger.debug("  Logged: FILE_ARCHIVED")
 
-        logger.info(f"  ✅ Success: {file_path.name}")
+        logger.info(" ✅ Success: %s", file_path.name)
         return True
 
     except Exception as e:
-        logger.error(f"  ❌ Failed: {file_path.name} - {e}")
+        logger.error(" ❌ Failed: %s - %s", file_path.name, e)
 
         # تسجيل الفشل في Ledger إذا أمكن
         if event_id and ledger:
@@ -200,7 +200,7 @@ def main():
     ledger_path = project_root / "data" / "ledger" / "verification_ledger.jsonl"
 
     # تهيئة Ledger
-    logger.info(f"Initializing Ledger: {ledger_path}")
+    logger.info("Initializing Ledger: %s", ledger_path)
     ledger = configure_ledger(ledger_path)
 
     # جمع الملفات للمعالجة
@@ -210,13 +210,13 @@ def main():
         files = [input_path] if input_path.exists() else []
 
     if not files:
-        logger.error(f"No FT2 files found in: {input_path}")
+        logger.error("No FT2 files found in: %s", input_path)
         sys.exit(1)
 
-    logger.info(f"Processing {len(files)} FT2 file(s)...")
-    logger.info(f"Archive Root: {archive_root}")
-    logger.info(f"CSV Output: {csv_output_dir}")
-    logger.info(f"{'='*60}")
+    logger.info("Processing %d FT2 file(s)...", len(files))
+    logger.info("Archive Root: %s", archive_root)
+    logger.info("CSV Output: %s", csv_output_dir)
+    logger.info("="*60)
 
     # معالجة كل ملف
     processed_count = 0
@@ -229,15 +229,15 @@ def main():
             failed_count += 1
 
     # الملخص
-    logger.info(f"\n{'='*60}")
-    logger.info(f"📊 Processing Summary")
-    logger.info(f"{'='*60}")
-    logger.info(f"✅ Processed: {processed_count}")
-    logger.info(f"❌ Failed: {failed_count}")
-    logger.info(f"📁 CSV Output: {csv_output_dir}")
-    logger.info(f"🗄️  Archive: {archive_root}")
-    logger.info(f"📜 Ledger: {ledger_path}")
-    logger.info(f"{'='*60}")
+    logger.info("\n" + "="*60)
+    logger.info("📊 Processing Summary")
+    logger.info("="*60)
+    logger.info("✅ Processed: %d", processed_count)
+    logger.info("❌ Failed: %d", failed_count)
+    logger.info("📁 CSV Output: %s", csv_output_dir)
+    logger.info("🗄️ Archive: %s", archive_root)
+    logger.info("📜 Ledger: %s", ledger_path)
+    logger.info("="*60)
 
     # عرض حالة السلسلة
     state = ledger.get_chain_state()

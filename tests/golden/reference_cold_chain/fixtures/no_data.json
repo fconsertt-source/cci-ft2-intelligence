@@ -1,0 +1,22 @@
+{
+  "scenario": "no_data",
+  "coverage_target": "Reference path should gracefully handle missing readings without breaking the operational path.",
+  "input": {
+    "center_id": "CENTER_EMPTY",
+    "temperature_ranges": {
+      "min": 2.0,
+      "max": 8.0
+    },
+    "vaccine_profile": "generic_safe_profile",
+    "readings": []
+  },
+  "expected_reference": {
+    "primary_path_preserved": true,
+    "reference_extra_stats": {
+      "reference_decision": "NO_DATA",
+      "reference_has_freeze": false,
+      "reference_has_heat_duration_breach": false,
+      "reference_no_data": true
+    }
+  }
+}

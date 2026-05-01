@@ -1,0 +1,14 @@
+[MASTER]
+ignore-patterns=test_.*?,conftest.py
+
+[MESSAGES CONTROL]
+disable=C0114,R0903,R0913,R0914,W0511
+
+[FORMAT]
+max-line-length=120
+
+[DESIGN]
+min-public-methods=1
+
+[IMPORTS]
+allow-any-import-level=tests.*,src.application.ports.*

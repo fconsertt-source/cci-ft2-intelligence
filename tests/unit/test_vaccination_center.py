@@ -3,10 +3,10 @@ from datetime import datetime
 
 import pytest
 
-from src.domain.entities.vaccination_center import FreezeTolerance, VaccinationCenter
-from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import (
-    FT2Reading as FT2Entry,  # kept alias for readability
-)
+from src.domain.entities.vaccination_center import (FreezeTolerance,
+                                                    VaccinationCenter)
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import \
+    FT2Reading as FT2Entry  # kept alias for readability
 
 
 @pytest.fixture

@@ -4,16 +4,15 @@ from datetime import datetime
 import pytest
 
 from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
-from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import (
-    FT2Reading as FT2Entry,
-)
+# استخدم النوع الفعلي الذي يرجعه الـ parser
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2EntryDTO as FT2Entry
 
 
 class TestFT2Parser:
 
     @pytest.fixture
     def sample_csv(self, tmp_path):
-        # Create a temporary CSV file
+        """إنشاء ملف CSV مؤقت للاختبار"""
         d = tmp_path / "data"
         d.mkdir()
         p = d / "test_readings.csv"
@@ -32,29 +31,34 @@ class TestFT2Parser:
         return str(p)
 
     def test_parse_valid_csv(self, sample_csv):
+        """اختبار تحليل ملف FT2 CSV صالح"""
         entries = FT2Parser.parse_file(sample_csv)
-        assert len(entries) == 2
-        assert isinstance(entries[0], FT2Entry)
+
+        assert len(entries) == 2, f"Expected 2 entries, got {len(entries)}"
+        assert isinstance(entries[0], FT2Entry), f"Expected FT2Entry type, got {type(entries[0])}"
+
         assert entries[0].device_id == "FT2-001"
         assert entries[0].temperature == 5.5
         assert isinstance(entries[0].timestamp, datetime)
         assert entries[0].timestamp.hour == 10
 
     def test_parse_invalid_file(self, tmp_path):
+        """اختبار ملف فارغ"""
         p = tmp_path / "empty.csv"
         p.touch()
         entries = FT2Parser.parse_file(str(p))
         assert len(entries) == 0
 
     def test_parse_malformed_rows(self, tmp_path):
+        """اختبار صفوف تالفة (يجب تخطي الصف السيء)"""
         d = tmp_path / "data_malformed"
         d.mkdir()
         p = d / "bad_readings.csv"
 
         with open(p, "w", newline="", encoding="utf-8") as f:
             f.write("device_id,temperature\n")
-            f.write("FT2-001,invalid_temp\n")  # Should fail float conversion
-            f.write("FT2-002,5.0\n")  # Should pass
+            f.write("FT2-001,invalid_temp\n")   # يجب تخطيه
+            f.write("FT2-002,5.0\n")            # يجب قبوله
 
         entries = FT2Parser.parse_file(str(p))
         assert len(entries) == 1

@@ -3,10 +3,8 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Any, Dict, List, Optional
 
-from src.domain.entities.ft2_entry import (  # افتراض وجود هذا الكيان في المسار الجديد
-    FT2Entry,
-)
-
+from src.domain.entities.ft2_entry import \
+    FT2Entry  # افتراض وجود هذا الكيان في المسار الجديد
 
 
 class FreezeTolerance(Enum):
@@ -179,7 +177,7 @@ class VaccinationCenter:
     @property
     def ccm_violations(self) -> List[FT2Entry]:
         """إدخالات تحتوي على انتهاكات CCM"""
-        return [entry for entry in self.ft2_entries if entry.has_ccm_violation]
+        return [entry for entry in self.ft2_entries if entry.has_ft2_tacc_alarm]
 
     @property
     def total_ccm_minutes(self) -> int:

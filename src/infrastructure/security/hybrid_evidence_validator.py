@@ -17,13 +17,9 @@ from src.application.ports.pdf_extractor_port import PdfExtractorPort
 from src.domain.enums.ledger_event import LedgerEvent
 from src.domain.evidence.cross_validation_result import CrossValidationResult
 from src.domain.evidence.evidence_integrity_report import (
-    EvidenceGrade,
-    EvidenceIntegrityReport,
-)
-from src.domain.evidence.verification_result import (
-    VerificationResult,
-    VerificationStatus,
-)
+    EvidenceGrade, EvidenceIntegrityReport)
+from src.domain.evidence.verification_result import (VerificationResult,
+                                                     VerificationStatus)
 
 logger = logging.getLogger(__name__)
 
@@ -145,10 +141,54 @@ class HybridEvidenceValidator:
             logger.info("TXT-only validation mode - skipping PDF comparison")
             return CrossValidationResult.TXT_ONLY
 
-        # TODO: تطبيق منطق المقارنة الفعلي
-        # - مقارنة serial
-        # - مقارنة درجات الحرارة
-        # - مقارنة الطوابع الزمنية
+        mismatches = []
+
+        # 1. مقارنة serial
+        txt_serial = getattr(txt_verification, "serial", None)
+        pdf_serial = pdf_data.get("serial")
+        if txt_serial and pdf_serial and txt_serial != pdf_serial:
+            mismatches.append(
+                f"Serial mismatch: TXT={txt_serial}, PDF={pdf_serial}"
+            )
+
+        # 2. مقارنة درجات الحرارة
+        pdf_min = pdf_data.get("min_temp")
+        pdf_max = pdf_data.get("max_temp")
+        txt_min = getattr(txt_verification, "min_temperature", None)
+        txt_max = getattr(txt_verification, "max_temperature", None)
+
+        if pdf_min is not None and txt_min is not None:
+            if abs(float(pdf_min) - float(txt_min)) > self.temp_tolerance:
+                mismatches.append(
+                    f"Min temp mismatch: TXT={txt_min}, PDF={pdf_min}"
+                )
+
+        if pdf_max is not None and txt_max is not None:
+            if abs(float(pdf_max) - float(txt_max)) > self.temp_tolerance:
+                mismatches.append(
+                    f"Max temp mismatch: TXT={txt_max}, PDF={pdf_max}"
+                )
+
+        # 3. مقارنة الطوابع الزمنية
+        pdf_start = pdf_data.get("start_date")
+        pdf_stop = pdf_data.get("stop_date")
+        txt_start = getattr(txt_verification, "start_date", None)
+        txt_stop = getattr(txt_verification, "stop_date", None)
+
+        if pdf_start and txt_start and str(pdf_start) != str(txt_start):
+            mismatches.append(
+                f"Start date mismatch: TXT={txt_start}, PDF={pdf_start}"
+            )
+
+        if pdf_stop and txt_stop and str(pdf_stop) != str(txt_stop):
+            mismatches.append(
+                f"Stop date mismatch: TXT={txt_stop}, PDF={pdf_stop}"
+            )
+
+        if mismatches:
+            logger.warning("Cross-validation found %d mismatch(s): %s",
+                           len(mismatches), "; ".join(mismatches))
+            return CrossValidationResult.MINOR_MISMATCH
 
         return CrossValidationResult.MATCH
 

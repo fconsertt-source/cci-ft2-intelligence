@@ -6,9 +6,10 @@ legacy implementation under `tools/legacy` so tests continue to work.
 When executed as a script, it prints a notice and runs the legacy script.
 """
 
+import importlib.util
 import sys
 from pathlib import Path
-import importlib.util
+
 
 def _load_legacy_module():
     repo_root = Path(__file__).parent.parent
@@ -16,10 +17,13 @@ def _load_legacy_module():
     if not legacy_path.exists():
         return None
 
-    spec = importlib.util.spec_from_file_location('legacy_simulate_vvm_scenarios', str(legacy_path))
+    spec = importlib.util.spec_from_file_location(
+        'legacy_simulate_vvm_scenarios', str(legacy_path)
+    )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
 
 # Try to proxy symbols from the legacy tool so unit tests that import
 # `scripts.simulate_vvm_scenarios` continue to work.

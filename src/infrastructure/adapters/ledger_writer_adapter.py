@@ -38,17 +38,13 @@ except ImportError:  # pragma: no cover
 
 from src.application.ports.ledger_writer_port import LedgerWriterPort
 from src.domain.enums.ledger_event import LedgerEvent
-from src.domain.ledger.exceptions import (
-    LedgerStateCorruptedError,
-    LedgerWriteError,
-)
+from src.domain.ledger.exceptions import (LedgerStateCorruptedError,
+                                          LedgerWriteError)
 from src.domain.ledger.models import LedgerChainState, LedgerEntry
 from src.infrastructure.utils.atomic_writer import atomic_append
-from src.infrastructure.utils.hash_chain import (
-    get_last_hash_from_ledger,
-    load_chain_state,
-    save_chain_state,
-)
+from src.infrastructure.utils.hash_chain import (get_last_hash_from_ledger,
+                                                 load_chain_state,
+                                                 save_chain_state)
 
 logger = logging.getLogger(__name__)
 
@@ -211,7 +207,7 @@ class HashChainedLedgerWriter(LedgerWriterPort):
                 try:
                     save_chain_state(self._chain_state, self.state_path)
                 except Exception as e:
-                    logger.error(f"Failed to update chain state: {e}")
+                    logger.error("Failed to update chain state: %s", e)
 
                 logger.debug(
                     "Ledger entry appended: %s -> %s", event_type.name, entry.event_id
@@ -306,7 +302,7 @@ class HashChainedLedgerWriter(LedgerWriterPort):
         if not self.ledger_path.exists():
             return None
         with open(self.ledger_path, "r", encoding="utf-8") as f:
-            lines = [l.strip() for l in f if l.strip()]
+            lines = [line.strip() for line in f if line.strip()]
         if not lines:
             return None
         try:

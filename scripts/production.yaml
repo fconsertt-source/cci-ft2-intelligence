@@ -1,0 +1,6 @@
+# Production Configuration
+logging:
+  level: "INFO"
+  file: "logs/production.log"
+security:
+  enforce_license: true

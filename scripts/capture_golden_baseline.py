@@ -8,7 +8,7 @@ import hashlib
 import json
 import re
 import sys
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Ensure package root is on PYTHONPATH
@@ -40,18 +40,9 @@ def calculate_hash(pdf_bytes: bytes) -> str:
 
 
 def create_test_dto():
-    """Create a standard test DTO following the golden blueprint."""
     from src.application.dtos.device_report_dto import DeviceReportDTO
+    return DeviceReportDTO.create_golden_baseline()
 
-    return DeviceReportDTO(
-        device_id="GOLDEN-TEST-001",
-        vaccine_type="Pfizer-BioNTech",
-        total_records=100,
-        excursions=[],
-        final_status="safe",
-        scientific_rationale="Golden baseline validation",
-        generated_at=datetime.now(UTC).isoformat(),
-    )
 
 
 def main(languages: list[str] | None = None) -> bool:
@@ -62,10 +53,7 @@ def main(languages: list[str] | None = None) -> bool:
     """
     try:
         from src.infrastructure.adapters.reporting.pdf_strategy import (
-            ArabicPDFStrategy,
-            OfficialPDFStrategy,
-            TechnicalPDFStrategy,
-        )
+            ArabicPDFStrategy, OfficialPDFStrategy, TechnicalPDFStrategy)
     except ImportError as e:
         print(f"PDF strategies not available: {e}")
         return False

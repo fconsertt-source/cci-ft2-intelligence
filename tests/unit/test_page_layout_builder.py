@@ -1,6 +1,7 @@
 """Basic tests for the PageLayoutBuilder stub."""
 
-from src.presentation.reporting.components.page_layout_builder import PageLayoutBuilder
+from src.presentation.reporting.components.page_layout_builder import \
+    PageLayoutBuilder
 
 
 def test_layout_builder_no_reportlab():

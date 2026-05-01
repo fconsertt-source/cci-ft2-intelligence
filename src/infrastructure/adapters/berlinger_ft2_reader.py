@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import logging
 import re
 from datetime import datetime
 from pathlib import Path
 from typing import List
 
 from src.application.ports.ft2_reader_port import Ft2ReaderPort
-from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
+from src.application.dtos.ft2_entry_dto import FT2EntryDTO
+
+logger = logging.getLogger(__name__)
 
 
 class BerlingerFt2Reader(Ft2ReaderPort):
@@ -44,14 +47,39 @@ class BerlingerFt2Reader(Ft2ReaderPort):
             return []
 
     def _is_berlinger_format(self, path: Path) -> bool:
-        """Detect Berlinger format by checking first 50 lines for Hist: section."""
+        """Detect Berlinger Fridge-tag 2 E format by checking the file header."""
         try:
             with open(path, "r", encoding="utf-8", errors="ignore") as f:
+                hist_found = False
+                fridgetag_found = False
+                alarm_found = False
+                loc_found = False
+
                 for i, line in enumerate(f):
                     if i >= 50:
                         break
-                    if "Hist:" in line:
-                        return True
+                    lower = line.lower()
+                    if "hist:" in lower:
+                        hist_found = True
+                    if "fridge-tag 2 e" in lower or "q-tag fridge-tag 2 e" in lower:
+                        fridgetag_found = True
+                    if "alarm" in lower:
+                        alarm_found = True
+                    if "loc:" in lower or "location:" in lower:
+                        loc_found = True
+
+                if hist_found and fridgetag_found and alarm_found and loc_found:
+                    return True
+
+            logger.warning(
+                "Skipping %s: not compliant with Fridge-tag 2E PQS E006-TR07 requirements "
+                "(hist=%s, device=%s, alarm=%s, loc=%s)",
+                path,
+                hist_found,
+                fridgetag_found,
+                alarm_found,
+                loc_found,
+            )
             return False
         except Exception:
             return False

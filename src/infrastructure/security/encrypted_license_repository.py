@@ -1,11 +1,14 @@
 # src/infrastructure/security/encrypted_license_repository.py
 from __future__ import annotations
-import os
+
 import json
+import os
 from typing import Dict, Optional
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives.hashes import SHA256
+
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.hashes import SHA256
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
 
 class EncryptedLicenseRepository:
     def __init__(self, license_path: str, fingerprint: str):
@@ -17,8 +20,8 @@ class EncryptedLicenseRepository:
         return HKDF(
             algorithm=SHA256(),
             length=32,
-            salt=b"cci-ft2-salt",
-            info=b"cci-ft2-license-key"
+            salt=b"cci-ft2-license-salt",
+            info=b"cci-ft2-license-key",
         ).derive(self._fingerprint.encode())
 
     def load(self) -> Optional[Dict]:

@@ -1,8 +1,7 @@
 # tests/unit/application/test_app_composer.py
 from src.application.app_composer import AppComposer
-from src.application.use_cases.generate_device_report_uc import (
-    GenerateDeviceReportUseCase,
-)
+from src.application.use_cases.generate_device_report_uc import \
+    GenerateDeviceReportUseCase
 
 
 def test_composer_builds_uc():

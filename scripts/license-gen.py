@@ -162,8 +162,8 @@ def main():
         f.write(pub_pem)
 
     safe_print(f"✅ License generated at: {license_dir}/")
-    safe_print(f"   • license.dat  (AES-256-GCM encrypted)")
-    safe_print(f"   • public.pem   (ECDSA public key)")
+    safe_print("   • license.dat  (AES-256-GCM encrypted)")
+    safe_print("   • public.pem   (ECDSA public key)")
     safe_print(f"   • Fingerprint: {fingerprint}")
     safe_print(f"   • Expiry: {expiry}")
 

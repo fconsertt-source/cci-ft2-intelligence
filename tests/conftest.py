@@ -1,133 +1,84 @@
 # tests/conftest.py
-import json
-
+import sys
+from pathlib import Path
 import pytest
 
-from src.application.use_cases.generate_device_report_uc import (
-    GenerateDeviceReportUseCase,
-)
-from src.domain.services.regulatory_decision_service import RegulatoryDecisionService
-from src.domain.services.thermal_degradation_estimator import (
-    ThermalDegradationEstimator,
-)
-from src.infrastructure.adapters.json_device_repository import JsonDeviceRepository
-from src.infrastructure.adapters.json_vaccine_spec_repository import (
-    JsonVaccineSpecRepository,
-)
-from src.infrastructure.adapters.validation_protocol_service import (
-    ValidationProtocolService,
-)
+# إضافة مسار src للمشاريع
+sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
 
-# ------------------------------------------------------------------
-# Test Doubles (يجب تعريفها قبل الاستخدام)
-# ------------------------------------------------------------------
-class DummyLicenseGuard:
-    """Test double that always allows execution."""
-
-    def ensure_active(self) -> None:
-        return None
-
-
-# ------------------------------------------------------------------
-# Fixtures
-# ------------------------------------------------------------------
 @pytest.fixture
-def sample_json_data():
-    """Sample data for normal temperature scenario."""
+def sample_device_data():
+    """بيانات جهاز عينة للاختبار"""
+    return {
+        'device_id': 'DEV_001',
+        'center_id': 'CTR_001',
+        'center_name': 'مستشفى الاختبار',
+        'temperature_ranges': {'min': 2.0, 'max': 8.0},
+    }
+
+
+@pytest.fixture
+def sample_report_dto():
+    """DTO تقرير عينة"""
+    from src.application.dtos.device_report_dto import DeviceReportDTO, ReportDecision, VVMStage
+    return {
+        'device_id': 'DEV_001',
+        'center_id': 'CTR_001',
+        'center_name': 'Test',
+        'temperature_ranges': {'min': 2.0, 'max': 8.0},
+        'decision': ReportDecision.ACCEPTED,
+        'vvm_stage': VVMStage.A
+    }
+
+
+@pytest.fixture(scope="session")
+def weasyprint_config():
+    """إعدادات WeasyPrint الموحدة للاختبارات."""
+    return {
+        'presentational_hints': True,
+        'hyphenate': False,
+        'font_config': {
+            'Tajawal': {
+                'normal': '/usr/share/fonts/truetype/tajawal/Tajawal-Regular.ttf',
+                'bold': '/usr/share/fonts/truetype/tajawal/Tajawal-Bold.ttf',
+            }
+        }
+    }
+
+
+@pytest.fixture
+def sample_vaccine_freeze_sensitive():
+    """عينة لقاح حساس للتجميد"""
+    return {
+        'code': 'HEPB',
+        'name_ar': 'التهاب الكبد B',
+        'name_en': 'Hepatitis B',
+        'category': 'freeze-sensitive',
+        'vvm_type': 'VVM14',
+        'storage_temp': '+2°C إلى +8°C'
+    }
+
+
+@pytest.fixture
+def sample_readings_stable():
+    """قراءات حرارة ضمن النطاق الآمن"""
     return [
-        {
-            "id": "130600112764_2021-12-01T00:00:00",
-            "device_id": "130600112764",
-            "timestamp": "2021-12-01 00:00:00",
-            "temperature": 3.0,
-            "duration_minutes": 1440.0,
-            "vaccine_type": "Hepatitis_B",
-        },
-        {
-            "id": "130600112764_2021-12-02T00:00:00",
-            "device_id": "130600112764",
-            "timestamp": "2021-12-02 00:00:00",
-            "temperature": 4.0,
-            "duration_minutes": 1440.0,
-            "vaccine_type": "Hepatitis_B",
-        },
+        {'timestamp': '2025-01-01T08:00:00Z', 'temperature': 4.2},
+        {'timestamp': '2025-01-01T09:00:00Z', 'temperature': 4.8},
+        {'timestamp': '2025-01-01T10:00:00Z', 'temperature': 5.1},
     ]
 
 
 @pytest.fixture
-def excursion_json_data():
-    """Sample data for temperature excursion scenario."""
-    return [
-        {
-            "id": "130600112764_2021-12-01T00:00:00",
-            "device_id": "130600112764",
-            "timestamp": "2021-12-01 00:00:00",
-            "temperature": 9.0,
-            "duration_minutes": 1440.0,
-            "vaccine_type": "Hepatitis_B",
-        },
-        {
-            "id": "130600112764_2021-12-02T00:00:00",
-            "device_id": "130600112764",
-            "timestamp": "2021-12-02 00:00:00",
-            "temperature": 2.5,
-            "duration_minutes": 1440.0,
-            "vaccine_type": "Hepatitis_B",
-        },
-    ]
+def temp_pdf_output(tmp_path):
+    """مسار مؤقت لمخرجات PDF"""
+    return tmp_path / 'test_report.pdf'
 
 
-@pytest.fixture
-def device_use_case(tmp_path, sample_json_data):
-    """Setup Use Case with temporary JSON file."""
-    json_file = tmp_path / "test_data.json"
-    with open(json_file, "w", encoding="utf-8") as f:
-        json.dump(sample_json_data, f, ensure_ascii=False)
+# تخطي تلقائي للاختبارات المؤرشة
 
-    device_repo = JsonDeviceRepository(json_path=json_file)
-    vaccine_spec_port = JsonVaccineSpecRepository()
-    regulatory_decision = RegulatoryDecisionService()
-    estimator = ThermalDegradationEstimator()
-    validator = ValidationProtocolService()
-    license_guard = DummyLicenseGuard()
-
-    return GenerateDeviceReportUseCase(
-        device_repository=device_repo,
-        vaccine_specifications=vaccine_spec_port,
-        regulatory_decision_service=regulatory_decision,
-        estimator=estimator,
-        validator=validator,
-        license_guard=license_guard,
-    )
-
-
-@pytest.fixture
-def excursion_use_case(tmp_path, excursion_json_data):
-    """Setup Use Case with excursion data."""
-    json_file = tmp_path / "excursion_test.json"
-    with open(json_file, "w", encoding="utf-8") as f:
-        json.dump(excursion_json_data, f, ensure_ascii=False)
-
-    device_repo = JsonDeviceRepository(json_path=json_file)
-    vaccine_spec_port = JsonVaccineSpecRepository()
-    regulatory_decision = RegulatoryDecisionService()
-    estimator = ThermalDegradationEstimator()
-    validator = ValidationProtocolService()
-    license_guard = DummyLicenseGuard()
-
-    return GenerateDeviceReportUseCase(
-        device_repository=device_repo,
-        vaccine_specifications=vaccine_spec_port,
-        regulatory_decision_service=regulatory_decision,
-        estimator=estimator,
-        validator=validator,
-        license_guard=license_guard,
-    )
-
-
-def pytest_configure(config):
-    """Configure pytest markers."""
-    config.addinivalue_line("markers", "unit: unit tests")
-    config.addinivalue_line("markers", "integration: integration tests")
-    config.addinivalue_line("markers", "architecture: architecture tests")
+def pytest_collection_modifyitems(config, items):
+    for item in items:
+        if 'archive_reportlab_legacy' in str(item.fspath):
+            item.add_marker(pytest.mark.skip(reason='مؤرشف: تم الانتقال إلى WeasyPrint'))

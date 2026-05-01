@@ -1,0 +1,9 @@
+# Snyk Security Configuration
+# API token should be set via SNYK_TOKEN environment variable
+test:
+  command: snyk test --severity-threshold=high
+monitor:
+  command: snyk monitor
+ignore:
+  - "requirements-dev.txt"
+  - "requirements-test.txt"

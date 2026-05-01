@@ -3,12 +3,11 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import Mock
 
-
 from src.application.ports.ft2_reader_port import Ft2ReaderPort
 from src.application.ports.ft2_writer_port import Ft2WriterPort
 from src.application.ports.logger_port import LoggerPort
 from src.application.use_cases.import_ft2_data_uc import ImportFt2DataUseCase
-from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
+from src.application.dtos.ft2_entry_dto import FT2EntryDTO
 
 
 def test_import_uc_delegates_to_ports():

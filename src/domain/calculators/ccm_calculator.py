@@ -2,12 +2,12 @@
 # DECISION LOCK: TIME UNIT SOURCE OF TRUTH
 # 🔒 DO NOT CHANGE without updating contracts and all tests
 # ============================================================================
-TIME_UNIT = "minutes"
-
 from typing import Any, Dict, List
+
 
 from src.domain.entities.temperature_reading import TemperatureReading
 
+TIME_UNIT = "minutes"
 
 def calculate_delta_minutes(record: Dict[str, Any]) -> float:
     """

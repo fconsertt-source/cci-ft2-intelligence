@@ -4,10 +4,8 @@ import os
 
 import pytest
 
-from src.infrastructure.pdf.unified_pdf_generator import (
-    _HAS_REPORTLAB,
-    UnifiedPDFGenerator,
-)
+from src.infrastructure.pdf.unified_pdf_generator import (_HAS_REPORTLAB,
+                                                          UnifiedPDFGenerator)
 
 # module-level skip when ReportLab (a hard requirement for the class) is missing
 if not _HAS_REPORTLAB:

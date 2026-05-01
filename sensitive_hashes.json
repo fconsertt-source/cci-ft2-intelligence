@@ -1,0 +1,17 @@
+{
+  "src/domain/calculators/q10_her_calculator.py": "14d7ca39aa25c37a65ab448423850f48a9d0b8b35b6a76e81a9131e50b0b4b7f",
+  "src/domain/calculators/time_weighted_ccm_calculator.py": "93469454fd8432c08abe79e536b678c11e31e5140445635f9d6bd364e6619171",
+  "src/domain/calculators/her_calculator.py": "74be142807bb896460b7aea9296db00652cd7f74f5b1ce7644b703f88208feef",
+  "src/domain/calculators/ccm_calculator.py": "49630d72eeddaaf2dee8336d20469df51ecae0fba90724145e264cbfd43c74a6",
+  "src/domain/services/exposure_analysis_service.py": "60978c59b5f92c02069abbd6486eee237238e3e03c7466236dc8ddf7390686a6",
+  "src/domain/services/her_calculator_service.py": "ac06502f51a229fa4eac642c599b188a4a15f385d79db3c44a9f15e446ec4580",
+  "src/domain/value_objects/her_result.py": "ebfa9830edca0463efbfff02ebbb564bdf608a324accbe6f158fc7e09ee19da7",
+  "src/domain/value_objects/ccm_result.py": "82c6998d959cb4612720e2f04162a7cc2e44654995dfd11e2976c282fda7d232",
+  "src/domain/services/rules_engine.py": "bfcafd06a035fc53da5c7ba5e104f3cfe49f78ba42556d1e2089b7b1d1f9cd4b",
+  "src/domain/dtos/evaluate_cold_chain_safety_request.py": "16e58f8107bdc2476c4ff0491dcdcb47a74c156e7dbbd6f5116e026fc537daff",
+  "src/application/use_cases/evaluate_cold_chain_safety_use_case.py": "5171bd92ef0e4962e0cea04716531029cbd80eac81766538e31d4324c6342cff",
+  "src/shared/config.py": "65cc91a1f9d37080dfb3b9b3e37ae5efa18e14e536c654bc177bf550e38deff4",
+  "src/domain/value_objects/vaccine_specification.py": "a7a5dde1f8e9cf0034ba11a3f7f1787170e7a593898988df714cc762930a311a",
+  "src/domain/services/scientific_reference_service.py": "67337fc9b06e2e14405cc357b1a1be70902aa6cf8781f6077e177f57df007f8d",
+  "src/domain/ports/vaccine_specification_port.py": "7a25ebd0b67f417fcd95b126d4e6ebb569ea4adde982d4767d36b75737958afb"
+}

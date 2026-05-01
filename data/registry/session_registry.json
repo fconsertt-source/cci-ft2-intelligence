@@ -1,0 +1,32 @@
+{
+  "130600112663": {
+    "last_timestamp": "2026-04-05T21:41:27.126514",
+    "last_file": "130600112663_converted.csv",
+    "total_readings": 300,
+    "updated_at": "2026-04-09T23:47:09.238631"
+  },
+  "130600112758": {
+    "last_timestamp": "2026-04-05T21:41:27.111416",
+    "last_file": "130600112758_converted.csv",
+    "total_readings": 300,
+    "updated_at": "2026-04-09T23:47:09.289570"
+  },
+  "130600113437": {
+    "last_timestamp": "2026-04-05T21:41:27.100092",
+    "last_file": "130600113437_converted.csv",
+    "total_readings": 300,
+    "updated_at": "2026-04-09T23:47:09.330590"
+  },
+  "130600113438": {
+    "last_timestamp": "2026-04-05T21:41:27.118965",
+    "last_file": "130600113438_converted.csv",
+    "total_readings": 300,
+    "updated_at": "2026-04-09T23:47:09.372248"
+  },
+  "130600205054": {
+    "last_timestamp": "2026-04-05T21:41:27.107641",
+    "last_file": "130600205054_converted.csv",
+    "total_readings": 300,
+    "updated_at": "2026-04-09T23:47:09.410622"
+  }
+}

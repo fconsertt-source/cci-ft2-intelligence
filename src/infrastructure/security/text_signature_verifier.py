@@ -3,18 +3,21 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from typing import Optional, Tuple
-from src.domain.evidence.verification_result import VerificationStatus, VerificationResult
-from src.application.ports.text_signature_verifier_port import ITextSignatureVerifier
-from src.application.ports.keyring_port import KeyRingPort
 
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import utils as asym_utils
-from cryptography.hazmat.backends import default_backend
-from cryptography.exceptions import InvalidSignature
-import logging
+
+from src.application.ports.keyring_port import KeyRingPort
+from src.application.ports.text_signature_verifier_port import \
+    ITextSignatureVerifier
+from src.domain.evidence.verification_result import (VerificationResult,
+                                                     VerificationStatus)
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +82,7 @@ class TextSignatureVerifier(ITextSignatureVerifier):
             is_valid = self._verify_ecdsa_signature(
                 data_bytes=normalized,
                 signature_hex=signature_hex,
-                public_key_hex=public_key_hex
+                public_key_hex=public_key_hex,
             )
 
             if not is_valid:
@@ -99,7 +102,7 @@ class TextSignatureVerifier(ITextSignatureVerifier):
             )
 
         except Exception as exc:
-            logger.warning(f"فشل التحقق من التوقيع: {exc}")
+            logger.warning("فشل التحقق من التوقيع: %s", exc)
             return VerificationResult(
                 status=VerificationStatus.DECODE_ERROR,
                 diagnostics=str(exc),
@@ -136,7 +139,9 @@ class TextSignatureVerifier(ITextSignatureVerifier):
             return None
         issuer = issuer_match.group(1).strip()
 
-        pubkey_match = re.search(r"Public Key:\s*([0-9a-fA-F]{128})", text, re.MULTILINE)
+        pubkey_match = re.search(
+            r"Public Key:\s*([0-9a-fA-F]{128})", text, re.MULTILINE
+        )
         if not pubkey_match:
             return None
         public_key_hex = pubkey_match.group(1).strip()
@@ -158,12 +163,16 @@ class TextSignatureVerifier(ITextSignatureVerifier):
             return None
         signature_hex = parts[1].strip()
 
-        if len(signature_hex) != 128 or not re.fullmatch(r'[0-9a-fA-F]{128}', signature_hex):
+        if len(signature_hex) != 128 or not re.fullmatch(
+            r'[0-9a-fA-F]{128}', signature_hex
+        ):
             return None
 
         return issuer, public_key_hex, signature_hex
 
-    def _verify_ecdsa_signature(self, data_bytes: bytes, signature_hex: str, public_key_hex: str) -> bool:
+    def _verify_ecdsa_signature(
+        self, data_bytes: bytes, signature_hex: str, public_key_hex: str
+    ) -> bool:
         """التحقق من توقيع ECDSA باستخدام DER"""
         try:
             if len(public_key_hex) != 128 or len(signature_hex) != 128:
@@ -181,19 +190,21 @@ class TextSignatureVerifier(ITextSignatureVerifier):
             public_key.verify(
                 signature=der_signature,
                 data=data_bytes,  # ← استخدم البايتات الموحّدة مباشرة
-                signature_algorithm=ec.ECDSA(hashes.SHA256())
+                signature_algorithm=ec.ECDSA(hashes.SHA256()),
             )
             return True
 
         except (InvalidSignature, ValueError, TypeError) as e:
-            logger.debug(f"فشل التحقق من التوقيع: {e}")
+            logger.debug("فشل التحقق من التوقيع: %s", e)
             return False
 
     @staticmethod
     def _raw_to_der(raw_signature: bytes) -> bytes:
         """تحويل توقيع ECDSA من Raw (r+s) إلى DER"""
         if len(raw_signature) != 64:
-            raise ValueError(f"التوقيع الخام يجب أن يكون 64 بايت، وجد: {len(raw_signature)}")
+            raise ValueError(
+                f"التوقيع الخام يجب أن يكون 64 بايت، وجد: {len(raw_signature)}"
+            )
         r = int.from_bytes(raw_signature[:32], byteorder='big')
         s = int.from_bytes(raw_signature[32:], byteorder='big')
         return asym_utils.encode_dss_signature(r, s)

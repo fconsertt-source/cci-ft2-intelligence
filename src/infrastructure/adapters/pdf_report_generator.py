@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from src.application.ports.i_reporter import IReporter
-from src.domain.dtos.analysis_result_dto import AnalysisResultDTO
+from src.application.dtos.analysis_result_dto import AnalysisResultDTO
 
 
 class PdfReportGenerator(IReporter):

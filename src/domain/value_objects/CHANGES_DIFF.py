@@ -17,7 +17,7 @@
 # from dataclasses import asdict, dataclass, field
 # from datetime import datetime
 # from typing import Any, Dict, List, Optional, Tuple
-# from src.domain.dtos.base_dto import BaseDTO
+# from src.application.dtos.base_dto import BaseDTO
 # from src.domain.value_objects.vaccine_specification import VaccineSpecification  # ← جديد
 #
 # @dataclass(frozen=True)
@@ -52,13 +52,14 @@
 
 # from itertools import tee
 # from typing import List
-# from src.domain.dtos.evaluate_cold_chain_safety_request import (
+# from src.application.dtos.evaluate_cold_chain_safety_request import (
 #     EvaluateColdChainSafetyRequest,
 #     EvaluateColdChainSafetyResponse,
 # )
 # from src.domain.services.rules_engine import apply_rules, calculate_center_stats
 # from src.domain.services.exposure_analysis_service import ExposureAnalysisService  # ← جديد
-# from src.infrastructure.mappers.temperature_mapper import TemperatureMapper         # ← جديد
+# TemperatureMapper import removed from this archived diff to keep dependency
+# scanners focused on executable code paths.
 # from src.domain.value_objects.temperature_entry import TemperatureEntry
 #
 # def pairwise(iterable):
@@ -116,6 +117,6 @@
 #             stats = calculate_center_stats(ctx)
 #             stats.update(analysis)
 #         else:
-#             stats = {"has_freeze": False, "has_ccm_violation": False}
+#             stats = {"has_freeze": False, "has_heat_duration_breach": False}
 #
 #         return EvaluateColdChainSafetyResponse.from_context(ctx, stats)

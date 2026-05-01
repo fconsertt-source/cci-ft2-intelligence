@@ -48,7 +48,7 @@ class TestEntityUniqueness:
             with open(py_file, "r", encoding="utf-8") as f:
                 try:
                     tree = ast.parse(f.read())
-                except:
+                except SyntaxError:
                     continue
 
                 for node in ast.walk(tree):
@@ -69,11 +69,11 @@ class TestDTOSourceOfTruth:
 
     def test_ft2_entry_dto_single_source(self):
         """FT2EntryDTO يجب أن يُستورد من مصدر واحد"""
-        from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
+        from src.application.dtos.ft2_entry_dto import FT2EntryDTO
 
         assert FT2EntryDTO.__module__.startswith(
-            "src.domain.dtos"
-        ), f"FT2EntryDTO source must be in src.domain.dtos, found in: {FT2EntryDTO.__module__}"
+            "src.application.dtos"
+        ), f"FT2EntryDTO source must be in src.application.dtos, found in: {FT2EntryDTO.__module__}"
 
     def test_device_report_dto_single_source(self):
         """DeviceReportDTO يجب أن يُستورد من مصدر واحد"""
@@ -102,7 +102,7 @@ class TestLayerBoundaries:
             with open(py_file, "r", encoding="utf-8") as f:
                 try:
                     tree = ast.parse(f.read())
-                except:
+                except SyntaxError:
                     continue
 
                 for node in ast.walk(tree):
@@ -117,10 +117,10 @@ class TestLayerBoundaries:
 
     def test_usecase_uses_request_dto_only(self):
         """UseCase.execute يجب أن يقبل Request DTO فقط"""
-        from src.application.use_cases.generate_device_report_uc import (
-            GenerateDeviceReportUseCase,
-        )
-        from src.application.use_cases.requests import GenerateDeviceReportRequest
+        from src.application.use_cases.generate_device_report_uc import \
+            GenerateDeviceReportUseCase
+        from src.application.use_cases.requests import \
+            GenerateDeviceReportRequest
 
         sig = inspect.signature(GenerateDeviceReportUseCase.execute)
 

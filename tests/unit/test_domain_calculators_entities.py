@@ -113,13 +113,13 @@ class TestFT2Entry:
         entry = make_entry()
         assert entry.has_freezing is False
 
-    def test_has_ccm_violation_true(self):
+    def test_has_ft2_tacc_alarm_true(self):
         entry = make_entry(alarms={"0": {"t_acc": 0}, "1": {"t_acc": 700}})
-        assert entry.has_ccm_violation is True
+        assert entry.has_ft2_tacc_alarm is True
 
-    def test_has_ccm_violation_false(self):
+    def test_has_ft2_tacc_alarm_false(self):
         entry = make_entry()
-        assert entry.has_ccm_violation is False
+        assert entry.has_ft2_tacc_alarm is False
 
     def test_freeze_minutes(self):
         entry = make_entry(alarms={"0": {"t_acc": 45}, "1": {"t_acc": 0}})
@@ -144,7 +144,7 @@ class TestFT2Entry:
             "sensor_timeout",
             "events",
             "has_freezing",
-            "has_ccm_violation",
+            "has_ft2_tacc_alarm",
             "freeze_minutes",
             "ccm_minutes",
             "temperature_range",

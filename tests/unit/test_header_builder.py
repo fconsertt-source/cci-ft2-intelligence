@@ -4,9 +4,7 @@ except ImportError:
     getSampleStyleSheet = None
 
 from src.presentation.reporting.components.header_builder import (
-    FooterBuilder,
-    HeaderBuilder,
-)
+    FooterBuilder, HeaderBuilder)
 
 
 def make_dto():

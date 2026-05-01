@@ -13,9 +13,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.application.use_cases.generate_device_report_uc import (
-    GenerateDeviceReportUseCase,
-)
+from src.application.use_cases.generate_device_report_uc import \
+    GenerateDeviceReportUseCase
 from src.application.use_cases.requests import GenerateDeviceReportRequest
 from src.domain.entities.thermal_record import ThermalRecord
 from src.domain.enums.ledger_event import LedgerEvent
@@ -108,7 +107,7 @@ class TestGenerateDeviceReportUseCase:
         uc.execute(req)
 
         # LicenseGuard يجب أن يُستدعى أولاً
-        calls_order = [
+        calls_order = [  # noqa: F841
             call[0][0] if call[0] else None
             for call in mock_dependencies["license_guard"].ensure_active.call_args_list
         ]
@@ -158,7 +157,7 @@ class TestGenerateDeviceReportUseCase:
                 LedgerEvent.OPERATOR_SESSION_STARTED.value,
                 "operator_session_started",
             ]:
-                found_session = True
+                found_session = True  # noqa: F841
                 break
 
         # ملاحظة: قد لا يكون مُنفذاً بعد في الكود الحالي
@@ -179,7 +178,7 @@ class TestGenerateDeviceReportUseCase:
             kwargs = call[1] if len(call) > 1 else {}
             event_type = kwargs.get("event_type")
             if event_type in [LedgerEvent.REPORT_GENERATED.value, "report_generated"]:
-                found_report = True
+                found_report = True  # noqa: F841
                 break
 
         # ملاحظة: قد لا يكون مُنفذاً بعد في الكود الحالي
@@ -223,6 +222,25 @@ class TestGenerateDeviceReportUseCase:
 
         # التحقق من وجود قسم استشاري
         assert hasattr(result, "advisory_section") or "advisory" in str(result)
+
+    def test_aefi_reporting_and_shelf_life_threshold(self, mock_dependencies):
+        """التأكد من أن تجاوزات الحرارة تربط بتوصيات AEFI وصلاحية الرف"""
+        mock_dependencies["regulatory_decision_service"].evaluate.return_value = "DISCARD"
+        mock_dependencies["estimator"].calculate_cumulative_impact.return_value = {
+            "cumulative_impact": 25.0,
+            "remaining_shelf_life": 45.0,
+            "remaining_shelf_life_percentage": 45.0,
+        }
+
+        uc = GenerateDeviceReportUseCase(**mock_dependencies)
+        request = GenerateDeviceReportRequest(device_id="DEV-001")
+        result = uc.execute(request)
+
+        assert result.aefi_reporting_required is True
+        assert any(exc.aefi_report_recommended for exc in result.excursions)
+        assert result.remaining_shelf_life_ok is False
+        assert result.advisory_section["remaining_shelf_life_threshold"] == 50
+        assert "below recommended" in " ".join(result.decision_reasons)
 
     def test_data_path_optional(self, mock_dependencies):
         """التأكد من أن data_path اختياري"""

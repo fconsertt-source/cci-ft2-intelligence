@@ -1,9 +1,23 @@
 # src/infrastructure/utils/vaccine_library_loader.py
 
 import os
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 import yaml
+
+from src.infrastructure.validators.vaccine_library_schema import validate_vaccine_library
+
+
+def load_vaccine_library(library_path: str = "config/vaccine_library.yaml") -> Dict[str, Any]:
+    path = Path(library_path)
+    if not path.exists():
+        return {"defaults": {}, "vaccines": {}, "metadata": {}}
+
+    with path.open("r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+
+    return validate_vaccine_library(data)
 
 
 class VaccineLibraryLoader:

@@ -9,7 +9,7 @@ import pytest
 @pytest.fixture
 def mock_guard():
     """Mock لـ LicenseGuard مع spec للصراحة النوعية"""
-    from src.application.security.license_guard import LicenseGuard
+    from src.infrastructure.security.license_guard import LicenseGuard
 
     guard = Mock(spec=LicenseGuard)
     guard.ensure_active.return_value = True
@@ -19,21 +19,21 @@ def mock_guard():
 @pytest.fixture
 def mock_dependencies():
     """Mocks صريحة لجميع Dependencies الـ 6"""
-    from src.application.ports.device_repository_port import DeviceRepositoryPort
-    from src.application.ports.vaccine_specification_port import (
-        VaccineSpecificationPort,
-    )
-    from src.application.ports.validation_protocol_port import ValidationProtocolPort
-    from src.domain.services.regulatory_decision_service import (
-        RegulatoryDecisionService,
-    )
-    from src.domain.services.thermal_degradation_estimator import (
-        ThermalDegradationEstimator,
-    )
+    from src.application.ports.device_repository_port import \
+        DeviceRepositoryPort
+    from src.domain.ports.vaccine_specification_port import \
+        VaccineSpecificationPort
+    from src.application.ports.validation_protocol_port import \
+        ValidationProtocolPort
+    from src.domain.services.regulatory_decision_service import \
+        RegulatoryDecisionService
+    from src.domain.services.thermal_degradation_estimator import \
+        ThermalDegradationEstimator
 
     mock_repo = Mock(spec=DeviceRepositoryPort)
     mock_record = Mock()
     mock_record.vaccine_type = "Hepatitis_B"
+    mock_record.temperature = 5.0  # Add temperature field
     mock_repo.get_device_history.return_value = [mock_record]
 
     mock_spec = Mock()
@@ -72,9 +72,8 @@ def test_repeated_execution_calls_guard_repeatedly(mock_dependencies, mock_guard
     ✅ لا يعتمد على container
     ✅ معزول وسريع
     """
-    from src.application.use_cases.generate_device_report_uc import (
-        GenerateDeviceReportUseCase,
-    )
+    from src.application.use_cases.generate_device_report_uc import \
+        GenerateDeviceReportUseCase
 
     uc = GenerateDeviceReportUseCase(
         device_repository=mock_dependencies["device_repository"],
@@ -87,7 +86,8 @@ def test_repeated_execution_calls_guard_repeatedly(mock_dependencies, mock_guard
     )
 
     for i in range(100):
-        from src.application.use_cases.requests import GenerateDeviceReportRequest
+        from src.application.use_cases.requests import \
+            GenerateDeviceReportRequest
 
         req = GenerateDeviceReportRequest(device_id="DEV-001")
         uc.execute(req)

@@ -9,13 +9,18 @@ from datetime import datetime, timezone
 
 import pytest
 
-from src.domain.dtos.device_report_dto import DeviceReportDTO
+from src.application.dtos.device_report_dto import DeviceReportDTO, ReportDecision, VVMStage
 
 
 @pytest.fixture
 def sample_dto():
     return DeviceReportDTO(
         device_id="INTEGRATION-TEST-001",
+        center_id="CTR-INT-001",
+        center_name="Integration Test Center",
+        temperature_ranges={"min": 2.0, "max": 8.0},
+        decision=ReportDecision.SAFE,
+        vvm_stage=VVMStage.A,
         vaccine_type="Pfizer-BioNTech",
         total_records=50,
         excursions=[],
@@ -31,9 +36,8 @@ class TestFallbackChainIntegration:
 
     def test_full_fallback_chain(self, sample_dto, caplog):
         """اختبار السلسلة الكاملة من Unified → Fallback → Placeholder"""
-        from src.infrastructure.pdf.unified_pdf_generator_wrapper import (
-            UnifiedPDFGeneratorWrapper,
-        )
+        from src.infrastructure.pdf.unified_pdf_generator_wrapper import \
+            UnifiedPDFGeneratorWrapper
 
         caplog.set_level(logging.INFO)
 
@@ -54,9 +58,8 @@ class TestFallbackChainIntegration:
 
     def test_unified_generator_priority(self, sample_dto):
         """التأكد من أن المولد الحقيقي له أولوية"""
-        from src.infrastructure.pdf.unified_pdf_generator_wrapper import (
-            UnifiedPDFGeneratorWrapper,
-        )
+        from src.infrastructure.pdf.unified_pdf_generator_wrapper import \
+            UnifiedPDFGeneratorWrapper
 
         wrapper = UnifiedPDFGeneratorWrapper()
         wrapper._ensure_initialized()

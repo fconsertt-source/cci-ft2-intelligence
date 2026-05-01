@@ -4,8 +4,8 @@ from datetime import datetime
 
 import pytest
 
-from src.domain.calculators.ccm_calculator import CCMCalculator, calculate_delta_minutes
-
+from src.domain.calculators.ccm_calculator import (CCMCalculator,
+                                                   calculate_delta_minutes)
 # helper utilities moved to shared time_factory to avoid duplication across tests
 from tests.helpers.time_factory import create_reading, minutes
 

@@ -16,15 +16,13 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from src.domain.calculators.q10_her_calculator import (
-    Q10HerCalculator,
-)
+from src.domain.calculators.q10_her_calculator import Q10HerCalculator
 from src.domain.entities.temperature_reading import TemperatureReading
-
 
 # ---------------------------------------------------------------------------
 # helpers
 # ---------------------------------------------------------------------------
+
 
 def make_readings(
     temps: list[float],
@@ -35,21 +33,24 @@ def make_readings(
     """بناء قائمة قراءات من درجات حرارة وفترات زمنية مع تحديد المدة."""
     if start is None:
         start = datetime(2025, 1, 1, 0, 0, 0)
-    
+
     readings = []
     for i, t in enumerate(temps):
-        readings.append(TemperatureReading(
-            vaccine_id=vaccine_id,
-            value=t,
-            recorded_at=start + timedelta(hours=i * interval_hours),
-            duration_hours=interval_hours,
-        ))
+        readings.append(
+            TemperatureReading(
+                vaccine_id=vaccine_id,
+                value=t,
+                recorded_at=start + timedelta(hours=i * interval_hours),
+                duration_hours=interval_hours,
+            )
+        )
     return readings
 
 
 # ---------------------------------------------------------------------------
 # edge cases
 # ---------------------------------------------------------------------------
+
 
 class TestQ10HerCalculatorEdgeCases:
 
@@ -82,8 +83,12 @@ class TestQ10HerCalculatorEdgeCases:
         """قراءتان في نفس اللحظة يجب تجاهلهما."""
         t = datetime(2025, 1, 1)
         readings = [
-            TemperatureReading(vaccine_id="V", value=30.0, recorded_at=t, duration_hours=1.0),
-            TemperatureReading(vaccine_id="V", value=35.0, recorded_at=t, duration_hours=1.0),
+            TemperatureReading(
+                vaccine_id="V", value=30.0, recorded_at=t, duration_hours=1.0
+            ),
+            TemperatureReading(
+                vaccine_id="V", value=35.0, recorded_at=t, duration_hours=1.0
+            ),
         ]
         calc = Q10HerCalculator()
         result = calc.calculate(readings)
@@ -93,6 +98,7 @@ class TestQ10HerCalculatorEdgeCases:
 # ---------------------------------------------------------------------------
 # scientific correctness
 # ---------------------------------------------------------------------------
+
 
 class TestQ10HerCalculatorScience:
 
@@ -141,13 +147,13 @@ class TestQ10HerCalculatorScience:
         )
         readings = make_readings([2.0, 2.0], interval_hours=1.0)
         result = calc.calculate(readings)
-        
+
         # الحساب العلمي الصحيح:
         # exponent = (2.0 - 5.0) / 10.0 = -0.3
         # factor = 2.0 ** (-0.3) = 0.812252396
         expected_factor = 2.0 ** ((2.0 - 5.0) / 10.0)
         expected_degradation = expected_factor * 1.0  # ساعة واحدة
-        
+
         assert abs(result.cumulative_degradation_hours - expected_degradation) < 1e-9
         # قيمة رقمية للتحقق السريع
         assert abs(result.cumulative_degradation_hours - 0.812252396) < 1e-6
@@ -204,6 +210,7 @@ class TestQ10HerCalculatorScience:
 # ---------------------------------------------------------------------------
 # independence from CCM
 # ---------------------------------------------------------------------------
+
 
 class TestHerCcmIndependence:
 

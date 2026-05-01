@@ -1,0 +1,7 @@
+logging:
+  level: "INFO"
+  file: "logs/pipeline_prod.log"
+
+storage:
+  ledger_path: "data/ledger/production_ledger.jsonl"
+  auto_archive: true

@@ -1,0 +1,354 @@
+#!/usr/bin/env python3
+# scripts/run_ft2_pipeline.py
+import argparse
+import csv
+import logging
+import os
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional
+
+sys.path.append(str(Path(__file__).parent.parent))
+
+from scripts.create_test_data import create_test_data
+from src.application.dtos.center_dto import CenterDTO
+from src.application.mappers.center_mapper import CenterMapper
+from src.application.dtos.evaluate_cold_chain_safety_request import (
+    EvaluateColdChainSafetyRequest, TemperatureReading)
+from src.application.use_cases.evaluate_cold_chain_safety_use_case import (
+    EvaluateColdChainSafetyUseCase)
+from src.domain.services.rules_engine import calculate_center_stats
+from src.infrastructure.adapters.ft2_reader.parser.ft2_parser import FT2Parser
+from src.infrastructure.adapters.ft2_reader.services.ft2_linker import FT2Linker
+from src.infrastructure.logging import get_logger
+from src.infrastructure.utils.yaml_loader import load_yaml
+from src.presentation.messages.message_map import MessageProvider
+from src.presentation.reporting.csv_reporter import generate_centers_report
+
+# ➕ Phase 1 Imports — Lifecycle + SSOT
+from src.application.use_cases.manage_file_lifecycle import ManageFileLifecycleUseCase
+from src.application.services.center_impact_service import CenterImpactService
+from src.application.ports.i_center_registry import ICenterRegistry
+from src.infrastructure.repositories.file_registry_impl import FileRegistryImpl
+from src.infrastructure.lifecycle.file_archiver import FileArchiver
+from src.infrastructure.security.file_hash import compute_file_hash
+
+# ➕ Phase 2 Imports — Fault Isolation + Validation
+from src.infrastructure.services.circuit_breaker import FileCircuitBreaker
+from src.infrastructure.validators.pydantic_ft2_schema import FT2BatchValidator
+
+# ➕ Phase 3 Imports — Observability
+from src.infrastructure.metrics.pipeline_metrics import PipelineRunMetrics
+
+logger = get_logger(__name__)
+
+
+def setup_directories():
+    dirs = ['data/input_raw', 'data/input_ft2', 'data/output', 'data/reports', 'config']
+    for d in dirs:
+        os.makedirs(d, exist_ok=True)
+        logger.debug("تم إنشاء/التحقق من المجلد: %s", d)
+
+
+def load_centers(config_path: str = "config/center_profiles.yaml") -> List[CenterDTO]:
+    try:
+        raw = load_yaml(config_path)
+        centers_data = raw.get('centers', {})
+        centers = []
+        for center_id, profile in centers_data.items():
+            dto = CenterMapper.from_dict_to_dto(center_id, profile)
+            centers.append(dto)
+        logger.info("تم تحميل %d مركز تطعيم", len(centers))
+        return centers
+    except Exception as e:
+        logger.critical(MessageProvider.get('CRITICAL_CONFIG_LOAD_FAILED', error=e))
+        raise RuntimeError(MessageProvider.get('CONFIG_LOAD_FAILED_STOP')) from e
+
+
+def run_pipeline(
+    config_path: str = "config/center_profiles.yaml",
+    input_dir: str = "data/input_raw",
+    output_dir: str = "data/output",
+):
+    logger.info(MessageProvider.get('PIPELINE_START'))
+
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    metrics = PipelineRunMetrics(run_id=run_id)
+
+    setup_directories()
+
+    # 1. تحميل المراكز (CenterDTO مع equipment_units)
+    centers = load_centers(config_path)
+
+    # ===========================================
+    # RuntimeCenterRegistry — تنفيذ مؤقت لـ ICenterRegistry
+    # ===========================================
+    class RuntimeCenterRegistry(ICenterRegistry):
+        """
+        تنفيذ لـ ICenterRegistry باستخدام مراكز محملة.
+        يربط بين البيانات الحالية وواجهات التطبيق.
+        """
+        def __init__(self, centers: List[CenterDTO]):
+            self._centers = centers
+            self._device_ids = frozenset(
+                unit.device_id
+                for center in centers
+                for unit in center.equipment_units
+                if unit.device_id
+            )
+        
+        def get_all_device_ids(self) -> frozenset:
+            return self._device_ids
+        
+        def get_center_id_for_device(self, device_id: str) -> Optional[str]:
+            for center in self._centers:
+                for unit in center.equipment_units:
+                    if unit.device_id == device_id:
+                        return center.id
+            return None
+        
+        def get_registered_center_count(self) -> int:
+            return len(self._centers)
+
+    # تهيئة المكونات
+    center_registry = RuntimeCenterRegistry(centers)
+    file_registry = FileRegistryImpl(registry_path=Path("data/registry/processed_files.json"))
+    archiver = FileArchiver(base_data_path=Path("data"))
+    lifecycle_uc = ManageFileLifecycleUseCase(
+        file_registry=file_registry,
+        center_registry=center_registry
+    )
+
+    # 2. بناء خريطة device_id -> EquipmentDTO
+    device_map = {}
+    for center in centers:
+        for unit in center.equipment_units:
+            if unit.device_id:
+                device_map[unit.device_id] = unit
+
+    # ===========================================
+    # 3. تصنيف الملفات عبر ManageFileLifecycleUseCase
+    # ===========================================
+    logger.info("🔍 تصنيف الملفات قبل المعالجة...")
+
+    # جلب ملفات CSV/TSV
+    input_raw_path = Path(input_dir)
+    csv_files = [input_raw_path / f for f in os.listdir(input_dir) if f.endswith(('.csv', '.tsv'))]
+    metrics.total_input_files = len(csv_files)
+
+    # تصنيف
+    classification = lifecycle_uc.classify_files(csv_files, run_id=run_id)
+    metrics.ready_files = len(classification.ready_for_processing)
+    metrics.already_processed = len(classification.already_processed)
+    metrics.quarantined_files = len(classification.quarantine)
+
+    # عرض النتائج
+    logger.info("📊 نتائج التصنيف: %s", classification.summary_ar())
+
+    # حجر الملفات غير المسجلة
+    for path, reason_ar, reason_en in classification.quarantine:
+        archiver.quarantine_file(path, reason_ar, reason_en)
+        logger.warning("🚫 تم حجر الملف: %s - %s", path.name, reason_ar)
+
+    # الملفات الجاهزة للمعالجة
+    files_to_process = classification.ready_for_processing
+    already_processed = classification.already_processed
+
+    if already_processed:
+        logger.info("⏭️ تخطي %d ملف(ات) معالجة مسبقاً", len(already_processed))
+
+    if not files_to_process:
+        logger.warning("لا توجد ملفات جديدة للمعالجة بعد التصنيف")
+        # نكمل لتوليد التقرير من البيانات الموجودة
+
+    # ===========================================
+    # 4. معالجة الملفات المصنفة كـ ready_for_processing
+    # ===========================================
+    failed_files = []
+    processed_results = []
+
+    # Phase 2: Initialize Circuit Breaker for fault isolation
+    circuit_breaker = FileCircuitBreaker(quarantine_handler=archiver)
+
+    for ft2_path in files_to_process:
+        ft2_file = ft2_path.name
+
+        def process_file_task():
+            # This inner function defines the unit of work for one file
+            raw_entries = FT2Parser.parse_file(str(ft2_path))
+            metrics.total_entries += len(raw_entries)
+            
+            # Entry-level validation gate
+            valid_entries, invalid = FT2BatchValidator.validate_batch(raw_entries)
+            metrics.valid_entries += len(valid_entries)
+            metrics.rejected_entries += len(invalid)
+            
+            # Process only valid entries
+            entries = valid_entries 
+            FT2Linker.link(entries, centers)
+
+            # التحقق من الربط
+            device_ids_in_file = {getattr(e, 'device_id', None) for e in entries if hasattr(e, 'device_id')}
+            linked = any(d in device_map for d in device_ids_in_file)
+
+            if not linked:
+                logger.debug("تجاهل الملف %s: لا يوجد تطابق مع أي جهاز", ft2_file)
+                processed_results.append({'file': ft2_file, 'status': 'ignored', 'reason': 'no_matching_device'})
+            else:
+                logger.info("✅ تمت معالجة وربط: %s", ft2_file)
+                processed_results.append({'file': ft2_file, 'status': 'processed'})
+            return True
+
+        # Execute with Protection (Phase 2 Fault Isolation)
+        success = circuit_breaker.execute_with_protection(ft2_path, process_file_task)
+        if success is None:
+            failed_files.append((ft2_file, "Circuit Breaker Tripped or Fatal Processing Error"))
+            processed_results.append({'file': ft2_file, 'status': 'failed'})
+
+    # 5. تطبيق القواعد على كل وحدة (EquipmentDTO)
+    logger.info(" Applying rules via EvaluateColdChainSafetyUseCase...")
+    use_case = EvaluateColdChainSafetyUseCase()
+
+    for center in centers:
+        for unit in center.equipment_units:
+            if not unit.ft2_entries:
+                unit.decision = 'NO_DATA'
+                continue
+
+            readings = tuple(
+                TemperatureReading(
+                    value=entry.temperature,
+                    timestamp=entry.timestamp,
+                    device_id=unit.device_id,
+                )
+                for entry in unit.ft2_entries
+            )
+
+            request = EvaluateColdChainSafetyRequest(
+                center_id=center.id,
+                center_name=f"{center.name} — {unit.equipment_name}",
+                readings=readings,
+                temperature_ranges=unit.temperature_ranges,
+                decision_thresholds=unit.decision_thresholds,
+            )
+            response = use_case.execute(request)
+
+            unit.decision = response.decision
+            unit.vvm_stage = response.vvm_stage
+            unit.alert_level = response.alert_level
+            unit.stability_budget_consumed_pct = response.stability_budget_consumed_pct
+            unit.thaw_remaining_hours = response.thaw_remaining_hours
+            unit.category_display = response.category_display
+            unit.decision_reasons = list(response.decision_reasons)
+            unit.stats = calculate_center_stats(unit)
+
+    # 6. إنشاء التقرير (centers هي CenterDTO مع equipment_units)
+    centers_report_path = os.path.join(output_dir, "centers_report.tsv")
+    generate_centers_report(centers, centers_report_path)
+
+    # Update metrics after rule execution
+    metrics.yaml_centers_count = len(centers)
+
+    # ===========================================
+    # تسجيل الملفات المعالجة في Registry
+    # ===========================================
+    if processed_results:
+        for path in files_to_process:
+            if path.exists():
+                try:
+                    file_hash = compute_file_hash(path)
+                    device_id = path.stem.split('_')[0]
+                    file_registry.mark_processed(
+                        file_hash=file_hash,
+                        device_id=device_id,
+                        run_id=run_id,
+                        processed_at=datetime.now()
+                    )
+                except Exception as e:
+                    logger.warning("فشل تسجيل الملف: %s - %s", path.name, str(e))
+        
+        logger.info("✅ سُجّل %d ملف في registry", len(files_to_process))
+
+    # 7. حفظ قائمة الملفات المتجاهلة
+    reports_dir = os.path.join(output_dir, "detailed_reports")
+    os.makedirs(reports_dir, exist_ok=True)
+
+    ignored = [r for r in processed_results if r.get('status') == 'ignored']
+    if ignored:
+        ignored_path = os.path.join(output_dir, "ignored_files.tsv")
+        with open(ignored_path, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f, delimiter='\t')
+            writer.writerow(["file", "status", "reason"])
+            for r in ignored:
+                writer.writerow([r['file'], r['status'], r.get('reason', '')])
+        logger.info("تم حفظ قائمة الملفات المتجاهلة: %s", ignored_path)
+
+    # 8. عرض الملخص
+    total = len(csv_files)
+    processed_cnt = sum(1 for r in processed_results if r.get('status') == 'processed')
+    ignored_cnt = len(ignored)
+    failed_cnt = len(failed_files)
+
+    logger.info("\n" + "=" * 70)
+    logger.info(MessageProvider.get('PIPELINE_SUMMARY_TITLE'))
+    logger.info("=" * 70)
+    logger.info(MessageProvider.get('FILES_PROCESSED', processed_count=processed_cnt, total_count=total))
+    logger.info("الملفات المعالجة بنجاح: %d", processed_cnt)
+    logger.info("الملفات المتجاهلة: %d", ignored_cnt)
+    for r in ignored:
+        logger.info("  - %s : %s", r['file'], r.get('reason', ''))
+    logger.info("الملفات الفاشلة: %d", failed_cnt)
+    if failed_cnt:
+        logger.warning(MessageProvider.get('FAILED_FILES_LIST_TITLE'))
+        for file, err in failed_files:
+            logger.warning("  - %s: %s", file, err)
+
+    logger.info("مراكز محمّلة: %d", len(centers))
+    
+    affected_count = CenterImpactService.count_affected_centers(centers)
+    yaml_count = center_registry.get_registered_center_count()
+
+    # تحقق من SSOT
+    is_valid, ssot_message = CenterImpactService.verify_ssot(yaml_count, affected_count)
+    logger.info("🎯 %s", ssot_message)
+    
+    metrics.affected_centers_count = affected_count
+    metrics.finished_at = datetime.now()
+    
+    # Phase 3: Print final metrics summary
+    metrics.print_bilingual_summary(logger)
+
+    logger.info("مراكز متأثرة (ببيانات): %d", affected_count)
+
+    logger.info(MessageProvider.get('CENTER_REPORT_GENERATED', path=centers_report_path))
+    logger.info(MessageProvider.get('DETAILED_REPORTS_GENERATED', path=f"{reports_dir}/"))
+    logger.info(MessageProvider.get('PIPELINE_COMPLETE', output_dir=output_dir))
+
+
+def main():
+    parser = argparse.ArgumentParser(description=MessageProvider.get('CLI_DESCRIPTION'))
+    parser.add_argument('--config', '-c', default='config/center_profiles.yaml')
+    parser.add_argument('--input', '-i', default='data/input_raw')
+    parser.add_argument('--output', '-o', default='data/output')
+    parser.add_argument('--verbose', '-v', action='store_true')
+    parser.add_argument('--generate-data', action='store_true', dest='generate_data')
+
+    args = parser.parse_args()
+
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+        logger.debug("وضع التفصيل مفعّل")
+
+    try:
+        if args.generate_data:
+            logger.info("🧪 جاري إنشاء بيانات اختبار...")
+            create_test_data()
+        run_pipeline(config_path=args.config, input_dir=args.input, output_dir=args.output)
+    except Exception as e:
+        logger.error(MessageProvider.get('UNEXPECTED_ERROR', error=e))
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

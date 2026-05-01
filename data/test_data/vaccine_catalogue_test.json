@@ -1,0 +1,42 @@
+{
+  "OPV": {
+    "min_temp": 2.0,
+    "max_temp": 8.0,
+    "freeze_range": [-10, 0],
+    "critical_temp_c": 34.0,
+    "critical_hours": 1.0,
+    "heat_excursion_threshold": 8.0,
+    "heat_excursion_hours": 2.0,
+    "freeze_sensitive": true
+  },
+  "HepB": {
+    "min_temp": 2.0,
+    "max_temp": 8.0,
+    "freeze_range": [-10, 0],
+    "critical_temp_c": 34.0,
+    "critical_hours": 1.0,
+    "heat_excursion_threshold": 8.0,
+    "heat_excursion_hours": 2.0,
+    "freeze_sensitive": true
+  },
+  "BCG": {
+    "min_temp": 2.0,
+    "max_temp": 8.0,
+    "freeze_range": [-10, 0],
+    "critical_temp_c": 34.0,
+    "critical_hours": 1.0,
+    "heat_excursion_threshold": 8.0,
+    "heat_excursion_hours": 2.0,
+    "freeze_sensitive": true
+  },
+  "Measles": {
+    "min_temp": 2.0,
+    "max_temp": 8.0,
+    "freeze_range": [-10, 0],
+    "critical_temp_c": 34.0,
+    "critical_hours": 1.0,
+    "heat_excursion_threshold": 8.0,
+    "heat_excursion_hours": 2.0,
+    "freeze_sensitive": true
+  }
+}

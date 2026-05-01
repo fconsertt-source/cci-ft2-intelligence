@@ -1,0 +1,42 @@
+{
+  "scenario": "mixed_excursion_freeze_and_heat",
+  "coverage_target": "Session containing both a freeze excursion and a heat-duration breach — reference path must detect and flag both simultaneously.",
+  "input": {
+    "center_id": "CENTER_MIXED",
+    "temperature_ranges": {
+      "min": 2.0,
+      "max": 8.0
+    },
+    "vaccine_profile": "freeze_sensitive_profile",
+    "readings": [
+      {
+        "timestamp": "2024-01-01T10:00:00",
+        "value": 4.0
+      },
+      {
+        "timestamp": "2024-01-01T10:15:00",
+        "value": -1.0
+      },
+      {
+        "timestamp": "2024-01-01T10:30:00",
+        "value": 9.5
+      },
+      {
+        "timestamp": "2024-01-01T10:45:00",
+        "value": 10.2
+      },
+      {
+        "timestamp": "2024-01-01T11:00:00",
+        "value": 9.8
+      }
+    ]
+  },
+  "expected_reference": {
+    "primary_path_preserved": true,
+    "reference_extra_stats": {
+      "reference_decision": "REJECTED",
+      "reference_has_freeze": true,
+      "reference_has_heat_duration_breach": true
+    }
+  }
+}

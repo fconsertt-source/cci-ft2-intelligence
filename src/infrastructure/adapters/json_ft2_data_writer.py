@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import List
 
 from src.application.ports.ft2_writer_port import Ft2WriterPort
-from src.domain.dtos.ft2_entry_dto import FT2EntryDTO
+from src.application.dtos.ft2_entry_dto import FT2EntryDTO
 
 
 class JsonFt2DataWriter(Ft2WriterPort):

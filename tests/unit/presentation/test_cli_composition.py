@@ -1,20 +1,21 @@
-# tests/unit/presentation/test_cli_composition.py
-"""Ensure the CLI uses AppComposer for building use cases."""
+"""
+اختبارات تركيب CLI والتكامل مع AppComposer.
+الإصدار النهائي مع جميع الإصلاحات.
+"""
 
 import pytest
+from typer.testing import CliRunner
 
-try:
-    from src.presentation.cli import cli
-except ImportError:
-    cli = None
-from src.application.app_composer import AppComposer
+from src.presentation.cli import cli
 
 
-def test_cli_import_uses_composer(monkeypatch, tmp_path):
-    if cli is None:
-        pytest.skip("typer not installed, skipping CLI tests")
+def test_cli_import_data_uses_composer(monkeypatch, tmp_path):
+    """اختبار أن أمر import-data يستخدم AppComposer.create_import_ft2_bundle_uc"""
+    try:
+        from src.application.app_composer import AppComposer
+    except ImportError:
+        pytest.skip("AppComposer not available")
 
-    # prepare dummy file
     p = tmp_path / "ft2.txt"
     p.write_text("x")
     called = {}
@@ -27,17 +28,116 @@ def test_cli_import_uses_composer(monkeypatch, tmp_path):
         AppComposer, "create_import_ft2_bundle_uc", staticmethod(lambda: DummyUC())
     )
 
-    # simulate command invocation directly
-    runner = cli.app.test_cli_runner()
+    runner = CliRunner()
     result = runner.invoke(
         cli.app,
-        [
-            "import-data",
-            "--input",
-            str(tmp_path),
-            "--output",
-            str(tmp_path / "out.json"),
-        ],
+        ["import-data", "--input", str(tmp_path), "--output", str(tmp_path / "output")],
     )
+
     assert result.exit_code == 0
-    assert called.get("imported", False)
+    assert called.get("imported") is True
+
+
+def test_cli_generate_device_report_uses_composer(monkeypatch, tmp_path):
+    """اختبار أن أمر generate-device-report يستخدم AppComposer.create_generate_device_report_uc"""
+    try:
+        from src.application.app_composer import AppComposer
+    except ImportError:
+        pytest.skip("AppComposer not available")
+
+    data_file = tmp_path / "ft2_data.json"
+    data_file.write_text("{}")
+
+    called = {}
+
+    class DummyUC:
+        def execute(self, request):
+            called["generated"] = True
+            from dataclasses import dataclass
+
+            @dataclass
+            class DummyReport:
+                device_id: str = "DEV-001"
+
+            return DummyReport()
+
+    monkeypatch.setattr(
+        AppComposer, "create_generate_device_report_uc", staticmethod(lambda: DummyUC())
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.app, ["generate-device-report", "DEV-001", "--data", str(data_file)]
+    )
+
+    assert result.exit_code == 0
+    assert called.get("generated") is True
+
+
+@pytest.mark.skip(
+    reason="Use case create_evaluate_cold_chain_uc not yet implemented in AppComposer"
+)
+def test_cli_evaluate_uses_composer(monkeypatch, tmp_path):
+    """اختبار أن أمر evaluate يستخدم AppComposer.create_evaluate_cold_chain_uc"""
+    pass
+
+
+def test_cli_health_check_uses_composer(monkeypatch):
+    """
+    اختبار أن أمر health-check يستخدم AppComposer.health_check
+    """
+    try:
+        from src.application.app_composer import AppComposer
+        from src.presentation.cli import cli
+    except ImportError as e:
+        pytest.skip(f"Required module not available: {e}")
+
+    tracker = {"called": False}
+    mock_returned = False
+
+    def mock_health_check():
+        tracker["called"] = True
+        return True
+
+    monkeypatch.setattr(AppComposer, "health_check", staticmethod(mock_health_check))
+
+    runner = CliRunner()
+    result = runner.invoke(cli.app, ["health-check"])
+
+    # ✅ طباعة معلومات debug مفصلة
+    print(f"\n=== Health Check Debug ===")
+    print(f"Exit code: {result.exit_code}")
+    print(f"STDOUT: {result.stdout}")
+    if result.exception:
+        print(f"Exception type: {type(result.exception)}")
+        print(f"Exception: {result.exception}")
+        import traceback
+
+        traceback.print_exception(
+            type(result.exception), result.exception, result.exception.__traceback__
+        )
+
+    assert tracker["called"] is True, "health_check was not called"
+    assert result.exit_code == 0, f"Health check failed with code {result.exit_code}"
+
+
+def test_cli_help_shows_commands():
+    """اختبار أن أمر --help يعرض الأوامر المتاحة"""
+    runner = CliRunner()
+    result = runner.invoke(cli.app, ["--help"])
+
+    assert result.exit_code == 0
+
+    # ✅ الأوامر المتاحة فعلياً في CLI
+    expected_commands = [
+        "health-check",
+        "import-data",
+        "evaluate",
+        "report",
+        "generate-device-report",
+        "generate-all-device-reports",
+        "verify-official",
+    ]
+
+    for cmd in expected_commands:
+        assert cmd in result.stdout, f"Command '{cmd}' not shown in help"
